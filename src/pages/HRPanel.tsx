@@ -12,6 +12,7 @@ import {
   MessageSquare,
   ClipboardCheck
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -19,7 +20,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import obaLogo from "@/assets/oba-logo.jpg";
-
+import { supabase } from "@/integrations/supabase/client";
 interface FilterState {
   country: string;
   branch: string;
@@ -28,12 +29,13 @@ interface FilterState {
 
 interface BurnoutCase {
   id: string;
-  employeeName: string;
+  employee_code: string;
   department: string;
   branch: string;
-  riskLevel: "critical" | "high" | "medium";
-  lastResponse: string;
-  score: number;
+  risk_score: number;
+  reason_category: string;
+  detected_at: string;
+  is_resolved: boolean;
 }
 
 const HRPanel = () => {
@@ -70,64 +72,29 @@ const HRPanel = () => {
     { value: "hr", label: "İnsan Resursları" }
   ];
 
-  // Mock statistics
+  // HR statistics (some mock values + real risk counts)
+  const { data: burnoutCases = [] } = useQuery<BurnoutCase[]>({
+    queryKey: ["hr-burnout-alerts"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("burnout_alerts")
+        .select("*")
+        .eq("is_resolved", false)
+        .order("risk_score", { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
   const stats = {
     totalEmployees: 1247,
     responseRate: 87.3,
     avgSatisfaction: 7.2,
-    burnoutCases: 23,
-    criticalCases: 5,
+    burnoutCases: burnoutCases.length,
+    criticalCases: burnoutCases.length, // bütün pis əhval cavabları kritik/yüksək sayılır
     trend: "+2.1"
   };
-
-  // Mock burnout cases
-  const burnoutCases: BurnoutCase[] = [
-    {
-      id: "1",
-      employeeName: "Əməkdaş #1247",
-      department: "Satış",
-      branch: "Bakı Mərkəz",
-      riskLevel: "critical",
-      lastResponse: "2 saat əvvəl",
-      score: 2.1
-    },
-    {
-      id: "2",
-      employeeName: "Əməkdaş #0834",
-      department: "Logistika",
-      branch: "Gəncə",
-      riskLevel: "critical",
-      lastResponse: "5 saat əvvəl",
-      score: 2.3
-    },
-    {
-      id: "3",
-      employeeName: "Əməkdaş #1056",
-      department: "Texniki",
-      branch: "Bakı 28 May",
-      riskLevel: "high",
-      lastResponse: "1 gün əvvəl",
-      score: 3.2
-    },
-    {
-      id: "4",
-      employeeName: "Əməkdaş #0567",
-      department: "Satış",
-      branch: "Sumqayıt",
-      riskLevel: "high",
-      lastResponse: "1 gün əvvəl",
-      score: 3.5
-    },
-    {
-      id: "5",
-      employeeName: "Əməkdaş #1189",
-      department: "İnsan Resursları",
-      branch: "Bakı Mərkəz",
-      riskLevel: "medium",
-      lastResponse: "2 gün əvvəl",
-      score: 4.1
-    }
-  ];
 
   // Department statistics
   const departmentStats = [
@@ -142,6 +109,12 @@ const HRPanel = () => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
+  const getRiskLevel = (score: number) => {
+    if (score >= 80) return "critical";
+    if (score >= 60) return "high";
+    return "medium";
+  };
+
   const getRiskColor = (level: string) => {
     switch (level) {
       case "critical":
@@ -154,7 +127,7 @@ const HRPanel = () => {
         return "text-muted-foreground";
     }
   };
-
+ 
   const getRiskLabel = (level: string) => {
     switch (level) {
       case "critical":
@@ -356,31 +329,34 @@ const HRPanel = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {burnoutCases.map((case_) => (
-                  <div 
-                    key={case_.id}
-                    className="flex items-center justify-between p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-foreground">{case_.employeeName}</span>
-                        <span className={cn("text-xs font-semibold", getRiskColor(case_.riskLevel))}>
-                          {getRiskLabel(case_.riskLevel)}
-                        </span>
+                {burnoutCases.map((case_) => {
+                  const level = getRiskLevel(case_.risk_score);
+                  return (
+                    <div 
+                      key={case_.id}
+                      className="flex items-center justify-between p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors"
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-medium text-foreground">{case_.employee_code}</span>
+                          <span className={cn("text-xs font-semibold", getRiskColor(level))}>
+                            {getRiskLabel(level)}
+                          </span>
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {case_.department} • {case_.branch} • {case_.reason_category}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Son qeyd: {new Date(case_.detected_at).toLocaleString("az-Latn")}
+                        </div>
                       </div>
-                      <div className="text-sm text-muted-foreground">
-                        {case_.department} • {case_.branch}
-                      </div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        Son cavab: {case_.lastResponse}
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-destructive">{case_.risk_score}</div>
+                        <div className="text-xs text-muted-foreground">Risk Bal</div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-destructive">{case_.score}</div>
-                      <div className="text-xs text-muted-foreground">Risk Bal</div>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
