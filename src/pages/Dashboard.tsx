@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { format, subDays } from "date-fns";
 import { az } from "date-fns/locale";
 import obaLogo from "@/assets/oba-logo.jpg";
+import { MobileNavMenu } from "@/components/MobileNavMenu";
 
 interface StatCardProps {
   title: string;
@@ -102,43 +103,48 @@ const Dashboard = () => {
       {/* Header */}
       <header className="sticky top-0 z-10 bg-card/80 backdrop-blur-lg border-b border-border shadow-soft">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
               <img 
                 src={obaLogo} 
                 alt="OBA Logo" 
-                className="w-12 h-12 rounded-xl shadow-glow object-cover"
+                className="w-12 h-12 rounded-xl shadow-glow object-cover flex-shrink-0"
               />
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">OBA Dashboard</h1>
-                <p className="text-sm text-muted-foreground">Personal Məmnuniyyət Sistemi</p>
+              <div className="min-w-0">
+                <h1 className="text-2xl font-bold text-foreground truncate">OBA Dashboard</h1>
+                <p className="text-sm text-muted-foreground truncate">Personal Məmnuniyyət Sistemi</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/")}
-                className="gap-2"
-              >
-                <Home className="w-4 h-4" />
-                <span className="hidden sm:inline">Ana Səhifə</span>
-              </Button>
-              <Button
-                variant="default"
-                size="sm"
-                onClick={() => navigate("/hr-panel")}
-                className="gap-2"
-              >
-                <UserCog className="w-4 h-4" />
-                <span className="hidden sm:inline">HR Paneli</span>
-              </Button>
+              {/* Desktop navigation */}
+              <div className="hidden sm:flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate("/")}
+                  className="gap-2"
+                >
+                  <Home className="w-4 h-4" />
+                  <span className="hidden md:inline">Ana Səhifə</span>
+                </Button>
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => navigate("/hr-panel")}
+                  className="gap-2"
+                >
+                  <UserCog className="w-4 h-4" />
+                  <span className="hidden md:inline">HR Paneli</span>
+                </Button>
+              </div>
+              {/* Mobile hamburger menu */}
+              <MobileNavMenu />
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     size="sm"
-                    className="gap-2 min-w-[200px] justify-start text-left font-normal"
+                    className="gap-2 min-w-[160px] sm:min-w-[200px] justify-start text-left font-normal"
                   >
                     <CalendarIcon className="h-4 w-4" />
                     <span className="hidden sm:inline">
