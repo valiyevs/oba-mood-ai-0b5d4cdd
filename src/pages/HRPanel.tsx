@@ -21,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import obaLogo from "@/assets/oba-logo.jpg";
 import { supabase } from "@/integrations/supabase/client";
+import { MobileNavMenu } from "@/components/MobileNavMenu";
 interface FilterState {
   country: string;
   branch: string;
@@ -146,46 +147,51 @@ const HRPanel = () => {
       {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <img src={obaLogo} alt="OBA" className="h-12 w-auto object-contain" />
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">İnsan Resursları Paneli</h1>
-                <p className="text-sm text-muted-foreground">Əməkdaş məmnuniyyəti və risk idarəetməsi</p>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-4 min-w-0">
+              <img src={obaLogo} alt="OBA" className="h-12 w-auto object-contain flex-shrink-0" />
+              <div className="min-w-0">
+                <h1 className="text-2xl font-bold text-foreground truncate">İnsan Resursları Paneli</h1>
+                <p className="text-sm text-muted-foreground truncate">Əməkdaş məmnuniyyəti və risk idarəetməsi</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/manager-actions")}
-                className="gap-2"
-              >
-                <ClipboardCheck className="w-4 h-4" />
-                <span className="hidden sm:inline">Tapşırıqlar</span>
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/employee-responses")}
-                className="gap-2"
-              >
-                <MessageSquare className="w-4 h-4" />
-                <span className="hidden sm:inline">Cavablar</span>
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/dashboard")}
-                className="gap-2"
-              >
-                <Home className="w-4 h-4" />
-                <span className="hidden sm:inline">Dashboard</span>
-              </Button>
-              <Button variant="outline" size="sm" className="gap-2">
-                <Download className="w-4 h-4" />
-                <span className="hidden sm:inline">Hesabat Yüklə</span>
-              </Button>
+              {/* Desktop navigation */}
+              <div className="hidden sm:flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate("/manager-actions")}
+                  className="gap-2"
+                >
+                  <ClipboardCheck className="w-4 h-4" />
+                  <span className="hidden md:inline">Tapşırıqlar</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate("/employee-responses")}
+                  className="gap-2"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  <span className="hidden md:inline">Cavablar</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate("/dashboard")}
+                  className="gap-2"
+                >
+                  <Home className="w-4 h-4" />
+                  <span className="hidden md:inline">Dashboard</span>
+                </Button>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Download className="w-4 h-4" />
+                  <span className="hidden md:inline">Hesabat Yüklə</span>
+                </Button>
+              </div>
+              {/* Mobile hamburger menu */}
+              <MobileNavMenu />
             </div>
           </div>
         </div>
