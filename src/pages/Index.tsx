@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { MoodSelector, type MoodType } from "@/components/MoodSelector";
 import { ReasonSelector, type ReasonType } from "@/components/ReasonSelector";
+import { BranchSelector, type BranchType } from "@/components/BranchSelector";
 import { SuccessScreen } from "@/components/SuccessScreen";
 import { AnimatedBackground } from "@/components/AnimatedBackground";
 import { TrendingUp } from "lucide-react";
@@ -9,13 +10,19 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import obaLogo from "@/assets/oba-logo.jpg";
 
-type StepType = "mood" | "reason" | "success";
+type StepType = "branch" | "mood" | "reason" | "success";
 
 const Index = () => {
-  const [currentStep, setCurrentStep] = useState<StepType>("mood");
+  const [currentStep, setCurrentStep] = useState<StepType>("branch");
+  const [selectedBranch, setSelectedBranch] = useState<BranchType>(null);
   const [selectedMood, setSelectedMood] = useState<MoodType>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const handleBranchSelect = (branch: BranchType) => {
+    setSelectedBranch(branch);
+    setTimeout(() => setCurrentStep("mood"), 300);
+  };
 
   const handleMoodSelect = (mood: MoodType) => {
     setSelectedMood(mood);
@@ -35,13 +42,13 @@ const Index = () => {
 
   const handleSubmit = (mood: MoodType, reason?: ReasonType, customText?: string) => {
     // Here we would send data to backend
-    console.log("Submitting:", { mood, reason, customText, timestamp: new Date() });
+    console.log("Submitting:", { mood, reason, customText, branch: selectedBranch, timestamp: new Date() });
     
     // Show toast notification
     const moodText = mood === "good" ? "Yaxşı" : mood === "normal" ? "Normal" : "Pis";
     toast({
       title: "Cavabınız qeydə alındı! ✓",
-      description: `Əhval: ${moodText}${reason ? ` • Səbəb: ${reason}` : ""}`,
+      description: `Bölgə: ${selectedBranch} • Əhval: ${moodText}${reason ? ` • Səbəb: ${reason}` : ""}`,
     });
     
     // Show success screen
@@ -50,13 +57,19 @@ const Index = () => {
 
   const handleComplete = () => {
     // Reset for next day
-    setCurrentStep("mood");
+    setCurrentStep("branch");
+    setSelectedBranch(null);
     setSelectedMood(null);
   };
 
   const handleBack = () => {
-    setCurrentStep("mood");
-    setSelectedMood(null);
+    if (currentStep === "reason") {
+      setCurrentStep("mood");
+      setSelectedMood(null);
+    } else if (currentStep === "mood") {
+      setCurrentStep("branch");
+      setSelectedBranch(null);
+    }
   };
 
   return (
@@ -93,6 +106,13 @@ const Index = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-12 flex flex-col items-center justify-center min-h-[calc(100vh-80px)]">
+        {currentStep === "branch" && (
+          <BranchSelector
+            onBranchSelect={handleBranchSelect}
+            selectedBranch={selectedBranch}
+          />
+        )}
+
         {currentStep === "mood" && (
           <div className="w-full max-w-4xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="text-center space-y-3">
