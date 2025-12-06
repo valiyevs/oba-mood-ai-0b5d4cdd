@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { label: "Ana Səhifə", to: "/", icon: Home },
-  { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
+  { label: "İdarəetmə", to: "/dashboard", icon: LayoutDashboard },
   { label: "HR Paneli", to: "/hr-panel", icon: UserCog },
   { label: "Menecer Tapşırıqları", to: "/manager-actions", icon: ClipboardCheck },
   { label: "İşçi Cavabları", to: "/employee-responses", icon: MessageSquare },
