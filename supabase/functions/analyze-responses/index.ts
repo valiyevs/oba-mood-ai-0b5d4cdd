@@ -18,12 +18,24 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `Sən HR analitika ekspertisən. Sənə işçilərin əhval sorğularının nəticələri veriləcək. Sənin vəzifən bu məlumatları analiz edib:
-1. Əsas müşahidələri yazmaq (3-4 cümlə)
-2. Problemli sahələri müəyyən etmək
-3. Konkret tövsiyyələr vermək (3-5 tövsiyyə)
+    const systemPrompt = `Sən HR analitika ekspertisən. Sənə işçilərin əhval sorğularının nəticələri veriləcək. 
 
-Cavabını Azərbaycan dilində yaz. Qısa və konkret ol. Emoji istifadə etmə.`;
+Cavabını aşağıdakı JSON formatında ver:
+{
+  "score": <0-100 arası ümumi qiymət balı>,
+  "summary": "<1-2 cümlə qısa xülasə>",
+  "observations": ["<müşahidə 1>", "<müşahidə 2>", "<müşahidə 3>"],
+  "recommendations": ["<tövsiyyə 1>", "<tövsiyyə 2>", "<tövsiyyə 3>"],
+  "riskLevel": "<aşağı|orta|yüksək|kritik>"
+}
+
+Score hesablama meyarları:
+- Yaxşı əhval % yüksəkdirsə +
+- Risk halları azdırsa +
+- Cavab dərəcəsi yüksəkdirsə +
+- Pis əhval % aşağıdırsa +
+
+Azərbaycan dilində yaz. Qısa və konkret ol.`;
 
     const userPrompt = `İşçi sorğusu nəticələri:
 
@@ -37,8 +49,10 @@ ${moodDistribution.map((m: any) => `- ${m.mood}: ${m.count} nəfər (${m.percent
 Əsas şikayət səbəbləri:
 ${topReasons.map((r: any, i: number) => `${i + 1}. ${r.reason}: ${r.count} şikayət (${r.percentage}%)`).join('\n')}
 
-Bu məlumatlara əsasən analiz və tövsiyyələrini ver.`;
+Bu məlumatlara əsasən JSON formatında analiz ver.`;
 
+    console.log("Calling AI gateway...");
+    
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -76,7 +90,31 @@ Bu məlumatlara əsasən analiz və tövsiyyələrini ver.`;
     }
 
     const data = await response.json();
-    const analysis = data.choices?.[0]?.message?.content || "Analiz aparıla bilmədi.";
+    const content = data.choices?.[0]?.message?.content || "";
+    
+    console.log("AI response:", content);
+    
+    // Parse JSON from response
+    let analysis;
+    try {
+      // Extract JSON from response (handle markdown code blocks)
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        analysis = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error("No JSON found in response");
+      }
+    } catch (parseError) {
+      console.error("Failed to parse AI response:", parseError);
+      // Fallback response
+      analysis = {
+        score: overallIndex,
+        summary: "Analiz aparıldı.",
+        observations: ["Məlumatlar analiz edildi."],
+        recommendations: ["Daha çox məlumat toplanmalıdır."],
+        riskLevel: riskCount > 5 ? "yüksək" : riskCount > 0 ? "orta" : "aşağı"
+      };
+    }
 
     return new Response(JSON.stringify({ analysis }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
