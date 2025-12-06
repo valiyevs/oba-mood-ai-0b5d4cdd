@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { TrendingUp, TrendingDown, Users, AlertCircle, BarChart3, Activity, Home, UserCog, CalendarIcon, Eye } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { TrendingUp, TrendingDown, Users, AlertCircle, BarChart3, Activity, Home, UserCog, CalendarIcon, Eye, Brain, Loader2, RefreshCw } from "lucide-react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -13,6 +13,7 @@ import { format, subDays } from "date-fns";
 import { az } from "date-fns/locale";
 import obaLogo from "@/assets/oba-logo.jpg";
 import { MobileNavMenu } from "@/components/MobileNavMenu";
+import { useToast } from "@/hooks/use-toast";
 
 interface StatCardProps {
   title: string;
@@ -56,10 +57,12 @@ const StatCard = ({ title, value, change, icon: Icon, description }: StatCardPro
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
     from: subDays(new Date(), 7),
     to: new Date(),
   });
+  const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
 
   // Fetch burnout alerts from database
   const { data: burnoutAlerts = [] } = useQuery({
@@ -98,6 +101,34 @@ const Dashboard = () => {
     { mood: "Pis", count: 124, percentage: 10, color: "status-bad" },
   ];
 
+  // AI Analysis mutation
+  const analysisMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('analyze-responses', {
+        body: {
+          moodDistribution,
+          topReasons,
+          riskCount: stats.riskCount,
+          responseRate: stats.responseRate,
+          overallIndex: stats.overallIndex,
+        },
+      });
+      
+      if (error) throw error;
+      return data.analysis;
+    },
+    onSuccess: (analysis) => {
+      setAiAnalysis(analysis);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "AI analiz xətası",
+        description: error.message || "Analiz aparıla bilmədi",
+        variant: "destructive",
+      });
+    },
+  });
+
   return (
     <div className="min-h-screen gradient-subtle">
       {/* Header */}
@@ -111,7 +142,7 @@ const Dashboard = () => {
                 className="w-12 h-12 rounded-xl shadow-glow object-cover flex-shrink-0"
               />
               <div className="min-w-0">
-                <h1 className="text-2xl font-bold text-foreground truncate">OBA Dashboard</h1>
+                <h1 className="text-2xl font-bold text-foreground truncate">OBA İdarəetmə</h1>
                 <p className="text-sm text-muted-foreground truncate">Personal Məmnuniyyət Sistemi</p>
               </div>
             </div>
@@ -296,6 +327,46 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* AI Analysis Section */}
+        <Card className="mt-6 gradient-card border-primary/30 shadow-soft">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Brain className="h-5 w-5 text-primary" />
+                <CardTitle className="text-foreground">Süni İntellekt Analizi</CardTitle>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => analysisMutation.mutate()}
+                disabled={analysisMutation.isPending}
+                className="gap-2"
+              >
+                {analysisMutation.isPending ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="w-4 h-4" />
+                )}
+                {analysisMutation.isPending ? "Analiz edilir..." : "Analiz Et"}
+              </Button>
+            </div>
+            <CardDescription>AI tərəfindən aparılmış məlumat analizi və tövsiyyələr</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {aiAnalysis ? (
+              <div className="prose prose-sm max-w-none text-foreground">
+                <div className="whitespace-pre-wrap leading-relaxed">{aiAnalysis}</div>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <Brain className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>AI analizi üçün "Analiz Et" düyməsini basın</p>
+                <p className="text-sm mt-2">Sistem cavabları analiz edib müşahidələrini və tövsiyyələrini verəcək</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Risk Alert */}
         {burnoutAlerts.length > 0 && (
