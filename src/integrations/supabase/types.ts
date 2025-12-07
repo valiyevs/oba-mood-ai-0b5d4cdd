@@ -50,6 +50,42 @@ export type Database = {
         }
         Relationships: []
       }
+      employee_responses: {
+        Row: {
+          branch: string
+          created_at: string
+          department: string
+          employee_code: string
+          id: string
+          mood: string
+          reason: string | null
+          reason_category: string | null
+          response_date: string
+        }
+        Insert: {
+          branch: string
+          created_at?: string
+          department: string
+          employee_code: string
+          id?: string
+          mood: string
+          reason?: string | null
+          reason_category?: string | null
+          response_date?: string
+        }
+        Update: {
+          branch?: string
+          created_at?: string
+          department?: string
+          employee_code?: string
+          id?: string
+          mood?: string
+          reason?: string | null
+          reason_category?: string | null
+          response_date?: string
+        }
+        Relationships: []
+      }
       manager_actions: {
         Row: {
           action_description: string

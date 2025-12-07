@@ -86,27 +86,80 @@ const Dashboard = () => {
     },
   });
 
-  // Mock data - will be replaced with real API data
-  const stats = {
-    overallIndex: 78,
-    totalResponses: 1247,
-    riskCount: burnoutAlerts.length,
-    responseRate: 89,
+  // Fetch employee responses from database
+  const { data: responses = [] } = useQuery({
+    queryKey: ['employee-responses', dateRange],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('employee_responses')
+        .select('*')
+        .gte('response_date', format(dateRange.from, 'yyyy-MM-dd'))
+        .lte('response_date', format(dateRange.to, 'yyyy-MM-dd'));
+      
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Calculate real statistics from responses
+  const totalResponses = responses.length;
+  const moodCounts = {
+    'Yaxşı': responses.filter(r => r.mood === 'Yaxşı').length,
+    'Normal': responses.filter(r => r.mood === 'Normal').length,
+    'Pis': responses.filter(r => r.mood === 'Pis').length,
   };
 
-  const topReasons = [
-    { reason: "İş yükü", count: 156, percentage: 42 },
-    { reason: "Qrafik", count: 98, percentage: 26 },
-    { reason: "Menecer", count: 67, percentage: 18 },
-    { reason: "Komanda", count: 34, percentage: 9 },
-    { reason: "Şərtlər", count: 18, percentage: 5 },
+  const moodDistribution = [
+    { 
+      mood: "Yaxşı", 
+      count: moodCounts['Yaxşı'], 
+      percentage: totalResponses > 0 ? Math.round((moodCounts['Yaxşı'] / totalResponses) * 100) : 0, 
+      color: "status-good" 
+    },
+    { 
+      mood: "Normal", 
+      count: moodCounts['Normal'], 
+      percentage: totalResponses > 0 ? Math.round((moodCounts['Normal'] / totalResponses) * 100) : 0, 
+      color: "status-normal" 
+    },
+    { 
+      mood: "Pis", 
+      count: moodCounts['Pis'], 
+      percentage: totalResponses > 0 ? Math.round((moodCounts['Pis'] / totalResponses) * 100) : 0, 
+      color: "status-bad" 
+    },
   ];
 
-  const moodDistribution = [
-    { mood: "Yaxşı", count: 856, percentage: 69, color: "status-good" },
-    { mood: "Normal", count: 267, percentage: 21, color: "status-normal" },
-    { mood: "Pis", count: 124, percentage: 10, color: "status-bad" },
-  ];
+  // Calculate top reasons from responses with reason_category
+  const reasonCounts: Record<string, number> = {};
+  responses.forEach(r => {
+    if (r.reason_category) {
+      reasonCounts[r.reason_category] = (reasonCounts[r.reason_category] || 0) + 1;
+    }
+  });
+  
+  const totalReasons = Object.values(reasonCounts).reduce((a, b) => a + b, 0);
+  const topReasons = Object.entries(reasonCounts)
+    .map(([reason, count]) => ({
+      reason,
+      count,
+      percentage: totalReasons > 0 ? Math.round((count / totalReasons) * 100) : 0,
+    }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
+
+  // Calculate overall satisfaction index
+  const overallIndex = totalResponses > 0 
+    ? Math.round(((moodCounts['Yaxşı'] * 100 + moodCounts['Normal'] * 50 + moodCounts['Pis'] * 0) / totalResponses))
+    : 0;
+
+  // Stats object with real data
+  const stats = {
+    overallIndex,
+    totalResponses,
+    riskCount: burnoutAlerts.length,
+    responseRate: 89, // This would need a total employee count to calculate properly
+  };
 
   // AI Analysis mutation
   const analysisMutation = useMutation({

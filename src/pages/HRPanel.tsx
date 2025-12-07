@@ -82,9 +82,9 @@ const HRPanel = () => {
     { value: "hr", label: "İnsan Resursları" }
   ];
 
-  // HR statistics (some mock values + real risk counts)
+  // HR statistics - fetch burnout cases
   const { data: burnoutCases = [] } = useQuery<BurnoutCase[]>({
-    queryKey: ["hr-burnout-alerts"],
+    queryKey: ["hr-burnout-alerts", dateRange],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("burnout_alerts")
@@ -97,23 +97,62 @@ const HRPanel = () => {
     },
   });
 
+  // Fetch employee responses
+  const { data: responses = [] } = useQuery({
+    queryKey: ["hr-responses", dateRange],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("employee_responses")
+        .select("*")
+        .gte("response_date", format(dateRange.from, "yyyy-MM-dd"))
+        .lte("response_date", format(dateRange.to, "yyyy-MM-dd"));
+
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Calculate real stats from responses
+  const totalResponses = responses.length;
+  const uniqueEmployees = [...new Set(responses.map(r => r.employee_code))].length;
+  
+  const moodCounts = {
+    'Yaxşı': responses.filter(r => r.mood === 'Yaxşı').length,
+    'Normal': responses.filter(r => r.mood === 'Normal').length,
+    'Pis': responses.filter(r => r.mood === 'Pis').length,
+  };
+
+  // Calculate average satisfaction (10 scale: Yaxşı=10, Normal=5, Pis=0)
+  const avgSatisfaction = totalResponses > 0 
+    ? ((moodCounts['Yaxşı'] * 10 + moodCounts['Normal'] * 5 + moodCounts['Pis'] * 0) / totalResponses).toFixed(1)
+    : "0";
+
   const stats = {
-    totalEmployees: 1247,
-    responseRate: 87.3,
-    avgSatisfaction: 7.2,
+    totalEmployees: uniqueEmployees,
+    responseRate: totalResponses > 0 ? ((totalResponses / Math.max(uniqueEmployees, 1)) * 100).toFixed(1) : "0",
+    avgSatisfaction: parseFloat(avgSatisfaction),
     burnoutCases: burnoutCases.length,
-    criticalCases: burnoutCases.length, // bütün pis əhval cavabları kritik/yüksək sayılır
+    criticalCases: burnoutCases.filter(c => c.risk_score >= 80).length,
     trend: "+2.1"
   };
 
-  // Department statistics
-  const departmentStats = [
-    { name: "Satış", employees: 456, satisfaction: 6.8, burnout: 8 },
-    { name: "Texniki", employees: 234, satisfaction: 7.5, burnout: 4 },
-    { name: "Logistika", employees: 312, satisfaction: 7.1, burnout: 7 },
-    { name: "İnsan Resursları", employees: 89, satisfaction: 8.2, burnout: 2 },
-    { name: "Digər", employees: 156, satisfaction: 7.4, burnout: 2 }
-  ];
+  // Calculate department statistics from real data
+  const departmentData: Record<string, { responses: number; moodSum: number; badCount: number }> = {};
+  responses.forEach(r => {
+    if (!departmentData[r.department]) {
+      departmentData[r.department] = { responses: 0, moodSum: 0, badCount: 0 };
+    }
+    departmentData[r.department].responses++;
+    departmentData[r.department].moodSum += r.mood === 'Yaxşı' ? 10 : r.mood === 'Normal' ? 5 : 0;
+    if (r.mood === 'Pis') departmentData[r.department].badCount++;
+  });
+
+  const departmentStats = Object.entries(departmentData).map(([name, data]) => ({
+    name,
+    employees: data.responses,
+    satisfaction: data.responses > 0 ? parseFloat((data.moodSum / data.responses).toFixed(1)) : 0,
+    burnout: data.badCount
+  })).sort((a, b) => b.employees - a.employees);
 
   const handleFilterChange = (key: keyof FilterState, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
