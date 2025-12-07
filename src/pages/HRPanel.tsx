@@ -10,8 +10,13 @@ import {
   Download,
   Home,
   MessageSquare,
-  ClipboardCheck
+  ClipboardCheck,
+  CalendarIcon
 } from "lucide-react";
+import { format, subDays } from "date-fns";
+import { az } from "date-fns/locale";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -45,6 +50,10 @@ const HRPanel = () => {
     country: "all",
     branch: "all",
     department: "all"
+  });
+  const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
+    from: subDays(new Date(), 30),
+    to: new Date(),
   });
 
   // Mock data - ölkələr
@@ -183,15 +192,75 @@ const HRPanel = () => {
                   className="gap-2"
                 >
                   <Home className="w-4 h-4" />
-                  <span className="hidden md:inline">Dashboard</span>
+                  <span className="hidden md:inline">İdarəetmə Paneli</span>
                 </Button>
                 <Button variant="outline" size="sm" className="gap-2">
                   <Download className="w-4 h-4" />
                   <span className="hidden md:inline">Hesabat Yüklə</span>
                 </Button>
               </div>
+              {/* Desktop date picker */}
+              <Popover>
+                <PopoverTrigger asChild className="hidden sm:flex">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 min-w-[180px] justify-start text-left font-normal"
+                  >
+                    <CalendarIcon className="h-4 w-4" />
+                    {format(dateRange.from, "dd MMM", { locale: az })} - {format(dateRange.to, "dd MMM yyyy", { locale: az })}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="end">
+                  <div className="p-3 border-b border-border">
+                    <div className="flex gap-2 flex-wrap">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setDateRange({ from: subDays(new Date(), 7), to: new Date() })}
+                        className="text-xs"
+                      >
+                        Son 7 gün
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setDateRange({ from: subDays(new Date(), 30), to: new Date() })}
+                        className="text-xs"
+                      >
+                        Son 30 gün
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setDateRange({ from: subDays(new Date(), 90), to: new Date() })}
+                        className="text-xs"
+                      >
+                        Son 90 gün
+                      </Button>
+                    </div>
+                  </div>
+                  <Calendar
+                    mode="range"
+                    selected={{ from: dateRange.from, to: dateRange.to }}
+                    onSelect={(range) => {
+                      if (range?.from && range?.to) {
+                        setDateRange({ from: range.from, to: range.to });
+                      } else if (range?.from) {
+                        setDateRange({ from: range.from, to: range.from });
+                      }
+                    }}
+                    numberOfMonths={2}
+                    className="p-3 pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
               {/* Mobile hamburger menu */}
-              <MobileNavMenu />
+              <MobileNavMenu 
+                dateRange={dateRange}
+                onDateRangeChange={setDateRange}
+                showDatePicker={true}
+              />
             </div>
           </div>
         </div>

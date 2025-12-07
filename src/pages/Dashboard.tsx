@@ -157,8 +157,8 @@ const Dashboard = () => {
                 className="w-12 h-12 rounded-xl shadow-glow object-cover flex-shrink-0"
               />
               <div className="min-w-0">
-                <h1 className="text-2xl font-bold text-foreground truncate">OBA İdarəetmə</h1>
-                <p className="text-sm text-muted-foreground truncate">Personal Məmnuniyyət Sistemi</p>
+                <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">OBA İdarəetmə Paneli</h1>
+                <p className="text-xs sm:text-sm text-muted-foreground truncate">Personal Məmnuniyyət Sistemi</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -184,21 +184,21 @@ const Dashboard = () => {
                 </Button>
               </div>
               {/* Mobile hamburger menu */}
-              <MobileNavMenu />
+              <MobileNavMenu 
+                dateRange={dateRange} 
+                onDateRangeChange={setDateRange} 
+                showDatePicker={true}
+              />
+              {/* Desktop date picker */}
               <Popover>
-                <PopoverTrigger asChild>
+                <PopoverTrigger asChild className="hidden sm:flex">
                   <Button
                     variant="outline"
                     size="sm"
-                    className="gap-2 min-w-[160px] sm:min-w-[200px] justify-start text-left font-normal"
+                    className="gap-2 min-w-[200px] justify-start text-left font-normal"
                   >
                     <CalendarIcon className="h-4 w-4" />
-                    <span className="hidden sm:inline">
-                      {format(dateRange.from, "dd MMM", { locale: az })} - {format(dateRange.to, "dd MMM yyyy", { locale: az })}
-                    </span>
-                    <span className="sm:hidden">
-                      {format(dateRange.from, "dd/MM")} - {format(dateRange.to, "dd/MM")}
-                    </span>
+                    {format(dateRange.from, "dd MMM", { locale: az })} - {format(dateRange.to, "dd MMM yyyy", { locale: az })}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="end">
