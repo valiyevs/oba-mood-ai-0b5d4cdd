@@ -11,7 +11,10 @@ import {
   Home,
   MessageSquare,
   ClipboardCheck,
-  CalendarIcon
+  CalendarIcon,
+  Sparkles,
+  Loader2,
+  Brain
 } from "lucide-react";
 import { format, subDays } from "date-fns";
 import { az } from "date-fns/locale";
@@ -187,6 +190,73 @@ const HRPanel = () => {
         return "Orta";
       default:
         return "Aşağı";
+    }
+  };
+
+  // AI Analysis state
+  const [aiAnalysis, setAiAnalysis] = useState<{
+    score: number;
+    summary: string;
+    observations: string[];
+    recommendations: string[];
+    riskLevel: string;
+  } | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  const runAIAnalysis = async () => {
+    setIsAnalyzing(true);
+    try {
+      // Prepare data for analysis
+      const moodDistribution = {
+        'Yaxşı': totalResponses > 0 ? Math.round((moodCounts['Yaxşı'] / totalResponses) * 100) : 0,
+        'Normal': totalResponses > 0 ? Math.round((moodCounts['Normal'] / totalResponses) * 100) : 0,
+        'Pis': totalResponses > 0 ? Math.round((moodCounts['Pis'] / totalResponses) * 100) : 0,
+      };
+
+      // Get top reasons from responses
+      const reasonCounts: Record<string, number> = {};
+      responses.forEach(r => {
+        if (r.reason_category) {
+          reasonCounts[r.reason_category] = (reasonCounts[r.reason_category] || 0) + 1;
+        }
+      });
+      const topReasons = Object.entries(reasonCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([reason, count]) => ({
+          reason,
+          percentage: totalResponses > 0 ? Math.round((count / totalResponses) * 100) : 0
+        }));
+
+      const response = await supabase.functions.invoke('analyze-responses', {
+        body: {
+          moodDistribution,
+          topReasons,
+          riskCount: stats.burnoutCases,
+          responseRate: parseFloat(stats.responseRate),
+          overallIndex: stats.avgSatisfaction * 10,
+        }
+      });
+
+      if (response.error) throw response.error;
+      setAiAnalysis(response.data);
+    } catch (error) {
+      console.error('AI analysis error:', error);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const getRiskLevelColor = (level: string) => {
+    switch (level) {
+      case 'kritik':
+        return 'text-destructive bg-destructive/10 border-destructive';
+      case 'yüksək':
+        return 'text-orange-600 bg-orange-50 border-orange-300';
+      case 'orta':
+        return 'text-yellow-600 bg-yellow-50 border-yellow-300';
+      default:
+        return 'text-primary bg-primary/10 border-primary';
     }
   };
 
@@ -428,6 +498,97 @@ const HRPanel = () => {
             </AlertDescription>
           </Alert>
         )}
+
+        {/* AI Analysis Section */}
+        <Card className="mb-6 border-primary/30 bg-gradient-to-r from-primary/5 to-transparent">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Brain className="w-5 h-5 text-primary" />
+                  AI Analiz
+                </CardTitle>
+                <CardDescription>
+                  Süni intellekt əsasında əməkdaş məmnuniyyəti analizi
+                </CardDescription>
+              </div>
+              <Button 
+                onClick={runAIAnalysis} 
+                disabled={isAnalyzing}
+                className="gap-2"
+              >
+                {isAnalyzing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Analiz edilir...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    Analiz Et
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardHeader>
+          {aiAnalysis && (
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Score */}
+                <div className="text-center p-4 rounded-lg bg-card border border-border">
+                  <div className="text-4xl font-bold text-primary mb-1">{aiAnalysis.score}</div>
+                  <div className="text-sm text-muted-foreground">Məmnuniyyət Balı</div>
+                  <div className={cn(
+                    "inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold border",
+                    getRiskLevelColor(aiAnalysis.riskLevel)
+                  )}>
+                    Risk: {aiAnalysis.riskLevel.charAt(0).toUpperCase() + aiAnalysis.riskLevel.slice(1)}
+                  </div>
+                </div>
+
+                {/* Summary */}
+                <div className="md:col-span-2 p-4 rounded-lg bg-card border border-border">
+                  <h4 className="font-semibold text-foreground mb-2">Xülasə</h4>
+                  <p className="text-sm text-muted-foreground">{aiAnalysis.summary}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                {/* Observations */}
+                <div className="p-4 rounded-lg bg-card border border-border">
+                  <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-primary" />
+                    Müşahidələr
+                  </h4>
+                  <ul className="space-y-2">
+                    {aiAnalysis.observations.map((obs, index) => (
+                      <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
+                        <span className="text-primary mt-1">•</span>
+                        {obs}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Recommendations */}
+                <div className="p-4 rounded-lg bg-card border border-border">
+                  <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-primary" />
+                    Tövsiyələr
+                  </h4>
+                  <ul className="space-y-2">
+                    {aiAnalysis.recommendations.map((rec, index) => (
+                      <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
+                        <span className="text-primary mt-1">{index + 1}.</span>
+                        {rec}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          )}
+        </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Burnout Risk Cases */}
