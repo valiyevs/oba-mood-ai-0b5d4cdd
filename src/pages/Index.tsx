@@ -7,7 +7,6 @@ import { AnimatedBackground } from "@/components/AnimatedBackground";
 import { TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
 import obaLogo from "@/assets/oba-logo.jpg";
 
 type StepType = "branch" | "mood" | "reason" | "success";
@@ -17,7 +16,6 @@ const Index = () => {
   const [selectedBranch, setSelectedBranch] = useState<BranchType>(null);
   const [selectedMood, setSelectedMood] = useState<MoodType>(null);
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const handleBranchSelect = (branch: BranchType) => {
     setSelectedBranch(branch);
@@ -43,13 +41,6 @@ const Index = () => {
   const handleSubmit = (mood: MoodType, reason?: ReasonType, customText?: string) => {
     // Here we would send data to backend
     console.log("Submitting:", { mood, reason, customText, branch: selectedBranch, timestamp: new Date() });
-    
-    // Show toast notification
-    const moodText = mood === "good" ? "Yaxşı" : mood === "normal" ? "Normal" : "Pis";
-    toast({
-      title: "Cavabınız qeydə alındı! ✓",
-      description: `Bölgə: ${selectedBranch} • Əhval: ${moodText}${reason ? ` • Səbəb: ${reason}` : ""}`,
-    });
     
     // Show success screen
     setCurrentStep("success");
