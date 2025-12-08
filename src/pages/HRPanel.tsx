@@ -14,7 +14,8 @@ import {
   CalendarIcon,
   Sparkles,
   Loader2,
-  Brain
+  Brain,
+  LogOut
 } from "lucide-react";
 import { format, subDays } from "date-fns";
 import { az } from "date-fns/locale";
@@ -306,6 +307,18 @@ const HRPanel = () => {
                 <Button variant="outline" size="sm" className="gap-2">
                   <Download className="w-4 h-4" />
                   <span className="hidden md:inline">Hesabat Yüklə</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={async () => {
+                    await supabase.auth.signOut();
+                    navigate("/auth");
+                  }}
+                  className="gap-2 text-destructive hover:text-destructive"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="hidden md:inline">Çıxış</span>
                 </Button>
               </div>
               {/* Desktop date picker */}

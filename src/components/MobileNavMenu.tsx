@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Menu, Home, LayoutDashboard, UserCog, ClipboardCheck, MessageSquare, CalendarIcon } from "lucide-react";
+import { Menu, Home, LayoutDashboard, UserCog, ClipboardCheck, MessageSquare, CalendarIcon, LogOut } from "lucide-react";
 import { format, subDays } from "date-fns";
 import { az } from "date-fns/locale";
 import { Calendar } from "@/components/ui/calendar";
@@ -8,6 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 const navItems = [
   { label: "Ana Səhifə", to: "/", icon: Home },
@@ -33,6 +34,12 @@ export const MobileNavMenu = ({ dateRange, onDateRangeChange, showDatePicker = f
     setOpen(false);
   };
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth");
+    setOpen(false);
+  };
+
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
@@ -49,7 +56,7 @@ export const MobileNavMenu = ({ dateRange, onDateRangeChange, showDatePicker = f
         <SheetHeader>
           <SheetTitle className="text-left">Naviqasiya</SheetTitle>
         </SheetHeader>
-        <nav className="space-y-2">
+        <nav className="space-y-2 flex-1">
           {navItems.map((item) => {
             const isActive = location.pathname === item.to;
             const Icon = item.icon;
@@ -130,6 +137,18 @@ export const MobileNavMenu = ({ dateRange, onDateRangeChange, showDatePicker = f
             </Popover>
           </div>
         )}
+
+        {/* Logout Button */}
+        <div className="pt-4 border-t border-border">
+          <Button
+            variant="destructive"
+            className="w-full justify-start gap-2"
+            onClick={handleLogout}
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Çıxış</span>
+          </Button>
+        </div>
       </SheetContent>
     </Sheet>
   );
