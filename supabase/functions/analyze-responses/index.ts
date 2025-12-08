@@ -37,6 +37,20 @@ Score hesablama meyarları:
 
 Azərbaycan dilində yaz. Qısa və konkret ol.`;
 
+    // Handle both array and object formats for moodDistribution
+    let moodDistributionText = "";
+    if (Array.isArray(moodDistribution)) {
+      moodDistributionText = moodDistribution.map((m: any) => `- ${m.mood}: ${m.count} nəfər (${m.percentage}%)`).join('\n');
+    } else if (typeof moodDistribution === 'object' && moodDistribution !== null) {
+      moodDistributionText = Object.entries(moodDistribution).map(([mood, percentage]) => `- ${mood}: ${percentage}%`).join('\n');
+    }
+
+    // Handle both array formats for topReasons
+    let topReasonsText = "";
+    if (Array.isArray(topReasons)) {
+      topReasonsText = topReasons.map((r: any, i: number) => `${i + 1}. ${r.reason}: ${r.count || ''} (${r.percentage}%)`).join('\n');
+    }
+
     const userPrompt = `İşçi sorğusu nəticələri:
 
 Ümumi məmnuniyyət indeksi: ${overallIndex}%
@@ -44,10 +58,10 @@ Cavab dərəcəsi: ${responseRate}%
 Risk halları sayı: ${riskCount}
 
 Əhval bölgüsü:
-${moodDistribution.map((m: any) => `- ${m.mood}: ${m.count} nəfər (${m.percentage}%)`).join('\n')}
+${moodDistributionText}
 
 Əsas şikayət səbəbləri:
-${topReasons.map((r: any, i: number) => `${i + 1}. ${r.reason}: ${r.count} şikayət (${r.percentage}%)`).join('\n')}
+${topReasonsText || "Qeyd olunmayıb"}
 
 Bu məlumatlara əsasən JSON formatında analiz ver.`;
 
