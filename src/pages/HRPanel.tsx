@@ -574,7 +574,7 @@ const HRPanel = () => {
                     Müşahidələr
                   </h4>
                   <ul className="space-y-2">
-                    {aiAnalysis.observations.map((obs, index) => (
+                    {(aiAnalysis.observations || []).map((obs, index) => (
                       <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
                         <span className="text-primary mt-1">•</span>
                         {obs}
@@ -590,7 +590,7 @@ const HRPanel = () => {
                     Tövsiyələr
                   </h4>
                   <ul className="space-y-2">
-                    {aiAnalysis.recommendations.map((rec, index) => (
+                    {(aiAnalysis.recommendations || []).map((rec, index) => (
                       <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
                         <span className="text-primary mt-1">{index + 1}.</span>
                         {rec}
