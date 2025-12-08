@@ -553,9 +553,9 @@ const HRPanel = () => {
                   <div className="text-sm text-muted-foreground">Məmnuniyyət Balı</div>
                   <div className={cn(
                     "inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold border",
-                    getRiskLevelColor(aiAnalysis.riskLevel)
+                    getRiskLevelColor(aiAnalysis.riskLevel || "orta")
                   )}>
-                    Risk: {aiAnalysis.riskLevel.charAt(0).toUpperCase() + aiAnalysis.riskLevel.slice(1)}
+                    Risk: {aiAnalysis.riskLevel ? (aiAnalysis.riskLevel.charAt(0).toUpperCase() + aiAnalysis.riskLevel.slice(1)) : "Orta"}
                   </div>
                 </div>
 
