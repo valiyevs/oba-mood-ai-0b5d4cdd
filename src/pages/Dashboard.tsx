@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { TrendingUp, TrendingDown, Users, AlertCircle, BarChart3, Activity, Home, UserCog, CalendarIcon, Eye, Brain, Loader2, RefreshCw, CheckCircle2, Lightbulb, Target } from "lucide-react";
+import { TrendingUp, TrendingDown, Users, AlertCircle, BarChart3, Activity, Home, UserCog, CalendarIcon, Eye, Brain, Loader2, RefreshCw, CheckCircle2, Lightbulb, Target, LogOut } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -234,6 +234,18 @@ const Dashboard = () => {
                 >
                   <UserCog className="w-4 h-4" />
                   <span className="hidden md:inline">HR Paneli</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={async () => {
+                    await supabase.auth.signOut();
+                    navigate("/auth");
+                  }}
+                  className="gap-2 text-destructive hover:text-destructive"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="hidden md:inline">Çıxış</span>
                 </Button>
               </div>
               {/* Mobile hamburger menu */}
