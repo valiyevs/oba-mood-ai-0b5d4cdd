@@ -8,6 +8,8 @@ import Dashboard from "./pages/Dashboard";
 import HRPanel from "./pages/HRPanel";
 import EmployeeResponses from "./pages/EmployeeResponses";
 import ManagerActions from "./pages/ManagerActions";
+import Auth from "./pages/Auth";
+import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,10 +22,27 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/hr-panel" element={<HRPanel />} />
-          <Route path="/employee-responses" element={<EmployeeResponses />} />
-          <Route path="/manager-actions" element={<ManagerActions />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/hr-panel" element={
+            <ProtectedRoute>
+              <HRPanel />
+            </ProtectedRoute>
+          } />
+          <Route path="/employee-responses" element={
+            <ProtectedRoute>
+              <EmployeeResponses />
+            </ProtectedRoute>
+          } />
+          <Route path="/manager-actions" element={
+            <ProtectedRoute>
+              <ManagerActions />
+            </ProtectedRoute>
+          } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
