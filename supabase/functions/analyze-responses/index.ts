@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { moodDistribution, topReasons, riskCount, responseRate, overallIndex } = await req.json();
+    const { moodDistribution, topReasons, riskCount, responseRate, overallIndex, criticalComplaints } = await req.json();
     
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -20,13 +20,16 @@ serve(async (req) => {
 
     const systemPrompt = `Sən HR analitika ekspertisən. Sənə işçilərin əhval sorğularının nəticələri veriləcək. 
 
+XÜSUSI DİQQƏT: Kritik şikayətlər bölməsinə xüsusi diqqət yetir! Bu bölmədə işçilərin sərbəst mətn şikayətləri var. Əgər orada zorakılıq, təhqir, döyülmə, söyülmə, mobbing və ya digər ciddi problemlər haqqında şikayət varsa, bunu MÜTLƏƏQİ qeyd et və risk səviyyəsini "kritik" olaraq təyin et!
+
 Cavabını aşağıdakı JSON formatında ver:
 {
   "score": <0-100 arası ümumi qiymət balı>,
   "summary": "<1-2 cümlə qısa xülasə>",
   "observations": ["<müşahidə 1>", "<müşahidə 2>", "<müşahidə 3>"],
   "recommendations": ["<tövsiyyə 1>", "<tövsiyyə 2>", "<tövsiyyə 3>"],
-  "riskLevel": "<aşağı|orta|yüksək|kritik>"
+  "riskLevel": "<aşağı|orta|yüksək|kritik>",
+  "criticalAlerts": ["<kritik xəbərdarlıq 1>", "<kritik xəbərdarlıq 2>"] 
 }
 
 Score hesablama meyarları:
@@ -34,6 +37,7 @@ Score hesablama meyarları:
 - Risk halları azdırsa +
 - Cavab dərəcəsi yüksəkdirsə +
 - Pis əhval % aşağıdırsa +
+- KRİTİK: Zorakılıq, söyülmə, döyülmə şikayətləri varsa score çox aşağı olmalı və riskLevel "kritik" olmalıdır!
 
 Azərbaycan dilində yaz. Qısa və konkret ol.`;
 
@@ -51,6 +55,14 @@ Azərbaycan dilində yaz. Qısa və konkret ol.`;
       topReasonsText = topReasons.map((r: any, i: number) => `${i + 1}. ${r.reason}: ${r.count || ''} (${r.percentage}%)`).join('\n');
     }
 
+    // Handle critical complaints (free text from employees)
+    let criticalComplaintsText = "";
+    if (Array.isArray(criticalComplaints) && criticalComplaints.length > 0) {
+      criticalComplaintsText = criticalComplaints.map((c: any, i: number) => 
+        `${i + 1}. "${c.reason}" (Kateqoriya: ${c.category || "Qeyd olunmayıb"}, Filial: ${c.branch}, Şöbə: ${c.department})`
+      ).join('\n');
+    }
+
     const userPrompt = `İşçi sorğusu nəticələri:
 
 Ümumi məmnuniyyət indeksi: ${overallIndex}%
@@ -63,7 +75,10 @@ ${moodDistributionText}
 Əsas şikayət səbəbləri:
 ${topReasonsText || "Qeyd olunmayıb"}
 
-Bu məlumatlara əsasən JSON formatında analiz ver.`;
+⚠️ KRİTİK ŞİKAYƏTLƏR (işçilərin sərbəst mətn cavabları):
+${criticalComplaintsText || "Kritik şikayət yoxdur"}
+
+Bu məlumatlara əsasən JSON formatında analiz ver. Kritik şikayətlərə xüsusi diqqət yetir!`;
 
     console.log("Calling AI gateway...");
     

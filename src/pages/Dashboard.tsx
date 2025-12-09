@@ -161,6 +161,16 @@ const Dashboard = () => {
     responseRate: 89, // This would need a total employee count to calculate properly
   };
 
+  // Extract critical complaints (free text reasons from bad moods)
+  const criticalComplaints = responses
+    .filter(r => r.mood === 'Pis' && r.reason)
+    .map(r => ({
+      reason: r.reason,
+      category: r.reason_category,
+      branch: r.branch,
+      department: r.department,
+    }));
+
   // AI Analysis mutation
   const analysisMutation = useMutation({
     mutationFn: async () => {
@@ -171,6 +181,7 @@ const Dashboard = () => {
           riskCount: stats.riskCount,
           responseRate: stats.responseRate,
           overallIndex: stats.overallIndex,
+          criticalComplaints, // Send critical complaints for AI to analyze
         },
       });
       

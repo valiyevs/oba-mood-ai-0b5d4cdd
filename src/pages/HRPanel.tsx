@@ -229,6 +229,16 @@ const HRPanel = () => {
           percentage: totalResponses > 0 ? Math.round((count / totalResponses) * 100) : 0
         }));
 
+      // Extract critical complaints (free text reasons from bad moods)
+      const criticalComplaints = responses
+        .filter(r => r.mood === 'Pis' && r.reason)
+        .map(r => ({
+          reason: r.reason,
+          category: r.reason_category,
+          branch: r.branch,
+          department: r.department,
+        }));
+
       const response = await supabase.functions.invoke('analyze-responses', {
         body: {
           moodDistribution,
@@ -236,6 +246,7 @@ const HRPanel = () => {
           riskCount: stats.burnoutCases,
           responseRate: parseFloat(stats.responseRate),
           overallIndex: stats.avgSatisfaction * 10,
+          criticalComplaints, // Send critical complaints for AI to analyze
         }
       });
 
