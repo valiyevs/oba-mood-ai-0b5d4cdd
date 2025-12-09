@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Users, 
   Building2, 
@@ -56,7 +56,7 @@ const HRPanel = () => {
     department: "all"
   });
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
-    from: subDays(new Date(), 30),
+    from: subDays(new Date(), 90), // Extended to 90 days to include more data
     to: new Date(),
   });
 
@@ -247,6 +247,13 @@ const HRPanel = () => {
       setIsAnalyzing(false);
     }
   };
+
+  // Auto-run AI analysis when data is loaded
+  useEffect(() => {
+    if (responses.length > 0 && !aiAnalysis && !isAnalyzing) {
+      runAIAnalysis();
+    }
+  }, [responses]);
 
   const getRiskLevelColor = (level: string) => {
     switch (level) {
