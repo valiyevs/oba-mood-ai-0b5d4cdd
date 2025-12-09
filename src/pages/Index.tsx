@@ -7,14 +7,28 @@ import { AnimatedBackground } from "@/components/AnimatedBackground";
 import { TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import obaLogo from "@/assets/oba-logo.jpg";
 
 type StepType = "branch" | "mood" | "reason" | "success";
+
+// Department mapping based on branch
+const getDepartmentFromBranch = (branch: BranchType): string => {
+  const departments = ["Satış", "Texniki", "Logistika", "İnsan Resursları"];
+  // Random department for demo purposes - in real app this would come from user profile
+  return departments[Math.floor(Math.random() * departments.length)];
+};
+
+// Generate employee code (in real app, this would come from user session/profile)
+const generateEmployeeCode = (): string => {
+  return `EMP${String(Math.floor(Math.random() * 9000) + 1000)}`;
+};
 
 const Index = () => {
   const [currentStep, setCurrentStep] = useState<StepType>("branch");
   const [selectedBranch, setSelectedBranch] = useState<BranchType>(null);
   const [selectedMood, setSelectedMood] = useState<MoodType>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const handleBranchSelect = (branch: BranchType) => {
@@ -38,12 +52,88 @@ const Index = () => {
     handleSubmit(selectedMood, reason, customText);
   };
 
-  const handleSubmit = (mood: MoodType, reason?: ReasonType, customText?: string) => {
-    // Here we would send data to backend
-    console.log("Submitting:", { mood, reason, customText, branch: selectedBranch, timestamp: new Date() });
+  const handleSubmit = async (mood: MoodType, reason?: ReasonType, customText?: string) => {
+    if (isSubmitting || !selectedBranch || !mood) return;
     
-    // Show success screen
-    setCurrentStep("success");
+    setIsSubmitting(true);
+    
+    try {
+      const employeeCode = generateEmployeeCode();
+      const department = getDepartmentFromBranch(selectedBranch);
+      
+      // Map mood to Azerbaijani
+      const moodMap: Record<string, string> = {
+        good: "Yaxşı",
+        normal: "Normal",
+        bad: "Pis"
+      };
+      
+      // Map reason category to Azerbaijani
+      const reasonMap: Record<string, string> = {
+        workload: "İş yükü",
+        schedule: "Qrafik",
+        manager: "Menecer",
+        team: "Komanda",
+        other: "Digər"
+      };
+
+      // 1. Save employee response to database
+      const { error: responseError } = await supabase
+        .from("employee_responses")
+        .insert({
+          employee_code: employeeCode,
+          branch: selectedBranch,
+          department: department,
+          mood: moodMap[mood] || mood,
+          reason: customText || null,
+          reason_category: reason ? (reasonMap[reason] || reason) : null,
+        });
+
+      if (responseError) {
+        console.error("Error saving response:", responseError);
+        throw responseError;
+      }
+
+      // 2. If bad mood, create a burnout alert
+      if (mood === "bad" && reason) {
+        const riskScore = 70 + Math.floor(Math.random() * 25); // 70-95 risk score for bad mood
+        
+        const { error: alertError } = await supabase
+          .from("burnout_alerts")
+          .insert({
+            employee_code: employeeCode,
+            branch: selectedBranch,
+            department: department,
+            reason_category: reasonMap[reason] || reason,
+            risk_score: riskScore,
+            is_resolved: false,
+          });
+
+        if (alertError) {
+          console.error("Error creating burnout alert:", alertError);
+          // Don't throw - the main response was saved successfully
+        }
+      }
+
+      console.log("Submitted successfully:", { 
+        mood, 
+        reason, 
+        customText, 
+        branch: selectedBranch, 
+        department,
+        employeeCode,
+        timestamp: new Date() 
+      });
+      
+      // Show success screen
+      setCurrentStep("success");
+    } catch (error) {
+      console.error("Failed to submit:", error);
+      // Still show success for UX (silent failure as per memory)
+      setCurrentStep("success");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleComplete = () => {
