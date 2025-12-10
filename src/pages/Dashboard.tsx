@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { TrendingUp, TrendingDown, Users, AlertCircle, BarChart3, Activity, Home, UserCog, CalendarIcon, Eye, Brain, Loader2, RefreshCw, CheckCircle2, Lightbulb, Target, LogOut } from "lucide-react";
+import { TrendingUp, TrendingDown, Users, AlertCircle, BarChart3, Activity, Home, UserCog, CalendarIcon, Eye, LogOut } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -14,6 +14,7 @@ import { az } from "date-fns/locale";
 import obaLogo from "@/assets/oba-logo.jpg";
 import { MobileNavMenu } from "@/components/MobileNavMenu";
 import { useToast } from "@/hooks/use-toast";
+import { AIAnalysisCard } from "@/components/AIAnalysisCard";
 
 interface StatCardProps {
   title: string;
@@ -68,6 +69,7 @@ const Dashboard = () => {
     observations: string[];
     recommendations: string[];
     riskLevel: string;
+    criticalAlerts?: string[];
   } | null>(null);
   const [hasAutoLoaded, setHasAutoLoaded] = useState(false);
 
@@ -420,141 +422,13 @@ const Dashboard = () => {
         </div>
 
         {/* AI Analysis Section */}
-        <Card className="mt-6 border-primary/20 bg-gradient-to-br from-primary/5 via-background to-primary/10 shadow-soft overflow-hidden">
-          <CardHeader className="pb-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-primary/10">
-                  <Brain className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <CardTitle className="text-foreground text-xl">Süni İntellekt Analizi</CardTitle>
-                  <CardDescription>AI tərəfindən aparılmış məlumat analizi</CardDescription>
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => analysisMutation.mutate()}
-                disabled={analysisMutation.isPending}
-                className="gap-2"
-              >
-                {analysisMutation.isPending ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <RefreshCw className="w-4 h-4" />
-                )}
-                {analysisMutation.isPending ? "Analiz edilir..." : "Yenilə"}
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {analysisMutation.isPending ? (
-              <div className="flex flex-col items-center justify-center py-12">
-                <div className="relative">
-                  <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
-                  <Brain className="h-16 w-16 text-primary relative animate-pulse" />
-                </div>
-                <p className="mt-6 text-lg font-medium text-foreground">Analiz aparılır...</p>
-                <p className="text-sm text-muted-foreground mt-2">AI məlumatları araşdırır</p>
-              </div>
-            ) : aiAnalysis ? (
-              <div className="space-y-6">
-                {/* Score Display */}
-                <div className="flex flex-col md:flex-row gap-6">
-                  <div className="flex-shrink-0">
-                    <div className="relative w-32 h-32 mx-auto md:mx-0">
-                      <svg className="w-full h-full -rotate-90">
-                        <circle
-                          cx="64"
-                          cy="64"
-                          r="56"
-                          fill="none"
-                          stroke="hsl(var(--muted))"
-                          strokeWidth="12"
-                        />
-                        <circle
-                          cx="64"
-                          cy="64"
-                          r="56"
-                          fill="none"
-                          stroke={aiAnalysis.score >= 70 ? "hsl(var(--status-good))" : aiAnalysis.score >= 50 ? "hsl(var(--status-normal))" : "hsl(var(--status-bad))"}
-                          strokeWidth="12"
-                          strokeDasharray={`${(aiAnalysis.score / 100) * 352} 352`}
-                          strokeLinecap="round"
-                          className="transition-all duration-1000"
-                        />
-                      </svg>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-3xl font-bold text-foreground">{aiAnalysis.score}</span>
-                        <span className="text-xs text-muted-foreground">ümumi bal</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex-1 space-y-4">
-                    {/* Risk Level Badge */}
-                    <div className="flex items-center gap-2">
-                      <span className={cn(
-                        "px-3 py-1 rounded-full text-sm font-medium",
-                        aiAnalysis.riskLevel === "aşağı" && "bg-status-good/20 text-status-good",
-                        aiAnalysis.riskLevel === "orta" && "bg-status-normal/20 text-status-normal",
-                        aiAnalysis.riskLevel === "yüksək" && "bg-orange-500/20 text-orange-600",
-                        aiAnalysis.riskLevel === "kritik" && "bg-destructive/20 text-destructive"
-                      )}>
-                        Risk səviyyəsi: {aiAnalysis.riskLevel}
-                      </span>
-                    </div>
-                    
-                    {/* Summary */}
-                    <p className="text-lg text-foreground leading-relaxed">{aiAnalysis.summary}</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Observations */}
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-foreground font-semibold">
-                      <Target className="h-5 w-5 text-primary" />
-                      <span>Müşahidələr</span>
-                    </div>
-                    <ul className="space-y-2">
-                      {aiAnalysis.observations.map((obs, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                          <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                          <span>{obs}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Recommendations */}
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-foreground font-semibold">
-                      <Lightbulb className="h-5 w-5 text-yellow-500" />
-                      <span>Tövsiyyələr</span>
-                    </div>
-                    <ul className="space-y-2">
-                      {aiAnalysis.recommendations.map((rec, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                          <span className="flex items-center justify-center w-5 h-5 rounded-full bg-yellow-500/20 text-yellow-600 text-xs font-bold flex-shrink-0">
-                            {i + 1}
-                          </span>
-                          <span>{rec}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-12 text-muted-foreground">
-                <Brain className="h-16 w-16 mx-auto mb-4 opacity-30" />
-                <p className="text-lg">AI analizi yüklənir...</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <div className="mt-6">
+          <AIAnalysisCard
+            analysis={aiAnalysis}
+            isLoading={analysisMutation.isPending}
+            onRefresh={() => analysisMutation.mutate()}
+          />
+        </div>
 
         {/* Risk Alert */}
         {burnoutAlerts.length > 0 && (
