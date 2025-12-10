@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,9 +13,11 @@ import {
   User, 
   CheckCircle2,
   Circle,
-  Loader2
+  Loader2,
+  Save
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 export interface AITask {
   id: string;
@@ -22,31 +26,166 @@ export interface AITask {
   priority: "kritik" | "yüksək" | "orta";
   targetEmployee?: string;
   department?: string;
-  dueDate?: string;
   category: string;
+  status?: string;
+  branch?: string;
+}
+
+interface DBTask {
+  id: string;
+  title: string;
+  description: string;
+  priority: string;
+  target_employee: string | null;
+  department: string | null;
+  category: string;
+  status: string;
+  branch: string;
+  created_at: string;
+  completed_at: string | null;
 }
 
 interface AITasksCardProps {
-  tasks: AITask[];
-  isLoading: boolean;
+  newTasks?: AITask[];
+  isGenerating: boolean;
   onRefresh: () => void;
-  onTaskComplete?: (taskId: string) => void;
+  branch?: string | null;
 }
 
-export const AITasksCard = ({ tasks, isLoading, onRefresh, onTaskComplete }: AITasksCardProps) => {
-  const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set());
+export const AITasksCard = ({ newTasks = [], isGenerating, onRefresh, branch }: AITasksCardProps) => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [pendingNewTasks, setPendingNewTasks] = useState<AITask[]>([]);
 
-  const handleTaskToggle = (taskId: string) => {
-    setCompletedTasks(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(taskId)) {
-        newSet.delete(taskId);
+  // When new tasks come from AI, store them temporarily
+  useEffect(() => {
+    if (newTasks.length > 0) {
+      setPendingNewTasks(newTasks);
+    }
+  }, [newTasks]);
+
+  // Fetch existing tasks from database
+  const { data: dbTasks = [], isLoading: loadingTasks } = useQuery({
+    queryKey: ['ai-tasks', branch],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('ai_tasks')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data as DBTask[];
+    },
+  });
+
+  // Listen to realtime updates
+  useEffect(() => {
+    const channel = supabase
+      .channel('ai-tasks-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'ai_tasks'
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['ai-tasks'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
+  // Save new tasks to database
+  const saveMutation = useMutation({
+    mutationFn: async (tasks: AITask[]) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("İstifadəçi tapılmadı");
+
+      // Get user's branch
+      const { data: branchData } = await supabase
+        .from('manager_branches')
+        .select('branch')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      const userBranch = branchData?.branch || branch || 'baku';
+
+      const tasksToInsert = tasks.map(task => ({
+        title: task.title,
+        description: task.description,
+        priority: task.priority,
+        category: task.category,
+        target_employee: task.targetEmployee || null,
+        department: task.department || null,
+        branch: userBranch,
+        status: 'pending',
+        created_by: user.id,
+      }));
+
+      const { error } = await supabase
+        .from('ai_tasks')
+        .insert(tasksToInsert);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      setPendingNewTasks([]);
+      queryClient.invalidateQueries({ queryKey: ['ai-tasks'] });
+      toast({
+        title: "Tapşırıqlar saxlanıldı",
+        description: "AI tapşırıqlar uğurla database-ə əlavə edildi",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Xəta",
+        description: error.message || "Tapşırıqlar saxlanıla bilmədi",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update task status mutation
+  const updateMutation = useMutation({
+    mutationFn: async ({ taskId, status }: { taskId: string; status: string }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      const updateData: any = { status };
+      if (status === 'completed') {
+        updateData.completed_at = new Date().toISOString();
+        updateData.completed_by = user?.id;
       } else {
-        newSet.add(taskId);
-        onTaskComplete?.(taskId);
+        updateData.completed_at = null;
+        updateData.completed_by = null;
       }
-      return newSet;
-    });
+
+      const { error } = await supabase
+        .from('ai_tasks')
+        .update(updateData)
+        .eq('id', taskId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ai-tasks'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Xəta",
+        description: error.message || "Status yenilənə bilmədi",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleTaskToggle = (taskId: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'completed' ? 'pending' : 'completed';
+    updateMutation.mutate({ taskId, status: newStatus });
   };
 
   const getPriorityColor = (priority: string) => {
@@ -73,8 +212,14 @@ export const AITasksCard = ({ tasks, isLoading, onRefresh, onTaskComplete }: AIT
     }
   };
 
-  const activeTasks = tasks.filter(t => !completedTasks.has(t.id));
-  const completedCount = completedTasks.size;
+  const activeTasks = dbTasks.filter(t => t.status !== 'completed');
+  const completedCount = dbTasks.filter(t => t.status === 'completed').length;
+  const isLoading = loadingTasks || isGenerating;
+
+  // Combine db tasks with pending new tasks for display
+  const allTasks = [
+    ...dbTasks,
+  ];
 
   return (
     <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
@@ -96,6 +241,22 @@ export const AITasksCard = ({ tasks, isLoading, onRefresh, onTaskComplete }: AIT
                 {completedCount} tamamlandı
               </Badge>
             )}
+            {pendingNewTasks.length > 0 && (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => saveMutation.mutate(pendingNewTasks)}
+                disabled={saveMutation.isPending}
+                className="gap-2"
+              >
+                {saveMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
+                Saxla ({pendingNewTasks.length})
+              </Button>
+            )}
             <Button
               variant="outline"
               size="sm"
@@ -103,7 +264,7 @@ export const AITasksCard = ({ tasks, isLoading, onRefresh, onTaskComplete }: AIT
               disabled={isLoading}
               className="gap-2"
             >
-              {isLoading ? (
+              {isGenerating ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <RefreshCw className="h-4 w-4" />
@@ -114,21 +275,47 @@ export const AITasksCard = ({ tasks, isLoading, onRefresh, onTaskComplete }: AIT
         </div>
       </CardHeader>
       <CardContent>
-        {isLoading ? (
+        {/* Pending new tasks section */}
+        {pendingNewTasks.length > 0 && (
+          <div className="mb-4 p-3 rounded-lg border-2 border-dashed border-primary/30 bg-primary/5">
+            <p className="text-sm font-medium text-primary mb-2 flex items-center gap-2">
+              <Sparkles className="w-4 h-4" />
+              Yeni AI tapşırıqlar ({pendingNewTasks.length})
+            </p>
+            <div className="space-y-2">
+              {pendingNewTasks.map((task) => (
+                <div
+                  key={task.id}
+                  className="flex items-center justify-between p-2 rounded bg-background/50 text-sm"
+                >
+                  <span>{task.title}</span>
+                  <Badge variant="outline" className={cn("text-xs", getPriorityColor(task.priority))}>
+                    {task.priority}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              "Saxla" düyməsinə basaraq tapşırıqları database-ə əlavə edin
+            </p>
+          </div>
+        )}
+
+        {isLoading && dbTasks.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
             <Loader2 className="h-8 w-8 animate-spin mb-3" />
-            <p>AI tapşırıqlar yaradılır...</p>
+            <p>Tapşırıqlar yüklənir...</p>
           </div>
-        ) : tasks.length === 0 ? (
+        ) : allTasks.length === 0 && pendingNewTasks.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
             <CheckCircle2 className="h-12 w-12 mb-3 text-status-good" />
-            <p className="font-medium">Kritik vəziyyət yoxdur</p>
-            <p className="text-sm">Bütün göstəricilər normal səviyyədədir</p>
+            <p className="font-medium">Tapşırıq yoxdur</p>
+            <p className="text-sm">Yeni tapşırıqlar yaratmaq üçün "Yenilə" düyməsinə basın</p>
           </div>
         ) : (
           <div className="space-y-3">
-            {tasks.map((task, index) => {
-              const isCompleted = completedTasks.has(task.id);
+            {allTasks.map((task) => {
+              const isCompleted = task.status === 'completed';
               return (
                 <div
                   key={task.id}
@@ -141,7 +328,8 @@ export const AITasksCard = ({ tasks, isLoading, onRefresh, onTaskComplete }: AIT
                 >
                   <Checkbox
                     checked={isCompleted}
-                    onCheckedChange={() => handleTaskToggle(task.id)}
+                    onCheckedChange={() => handleTaskToggle(task.id, task.status)}
+                    disabled={updateMutation.isPending}
                     className="mt-1"
                   />
                   <div className="flex-1 min-w-0">
@@ -167,10 +355,10 @@ export const AITasksCard = ({ tasks, isLoading, onRefresh, onTaskComplete }: AIT
                       {task.description}
                     </p>
                     <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                      {task.targetEmployee && (
+                      {task.target_employee && (
                         <span className="flex items-center gap-1 bg-muted px-2 py-0.5 rounded">
                           <User className="w-3 h-3" />
-                          {task.targetEmployee}
+                          {task.target_employee}
                         </span>
                       )}
                       {task.department && (
@@ -181,6 +369,11 @@ export const AITasksCard = ({ tasks, isLoading, onRefresh, onTaskComplete }: AIT
                       <span className="bg-primary/10 text-primary px-2 py-0.5 rounded">
                         {task.category}
                       </span>
+                      {isCompleted && task.completed_at && (
+                        <span className="text-status-good">
+                          ✓ {new Date(task.completed_at).toLocaleDateString('az-Latn')}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -198,7 +391,7 @@ export const AITasksCard = ({ tasks, isLoading, onRefresh, onTaskComplete }: AIT
               <div className="flex items-center gap-2">
                 <span className="flex items-center gap-1 text-destructive">
                   <AlertTriangle className="w-3 h-3" />
-                  {tasks.filter(t => t.priority === "kritik" && !completedTasks.has(t.id)).length} kritik
+                  {dbTasks.filter(t => t.priority === "kritik" && t.status !== 'completed').length} kritik
                 </span>
               </div>
             </div>

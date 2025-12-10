@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_tasks: {
+        Row: {
+          assigned_to: string | null
+          branch: string
+          category: string
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          created_by: string | null
+          department: string | null
+          description: string
+          id: string
+          notes: string | null
+          priority: string
+          source_analysis_date: string
+          status: string
+          target_employee: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          branch: string
+          category: string
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          department?: string | null
+          description: string
+          id?: string
+          notes?: string | null
+          priority: string
+          source_analysis_date?: string
+          status?: string
+          target_employee?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          branch?: string
+          category?: string
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          department?: string | null
+          description?: string
+          id?: string
+          notes?: string | null
+          priority?: string
+          source_analysis_date?: string
+          status?: string
+          target_employee?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       burnout_alerts: {
         Row: {
           branch: string
