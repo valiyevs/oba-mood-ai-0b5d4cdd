@@ -14,8 +14,8 @@ interface BranchComparisonChartProps {
 
 export const BranchComparisonChart = ({ 
   responses, 
-  title = "Filial Müqayisəsi", 
-  description = "Filiallar üzrə əhval bölgüsü" 
+  title = "Bölgə Müqayisəsi", 
+  description = "Bölgələr üzrə əhval bölgüsü" 
 }: BranchComparisonChartProps) => {
   // Group by branch
   const branchData: Record<string, { good: number; normal: number; bad: number }> = {};
@@ -29,9 +29,15 @@ export const BranchComparisonChart = ({
     else if (r.mood === "Pis") branchData[r.branch].bad++;
   });
 
+  const regionNames: Record<string, string> = {
+    'baku': 'Bakı', 'ganja': 'Gəncə', 'sumgait': 'Sumqayıt',
+    'mingachevir': 'Mingəçevir', 'shirvan': 'Şirvan',
+    'lankaran': 'Lənkəran', 'shaki': 'Şəki', 'quba': 'Quba'
+  };
+
   const chartData = Object.entries(branchData)
     .map(([branch, counts]) => ({
-      branch: branch.charAt(0).toUpperCase() + branch.slice(1),
+      branch: regionNames[branch] || branch.charAt(0).toUpperCase() + branch.slice(1),
       Yaxşı: counts.good,
       Normal: counts.normal,
       Pis: counts.bad,
