@@ -5,17 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Loader2, Lock, Mail, UserCog, Users } from "lucide-react";
+import { Loader2, Lock, Mail, UserCog } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import obaLogo from "@/assets/oba-logo.jpg";
-
-type AppRole = "hr" | "manager";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [selectedRole, setSelectedRole] = useState<AppRole>("manager");
   const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
@@ -56,12 +52,12 @@ const Auth = () => {
         
         if (signUpError) throw signUpError;
 
-        // If sign up successful, assign the role using RPC function
+        // If sign up successful, assign manager role by default
         if (signUpData.user) {
           const { error: roleError } = await supabase
             .rpc('assign_user_role', {
               _user_id: signUpData.user.id,
-              _role: selectedRole
+              _role: 'manager'
             });
           
           if (roleError) {
@@ -72,7 +68,7 @@ const Auth = () => {
         
         toast({
           title: "Qeydiyyat uğurlu!",
-          description: `Hesabınız ${selectedRole === 'hr' ? 'HR' : 'Menecer'} rolu ilə yaradıldı.`,
+          description: "Hesabınız Menecer rolu ilə yaradıldı. HR roluna ehtiyacınız varsa, HR ilə əlaqə saxlayın.",
         });
         setIsSignUp(false);
       } else {
@@ -158,46 +154,16 @@ const Auth = () => {
               </div>
             </div>
 
-            {/* Role Selection - Only shown during sign up */}
+            {/* Info about role - Only shown during sign up */}
             {isSignUp && (
-              <div className="space-y-3">
-                <Label>Rol seçin</Label>
-                <RadioGroup
-                  value={selectedRole}
-                  onValueChange={(value) => setSelectedRole(value as AppRole)}
-                  className="grid grid-cols-2 gap-3"
-                >
-                  <div>
-                    <RadioGroupItem
-                      value="manager"
-                      id="role-manager"
-                      className="peer sr-only"
-                    />
-                    <Label
-                      htmlFor="role-manager"
-                      className="flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 cursor-pointer transition-all"
-                    >
-                      <UserCog className="mb-2 h-6 w-6 text-primary" />
-                      <span className="text-sm font-medium">Bölgə Meneceri</span>
-                      <span className="text-xs text-muted-foreground mt-1">Öz bölgənizi idarə edin</span>
-                    </Label>
-                  </div>
-                  <div>
-                    <RadioGroupItem
-                      value="hr"
-                      id="role-hr"
-                      className="peer sr-only"
-                    />
-                    <Label
-                      htmlFor="role-hr"
-                      className="flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 cursor-pointer transition-all"
-                    >
-                      <Users className="mb-2 h-6 w-6 text-primary" />
-                      <span className="text-sm font-medium">HR / Rəhbərlik</span>
-                      <span className="text-xs text-muted-foreground mt-1">Bütün bölgələri izləyin</span>
-                    </Label>
-                  </div>
-                </RadioGroup>
+              <div className="rounded-lg border border-border bg-muted/50 p-3">
+                <div className="flex items-center gap-2">
+                  <UserCog className="h-5 w-5 text-primary" />
+                  <span className="text-sm font-medium">Bölgə Meneceri</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Qeydiyyatdan keçdikdən sonra sizə menecer rolu təyin ediləcək. HR roluna ehtiyacınız varsa, mövcud HR ilə əlaqə saxlayın.
+                </p>
               </div>
             )}
 
