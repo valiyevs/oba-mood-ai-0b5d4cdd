@@ -77,6 +77,36 @@ const Dashboard = () => {
   } | null>(null);
   const [hasAutoLoaded, setHasAutoLoaded] = useState(false);
 
+  // Fetch manager's assigned branch
+  const { data: managerBranch } = useQuery({
+    queryKey: ['manager-branch'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+      
+      const { data, error } = await supabase
+        .from('manager_branches')
+        .select('branch')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data?.branch || null;
+    },
+  });
+
+  // Branch name mapping
+  const branchNames: Record<string, string> = {
+    'baku': 'Bakı',
+    'ganja': 'Gəncə',
+    'sumgait': 'Sumqayıt',
+    'mingachevir': 'Mingəçevir',
+    'shirvan': 'Şirvan',
+    'lankaran': 'Lənkəran',
+    'shaki': 'Şəki',
+    'quba': 'Quba',
+  };
+
   // Fetch burnout alerts from database
   const { data: burnoutAlerts = [] } = useQuery({
     queryKey: ['burnout-alerts', dateRange],
@@ -227,8 +257,15 @@ const Dashboard = () => {
                 className="w-12 h-12 rounded-xl shadow-glow object-cover flex-shrink-0"
               />
               <div className="min-w-0">
-                <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">OBA İdarəetmə Paneli</h1>
-                <p className="text-xs sm:text-sm text-muted-foreground truncate">Personal Məmnuniyyət Sistemi</p>
+                <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">
+                  OBA İdarəetmə Paneli
+                  {managerBranch && (
+                    <span className="ml-2 text-primary">• {branchNames[managerBranch] || managerBranch}</span>
+                  )}
+                </h1>
+                <p className="text-xs sm:text-sm text-muted-foreground truncate">
+                  {managerBranch ? `${branchNames[managerBranch] || managerBranch} Bölgəsi Məmnuniyyət Sistemi` : 'Personal Məmnuniyyət Sistemi'}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-2">

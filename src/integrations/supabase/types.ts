@@ -139,6 +139,30 @@ export type Database = {
           },
         ]
       }
+      manager_branches: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          branch: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          branch: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          branch?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -165,6 +189,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_user_branch: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
