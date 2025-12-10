@@ -12,9 +12,6 @@ import {
   MessageSquare,
   ClipboardCheck,
   CalendarIcon,
-  Sparkles,
-  Loader2,
-  Brain,
   LogOut
 } from "lucide-react";
 import { format, subDays } from "date-fns";
@@ -31,6 +28,7 @@ import { cn } from "@/lib/utils";
 import obaLogo from "@/assets/oba-logo.jpg";
 import { supabase } from "@/integrations/supabase/client";
 import { MobileNavMenu } from "@/components/MobileNavMenu";
+import { AIAnalysisCard } from "@/components/AIAnalysisCard";
 interface FilterState {
   country: string;
   branch: string;
@@ -201,6 +199,7 @@ const HRPanel = () => {
     observations: string[];
     recommendations: string[];
     riskLevel: string;
+    criticalAlerts?: string[];
   } | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
@@ -531,95 +530,13 @@ const HRPanel = () => {
         )}
 
         {/* AI Analysis Section */}
-        <Card className="mb-6 border-primary/30 bg-gradient-to-r from-primary/5 to-transparent">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <Brain className="w-5 h-5 text-primary" />
-                  AI Analiz
-                </CardTitle>
-                <CardDescription>
-                  Süni intellekt əsasında əməkdaş məmnuniyyəti analizi
-                </CardDescription>
-              </div>
-              <Button 
-                onClick={runAIAnalysis} 
-                disabled={isAnalyzing}
-                className="gap-2"
-              >
-                {isAnalyzing ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Analiz edilir...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-4 h-4" />
-                    Analiz Et
-                  </>
-                )}
-              </Button>
-            </div>
-          </CardHeader>
-          {aiAnalysis && (
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Score */}
-                <div className="text-center p-4 rounded-lg bg-card border border-border">
-                  <div className="text-4xl font-bold text-primary mb-1">{aiAnalysis.score}</div>
-                  <div className="text-sm text-muted-foreground">Məmnuniyyət Balı</div>
-                  <div className={cn(
-                    "inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold border",
-                    getRiskLevelColor(aiAnalysis.riskLevel || "orta")
-                  )}>
-                    Risk: {aiAnalysis.riskLevel ? (aiAnalysis.riskLevel.charAt(0).toUpperCase() + aiAnalysis.riskLevel.slice(1)) : "Orta"}
-                  </div>
-                </div>
-
-                {/* Summary */}
-                <div className="md:col-span-2 p-4 rounded-lg bg-card border border-border">
-                  <h4 className="font-semibold text-foreground mb-2">Xülasə</h4>
-                  <p className="text-sm text-muted-foreground">{aiAnalysis.summary}</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                {/* Observations */}
-                <div className="p-4 rounded-lg bg-card border border-border">
-                  <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-primary" />
-                    Müşahidələr
-                  </h4>
-                  <ul className="space-y-2">
-                    {(aiAnalysis.observations || []).map((obs, index) => (
-                      <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
-                        <span className="text-primary mt-1">•</span>
-                        {obs}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Recommendations */}
-                <div className="p-4 rounded-lg bg-card border border-border">
-                  <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-primary" />
-                    Tövsiyələr
-                  </h4>
-                  <ul className="space-y-2">
-                    {(aiAnalysis.recommendations || []).map((rec, index) => (
-                      <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
-                        <span className="text-primary mt-1">{index + 1}.</span>
-                        {rec}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </CardContent>
-          )}
-        </Card>
+        <div className="mb-6">
+          <AIAnalysisCard
+            analysis={aiAnalysis}
+            isLoading={isAnalyzing}
+            onRefresh={runAIAnalysis}
+          />
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Burnout Risk Cases */}
