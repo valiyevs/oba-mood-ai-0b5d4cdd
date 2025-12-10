@@ -29,8 +29,26 @@ Cavabını aşağıdakı JSON formatında ver:
   "observations": ["<müşahidə 1>", "<müşahidə 2>", "<müşahidə 3>"],
   "recommendations": ["<tövsiyyə 1>", "<tövsiyyə 2>", "<tövsiyyə 3>"],
   "riskLevel": "<aşağı|orta|yüksək|kritik>",
-  "criticalAlerts": ["<kritik xəbərdarlıq 1>", "<kritik xəbərdarlıq 2>"] 
+  "criticalAlerts": ["<kritik xəbərdarlıq 1>", "<kritik xəbərdarlıq 2>"],
+  "tasks": [
+    {
+      "id": "<unikal_id>",
+      "title": "<tapşırıq başlığı>",
+      "description": "<ətraflı təsvir>",
+      "priority": "<kritik|yüksək|orta>",
+      "targetEmployee": "<işçi kodu əgər varsa>",
+      "department": "<şöbə adı>",
+      "category": "<kateqoriya: Görüş|Müdaxilə|Araşdırma|Dəyişiklik>"
+    }
+  ]
 }
+
+Tapşırıqlar yaratma qaydaları:
+- Hər kritik hal üçün konkret tapşırıq yarat
+- Prioritet: kritik (dərhal müdaxilə), yüksək (bu həftə), orta (planlaşdırılmış)
+- Kateqoriyalar: "Görüş" (1-1 söhbət), "Müdaxilə" (dərhal tədbir), "Araşdırma" (problem analizi), "Dəyişiklik" (proses dəyişikliyi)
+- Ən az 3, ən çox 7 tapşırıq yarat
+- Zorakılıq/mobbing halları varsa "kritik" prioritetli tapşırıq MÜTLƏQ olmalıdır!
 
 Score hesablama meyarları:
 - Yaxşı əhval % yüksəkdirsə +
