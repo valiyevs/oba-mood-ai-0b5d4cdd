@@ -33,6 +33,7 @@ import { MoodPieChart } from "@/components/charts/MoodPieChart";
 import { TrendLineChart } from "@/components/charts/TrendLineChart";
 import { DepartmentRadarChart } from "@/components/charts/DepartmentRadarChart";
 import { BranchComparisonChart } from "@/components/charts/BranchComparisonChart";
+import { ManagerBranchAssignment } from "@/components/ManagerBranchAssignment";
 interface FilterState {
   country: string;
   branch: string;
@@ -590,6 +591,11 @@ const HRPanel = () => {
             title="Filial Müqayisəsi" 
             description="Filiallar üzrə əhval bölgüsü" 
           />
+        </div>
+
+        {/* Manager Branch Assignments - HR Only */}
+        <div className="mb-6">
+          <ManagerBranchAssignment />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
