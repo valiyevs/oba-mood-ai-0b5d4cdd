@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { TrendingUp, TrendingDown, Users, AlertCircle, BarChart3, Activity, Home, UserCog, CalendarIcon, Eye, LogOut } from "lucide-react";
+import { TrendingUp, TrendingDown, Users, AlertCircle, BarChart3, Activity, Home, UserCog, CalendarIcon, LogOut } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -15,6 +15,7 @@ import obaLogo from "@/assets/oba-logo.jpg";
 import { MobileNavMenu } from "@/components/MobileNavMenu";
 import { useToast } from "@/hooks/use-toast";
 import { AIAnalysisCard } from "@/components/AIAnalysisCard";
+import { AITasksCard, AITask } from "@/components/AITasksCard";
 import { MoodPieChart } from "@/components/charts/MoodPieChart";
 import { ReasonsBarChart } from "@/components/charts/ReasonsBarChart";
 import { TrendLineChart } from "@/components/charts/TrendLineChart";
@@ -74,6 +75,7 @@ const Dashboard = () => {
     recommendations: string[];
     riskLevel: string;
     criticalAlerts?: string[];
+    tasks?: AITask[];
   } | null>(null);
   const [hasAutoLoaded, setHasAutoLoaded] = useState(false);
 
@@ -423,65 +425,14 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* Risk Alert */}
-        {burnoutAlerts.length > 0 && (
-          <Card className="mt-6 border-destructive/50 bg-destructive/5 shadow-soft">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <AlertCircle className="h-5 w-5 text-destructive" />
-                <CardTitle className="text-destructive">Diqqət Tələb Edən Hallar</CardTitle>
-              </div>
-              <CardDescription>
-                {burnoutAlerts.length} işçidə burnout riski aşkar edilib
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3 mb-4">
-                {burnoutAlerts.slice(0, 5).map((alert) => (
-                  <div 
-                    key={alert.id} 
-                    className="flex items-center justify-between p-3 rounded-lg bg-background/50 border border-border/50"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-foreground">{alert.employee_code}</span>
-                        <span className={cn(
-                          "text-xs px-2 py-0.5 rounded-full font-medium",
-                          alert.risk_score >= 80 ? "bg-destructive/20 text-destructive" :
-                          alert.risk_score >= 60 ? "bg-orange-500/20 text-orange-600" :
-                          "bg-yellow-500/20 text-yellow-600"
-                        )}>
-                          {alert.risk_score >= 80 ? "Kritik" : alert.risk_score >= 60 ? "Yüksək" : "Orta"}
-                        </span>
-                      </div>
-                      <div className="text-sm text-muted-foreground mt-1">
-                        {alert.department} • {alert.branch} • {alert.reason_category}
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-xl font-bold text-destructive">{alert.risk_score}</div>
-                      <div className="text-xs text-muted-foreground">Risk Balı</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {burnoutAlerts.length > 5 && (
-                <p className="text-sm text-muted-foreground mb-4">
-                  +{burnoutAlerts.length - 5} digər hal var
-                </p>
-              )}
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => navigate("/hr-panel")}
-                className="gap-2"
-              >
-                <Eye className="w-4 h-4" />
-                Hamısına Bax
-              </Button>
-            </CardContent>
-          </Card>
-        )}
+        {/* AI Tasks Section */}
+        <div className="mt-6">
+          <AITasksCard
+            tasks={aiAnalysis?.tasks || []}
+            isLoading={analysisMutation.isPending}
+            onRefresh={() => analysisMutation.mutate()}
+          />
+        </div>
       </main>
     </div>
   );
