@@ -33,7 +33,7 @@ import { MoodPieChart } from "@/components/charts/MoodPieChart";
 import { TrendLineChart } from "@/components/charts/TrendLineChart";
 import { ReasonsBarChart } from "@/components/charts/ReasonsBarChart";
 import { BranchComparisonChart } from "@/components/charts/BranchComparisonChart";
-import { ManagerBranchAssignment } from "@/components/ManagerBranchAssignment";
+
 interface FilterState {
   country: string;
   branch: string;
@@ -314,6 +314,15 @@ const HRPanel = () => {
                 <Button
                   variant="ghost"
                   size="sm"
+                  onClick={() => navigate("/manager-assignments")}
+                  className="gap-2"
+                >
+                  <Users className="w-4 h-4" />
+                  <span className="hidden md:inline">Təyinatlar</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => navigate("/manager-actions")}
                   className="gap-2"
                 >
@@ -566,10 +575,6 @@ const HRPanel = () => {
           />
         </div>
 
-        {/* Manager Branch Assignments - Separate Section */}
-        <div className="mb-6">
-          <ManagerBranchAssignment />
-        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Burnout Risk Cases */}
