@@ -171,36 +171,40 @@ export const AIAnalysisCard = ({ analysis, isLoading, onRefresh }: AIAnalysisCar
             )}
 
             {/* Observations */}
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <TrendingUp className="h-5 w-5 text-primary" />
-                <h3 className="font-semibold text-foreground">Əsas Müşahidələr</h3>
+            {analysis.observations && analysis.observations.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                  <h3 className="font-semibold text-foreground">Əsas Müşahidələr</h3>
+                </div>
+                <ul className="space-y-2">
+                  {analysis.observations.map((observation, index) => (
+                    <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
+                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
+                      <span>{observation}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <ul className="space-y-2">
-                {analysis.observations.map((observation, index) => (
-                  <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
-                    <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
-                    <span>{observation}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            )}
 
             {/* Recommendations */}
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <Lightbulb className="h-5 w-5 text-status-good" />
-                <h3 className="font-semibold text-foreground">Tövsiyələr</h3>
+            {analysis.recommendations && analysis.recommendations.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Lightbulb className="h-5 w-5 text-status-good" />
+                  <h3 className="font-semibold text-foreground">Tövsiyələr</h3>
+                </div>
+                <ul className="space-y-2">
+                  {analysis.recommendations.map((rec, index) => (
+                    <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 text-status-good flex-shrink-0" />
+                      <span>{rec}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <ul className="space-y-2">
-                {analysis.recommendations.map((rec, index) => (
-                  <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 text-status-good flex-shrink-0" />
-                    <span>{rec}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            )}
           </>
         ) : (
           <div className="text-center py-8 text-muted-foreground">
