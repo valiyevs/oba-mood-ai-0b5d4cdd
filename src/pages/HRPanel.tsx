@@ -225,6 +225,9 @@ const HRPanel = () => {
           department: r.department,
         }));
 
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('Autentifikasiya tələb olunur');
+      
       const response = await supabase.functions.invoke('analyze-responses', {
         body: {
           moodDistribution,
@@ -232,7 +235,7 @@ const HRPanel = () => {
           riskCount: stats.burnoutCases,
           responseRate: parseFloat(stats.responseRate),
           overallIndex: stats.avgSatisfaction * 10,
-          criticalComplaints, // Send critical complaints for AI to analyze
+          criticalComplaints,
         }
       });
 

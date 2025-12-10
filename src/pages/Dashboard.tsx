@@ -212,6 +212,9 @@ const Dashboard = () => {
   // AI Analysis mutation
   const analysisMutation = useMutation({
     mutationFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('Autentifikasiya tələb olunur');
+      
       const { data, error } = await supabase.functions.invoke('analyze-responses', {
         body: {
           moodDistribution,
@@ -219,7 +222,7 @@ const Dashboard = () => {
           riskCount: stats.riskCount,
           responseRate: stats.responseRate,
           overallIndex: stats.overallIndex,
-          criticalComplaints, // Send critical complaints for AI to analyze
+          criticalComplaints,
         },
       });
       
