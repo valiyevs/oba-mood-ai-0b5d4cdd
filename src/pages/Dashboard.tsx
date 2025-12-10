@@ -428,9 +428,10 @@ const Dashboard = () => {
         {/* AI Tasks Section */}
         <div className="mt-6">
           <AITasksCard
-            tasks={aiAnalysis?.tasks || []}
-            isLoading={analysisMutation.isPending}
+            newTasks={aiAnalysis?.tasks || []}
+            isGenerating={analysisMutation.isPending}
             onRefresh={() => analysisMutation.mutate()}
+            branch={managerBranch}
           />
         </div>
       </main>
