@@ -31,13 +31,12 @@ import { MobileNavMenu } from "@/components/MobileNavMenu";
 import { AIAnalysisCard } from "@/components/AIAnalysisCard";
 import { MoodPieChart } from "@/components/charts/MoodPieChart";
 import { TrendLineChart } from "@/components/charts/TrendLineChart";
-import { DepartmentRadarChart } from "@/components/charts/DepartmentRadarChart";
+import { ReasonsBarChart } from "@/components/charts/ReasonsBarChart";
 import { BranchComparisonChart } from "@/components/charts/BranchComparisonChart";
 import { ManagerBranchAssignment } from "@/components/ManagerBranchAssignment";
 interface FilterState {
   country: string;
   branch: string;
-  department: string;
 }
 
 interface BurnoutCase {
@@ -55,8 +54,7 @@ const HRPanel = () => {
   const navigate = useNavigate();
   const [filters, setFilters] = useState<FilterState>({
     country: "all",
-    branch: "all",
-    department: "all"
+    branch: "all"
   });
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
     from: subDays(new Date(), 90), // Extended to 90 days to include more data
@@ -80,14 +78,6 @@ const HRPanel = () => {
     { value: "sumgayit", label: "Sumqayıt" }
   ];
 
-  // Mock data - şöbələr
-  const departments = [
-    { value: "all", label: "Bütün şöbələr" },
-    { value: "sales", label: "Satış" },
-    { value: "tech", label: "Texniki" },
-    { value: "logistics", label: "Logistika" },
-    { value: "hr", label: "İnsan Resursları" }
-  ];
 
   // HR statistics - fetch burnout cases
   const { data: burnoutCases = [] } = useQuery<BurnoutCase[]>({
@@ -165,23 +155,23 @@ const HRPanel = () => {
     trend: "+2.1"
   };
 
-  // Calculate department statistics from real data
-  const departmentData: Record<string, { responses: number; moodSum: number; badCount: number }> = {};
+  // Calculate top reasons from responses
+  const reasonCounts: Record<string, number> = {};
   responses.forEach(r => {
-    if (!departmentData[r.department]) {
-      departmentData[r.department] = { responses: 0, moodSum: 0, badCount: 0 };
+    if (r.reason_category) {
+      reasonCounts[r.reason_category] = (reasonCounts[r.reason_category] || 0) + 1;
     }
-    departmentData[r.department].responses++;
-    departmentData[r.department].moodSum += r.mood === 'Yaxşı' ? 10 : r.mood === 'Normal' ? 5 : 0;
-    if (r.mood === 'Pis') departmentData[r.department].badCount++;
   });
-
-  const departmentStats = Object.entries(departmentData).map(([name, data]) => ({
-    name,
-    employees: data.responses,
-    satisfaction: data.responses > 0 ? parseFloat((data.moodSum / data.responses).toFixed(1)) : 0,
-    burnout: data.badCount
-  })).sort((a, b) => b.employees - a.employees);
+  
+  const totalReasons = Object.values(reasonCounts).reduce((a, b) => a + b, 0);
+  const topReasons = Object.entries(reasonCounts)
+    .map(([reason, count]) => ({
+      reason,
+      count,
+      percentage: totalReasons > 0 ? Math.round((count / totalReasons) * 100) : 0,
+    }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
 
   const handleFilterChange = (key: keyof FilterState, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -442,7 +432,7 @@ const HRPanel = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-2 text-foreground">
                   <MapPin className="w-4 h-4 inline mr-1" />
@@ -463,7 +453,7 @@ const HRPanel = () => {
               <div>
                 <label className="block text-sm font-medium mb-2 text-foreground">
                   <Building2 className="w-4 h-4 inline mr-1" />
-                  Filial
+                  Bölgə / Filial
                 </label>
                 <select
                   value={filters.branch}
@@ -473,23 +463,6 @@ const HRPanel = () => {
                   {branches.map(branch => (
                     <option key={branch.value} value={branch.value}>
                       {branch.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2 text-foreground">
-                  <Users className="w-4 h-4 inline mr-1" />
-                  Şöbə
-                </label>
-                <select
-                  value={filters.department}
-                  onChange={(e) => handleFilterChange("department", e.target.value)}
-                  className="w-full px-4 py-2 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                >
-                  {departments.map(dept => (
-                    <option key={dept.value} value={dept.value}>
-                      {dept.label}
                     </option>
                   ))}
                 </select>
@@ -581,10 +554,10 @@ const HRPanel = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <DepartmentRadarChart 
-            data={departmentStats} 
-            title="Şöbə Performansı" 
-            description="Şöbələr üzrə məmnuniyyət müqayisəsi" 
+          <ReasonsBarChart 
+            data={topReasons} 
+            title="Şikayət Səbəbləri" 
+            description="Ən çox qeyd olunan problemlər" 
           />
           <BranchComparisonChart 
             responses={responses}
@@ -648,49 +621,77 @@ const HRPanel = () => {
             </CardContent>
           </Card>
 
-          {/* Department Statistics */}
+          {/* Branch Statistics */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Building2 className="w-5 h-5" />
-                Şöbə üzrə Statistika
+                Filial üzrə Statistika
               </CardTitle>
               <CardDescription>
-                Məmnuniyyət və risk göstəriciləri
+                Bölgələr üzrə əhval göstəriciləri
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {departmentStats.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-4">Məlumat yoxdur</p>
-                ) : (
-                  departmentStats.map((dept, index) => (
-                    <div key={index}>
-                      <div className="flex items-center justify-between mb-2">
-                        <div>
-                          <div className="font-medium text-foreground">{dept.name}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {dept.employees} əməkdaş
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm font-semibold text-foreground">
-                            {dept.satisfaction}/10
-                          </div>
-                          {dept.burnout > 0 && (
-                            <div className="text-xs text-destructive">
-                              {dept.burnout} risk
+                {(() => {
+                  // Calculate branch statistics
+                  const branchData: Record<string, { responses: number; moodSum: number; badCount: number }> = {};
+                  responses.forEach(r => {
+                    if (!branchData[r.branch]) {
+                      branchData[r.branch] = { responses: 0, moodSum: 0, badCount: 0 };
+                    }
+                    branchData[r.branch].responses++;
+                    branchData[r.branch].moodSum += r.mood === 'Yaxşı' ? 10 : r.mood === 'Normal' ? 5 : 0;
+                    if (r.mood === 'Pis') branchData[r.branch].badCount++;
+                  });
+
+                  const branchStats = Object.entries(branchData).map(([name, data]) => ({
+                    name,
+                    employees: data.responses,
+                    satisfaction: data.responses > 0 ? parseFloat((data.moodSum / data.responses).toFixed(1)) : 0,
+                    burnout: data.badCount
+                  })).sort((a, b) => b.employees - a.employees);
+
+                  const branchNames: Record<string, string> = {
+                    'baku': 'Bakı', 'ganja': 'Gəncə', 'sumgait': 'Sumqayıt',
+                    'mingachevir': 'Mingəçevir', 'shirvan': 'Şirvan',
+                    'lankaran': 'Lənkəran', 'shaki': 'Şəki', 'quba': 'Quba'
+                  };
+
+                  return branchStats.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-4">Məlumat yoxdur</p>
+                  ) : (
+                    branchStats.map((branch, index) => (
+                      <div key={index}>
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <div className="font-medium text-foreground">
+                              {branchNames[branch.name] || branch.name}
                             </div>
-                          )}
+                            <div className="text-sm text-muted-foreground">
+                              {branch.employees} cavab
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-sm font-semibold text-foreground">
+                              {branch.satisfaction}/10
+                            </div>
+                            {branch.burnout > 0 && (
+                              <div className="text-xs text-destructive">
+                                {branch.burnout} pis əhval
+                              </div>
+                            )}
+                          </div>
                         </div>
+                        <Progress 
+                          value={branch.satisfaction * 10} 
+                          className="h-2"
+                        />
                       </div>
-                      <Progress 
-                        value={dept.satisfaction * 10} 
-                        className="h-2"
-                      />
-                    </div>
-                  ))
-                )}
+                    ))
+                  );
+                })()}
               </div>
             </CardContent>
           </Card>

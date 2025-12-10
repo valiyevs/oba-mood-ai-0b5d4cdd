@@ -12,11 +12,16 @@ import obaLogo from "@/assets/oba-logo.jpg";
 
 type StepType = "branch" | "mood" | "reason" | "success";
 
-// Department mapping based on branch
-const getDepartmentFromBranch = (branch: BranchType): string => {
-  const departments = ["Satış", "Texniki", "Logistika", "İnsan Resursları"];
-  // Random department for demo purposes - in real app this would come from user profile
-  return departments[Math.floor(Math.random() * departments.length)];
+// Branch name mapping
+const branchNames: Record<string, string> = {
+  'baku': 'Bakı',
+  'ganja': 'Gəncə',
+  'sumgait': 'Sumqayıt',
+  'mingachevir': 'Mingəçevir',
+  'shirvan': 'Şirvan',
+  'lankaran': 'Lənkəran',
+  'shaki': 'Şəki',
+  'quba': 'Quba',
 };
 
 // Generate employee code (in real app, this would come from user session/profile)
@@ -59,7 +64,7 @@ const Index = () => {
     
     try {
       const employeeCode = generateEmployeeCode();
-      const department = getDepartmentFromBranch(selectedBranch);
+      const branchName = branchNames[selectedBranch] || selectedBranch;
       
       // Map mood to Azerbaijani
       const moodMap: Record<string, string> = {
@@ -83,7 +88,7 @@ const Index = () => {
         .insert({
           employee_code: employeeCode,
           branch: selectedBranch,
-          department: department,
+          department: branchName, // Filialda şöbə yoxdur, bölgə adı istifadə olunur
           mood: moodMap[mood] || mood,
           reason: customText || null,
           reason_category: reason ? (reasonMap[reason] || reason) : null,
@@ -103,7 +108,7 @@ const Index = () => {
           .insert({
             employee_code: employeeCode,
             branch: selectedBranch,
-            department: department,
+            department: branchName, // Filialda şöbə yoxdur, bölgə adı istifadə olunur
             reason_category: reasonMap[reason] || reason,
             risk_score: riskScore,
             is_resolved: false,
@@ -120,9 +125,9 @@ const Index = () => {
         reason, 
         customText, 
         branch: selectedBranch, 
-        department,
+        branchName,
         employeeCode,
-        timestamp: new Date() 
+        timestamp: new Date()
       });
       
       // Show success screen
