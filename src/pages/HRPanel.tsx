@@ -177,37 +177,7 @@ const HRPanel = () => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
-  const getRiskLevel = (score: number) => {
-    if (score >= 80) return "critical";
-    if (score >= 60) return "high";
-    return "medium";
-  };
 
-  const getRiskColor = (level: string) => {
-    switch (level) {
-      case "critical":
-        return "text-destructive";
-      case "high":
-        return "text-orange-500";
-      case "medium":
-        return "text-yellow-500";
-      default:
-        return "text-muted-foreground";
-    }
-  };
- 
-  const getRiskLabel = (level: string) => {
-    switch (level) {
-      case "critical":
-        return "Kritik";
-      case "high":
-        return "Yüksək";
-      case "medium":
-        return "Orta";
-      default:
-        return "Aşağı";
-    }
-  };
 
   // AI Analysis state
   const [aiAnalysis, setAiAnalysis] = useState<{
@@ -561,8 +531,8 @@ const HRPanel = () => {
           />
           <BranchComparisonChart 
             responses={responses}
-            title="Filial Müqayisəsi" 
-            description="Filiallar üzrə əhval bölgüsü" 
+            title="Bölgə Müqayisəsi" 
+            description="Bölgələr üzrə əhval bölgüsü" 
           />
         </div>
 
@@ -576,131 +546,92 @@ const HRPanel = () => {
         </div>
 
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Burnout Risk Cases */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-destructive" />
-                Burnout Risk Halları
-              </CardTitle>
-              <CardDescription>
-                Yüksək risk altında olan əməkdaşlar
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {burnoutCases.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-4">Risk halı yoxdur</p>
+        {/* Region Statistics - Full Width */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Building2 className="w-5 h-5" />
+              Bölgələr üzrə Ümumi Statistika
+            </CardTitle>
+            <CardDescription>
+              Real sorğu cavablarına əsasən bölgə göstəriciləri
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {(() => {
+                // Calculate region statistics from real responses
+                const regionData: Record<string, { responses: number; moodSum: number; badCount: number; goodCount: number }> = {};
+                responses.forEach(r => {
+                  if (!regionData[r.branch]) {
+                    regionData[r.branch] = { responses: 0, moodSum: 0, badCount: 0, goodCount: 0 };
+                  }
+                  regionData[r.branch].responses++;
+                  regionData[r.branch].moodSum += r.mood === 'Yaxşı' ? 10 : r.mood === 'Normal' ? 5 : 0;
+                  if (r.mood === 'Pis') regionData[r.branch].badCount++;
+                  if (r.mood === 'Yaxşı') regionData[r.branch].goodCount++;
+                });
+
+                const regionStats = Object.entries(regionData).map(([name, data]) => ({
+                  name,
+                  responses: data.responses,
+                  satisfaction: data.responses > 0 ? parseFloat((data.moodSum / data.responses).toFixed(1)) : 0,
+                  badCount: data.badCount,
+                  goodCount: data.goodCount,
+                  goodPercent: data.responses > 0 ? Math.round((data.goodCount / data.responses) * 100) : 0
+                })).sort((a, b) => b.responses - a.responses);
+
+                const regionNames: Record<string, string> = {
+                  'baku': 'Bakı', 'ganja': 'Gəncə', 'sumgait': 'Sumqayıt',
+                  'mingachevir': 'Mingəçevir', 'shirvan': 'Şirvan',
+                  'lankaran': 'Lənkəran', 'shaki': 'Şəki', 'quba': 'Quba'
+                };
+
+                return regionStats.length === 0 ? (
+                  <p className="col-span-full text-center text-muted-foreground py-8">Məlumat yoxdur</p>
                 ) : (
-                  burnoutCases.map((case_) => {
-                    const level = getRiskLevel(case_.risk_score);
-                    return (
-                      <div 
-                        key={case_.id}
-                        className="flex items-center justify-between p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors"
-                      >
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-medium text-foreground">{case_.employee_code}</span>
-                            <span className={cn("text-xs font-semibold", getRiskColor(level))}>
-                              {getRiskLabel(level)}
-                            </span>
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            {case_.department} • {case_.branch} • {case_.reason_category}
-                          </div>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            Son qeyd: {new Date(case_.detected_at).toLocaleString("az-Latn")}
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-2xl font-bold text-destructive">{case_.risk_score}</div>
-                          <div className="text-xs text-muted-foreground">Risk Bal</div>
-                        </div>
+                  regionStats.map((region, index) => (
+                    <div key={index} className="p-4 rounded-lg border border-border bg-card hover:bg-accent/30 transition-colors">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-semibold text-foreground">
+                          {regionNames[region.name] || region.name}
+                        </h4>
+                        <span className={cn(
+                          "text-xs font-medium px-2 py-1 rounded-full",
+                          region.satisfaction >= 7 ? "bg-status-good/20 text-status-good" :
+                          region.satisfaction >= 4 ? "bg-status-normal/20 text-status-normal" :
+                          "bg-status-bad/20 text-status-bad"
+                        )}>
+                          {region.satisfaction}/10
+                        </span>
                       </div>
-                    );
-                  })
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Branch Statistics */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building2 className="w-5 h-5" />
-                Filial üzrə Statistika
-              </CardTitle>
-              <CardDescription>
-                Bölgələr üzrə əhval göstəriciləri
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                {(() => {
-                  // Calculate branch statistics
-                  const branchData: Record<string, { responses: number; moodSum: number; badCount: number }> = {};
-                  responses.forEach(r => {
-                    if (!branchData[r.branch]) {
-                      branchData[r.branch] = { responses: 0, moodSum: 0, badCount: 0 };
-                    }
-                    branchData[r.branch].responses++;
-                    branchData[r.branch].moodSum += r.mood === 'Yaxşı' ? 10 : r.mood === 'Normal' ? 5 : 0;
-                    if (r.mood === 'Pis') branchData[r.branch].badCount++;
-                  });
-
-                  const branchStats = Object.entries(branchData).map(([name, data]) => ({
-                    name,
-                    employees: data.responses,
-                    satisfaction: data.responses > 0 ? parseFloat((data.moodSum / data.responses).toFixed(1)) : 0,
-                    burnout: data.badCount
-                  })).sort((a, b) => b.employees - a.employees);
-
-                  const branchNames: Record<string, string> = {
-                    'baku': 'Bakı', 'ganja': 'Gəncə', 'sumgait': 'Sumqayıt',
-                    'mingachevir': 'Mingəçevir', 'shirvan': 'Şirvan',
-                    'lankaran': 'Lənkəran', 'shaki': 'Şəki', 'quba': 'Quba'
-                  };
-
-                  return branchStats.length === 0 ? (
-                    <p className="text-center text-muted-foreground py-4">Məlumat yoxdur</p>
-                  ) : (
-                    branchStats.map((branch, index) => (
-                      <div key={index}>
-                        <div className="flex items-center justify-between mb-2">
-                          <div>
-                            <div className="font-medium text-foreground">
-                              {branchNames[branch.name] || branch.name}
-                            </div>
-                            <div className="text-sm text-muted-foreground">
-                              {branch.employees} cavab
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-sm font-semibold text-foreground">
-                              {branch.satisfaction}/10
-                            </div>
-                            {branch.burnout > 0 && (
-                              <div className="text-xs text-destructive">
-                                {branch.burnout} pis əhval
-                              </div>
-                            )}
-                          </div>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Cavab sayı:</span>
+                          <span className="font-medium">{region.responses}</span>
                         </div>
-                        <Progress 
-                          value={branch.satisfaction * 10} 
-                          className="h-2"
-                        />
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Yaxşı əhval:</span>
+                          <span className="text-status-good font-medium">{region.goodPercent}%</span>
+                        </div>
+                        {region.badCount > 0 && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Pis əhval:</span>
+                            <span className="text-status-bad font-medium">{region.badCount} nəfər</span>
+                          </div>
+                        )}
                       </div>
-                    ))
-                  );
-                })()}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+                      <Progress 
+                        value={region.satisfaction * 10} 
+                        className="h-1.5 mt-3"
+                      />
+                    </div>
+                  ))
+                );
+              })()}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
