@@ -15,6 +15,10 @@ import obaLogo from "@/assets/oba-logo.jpg";
 import { MobileNavMenu } from "@/components/MobileNavMenu";
 import { useToast } from "@/hooks/use-toast";
 import { AIAnalysisCard } from "@/components/AIAnalysisCard";
+import { MoodPieChart } from "@/components/charts/MoodPieChart";
+import { ReasonsBarChart } from "@/components/charts/ReasonsBarChart";
+import { TrendLineChart } from "@/components/charts/TrendLineChart";
+import { BranchComparisonChart } from "@/components/charts/BranchComparisonChart";
 
 interface StatCardProps {
   title: string;
@@ -361,64 +365,16 @@ const Dashboard = () => {
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Mood Distribution */}
-          <Card className="gradient-card border-border/50 shadow-soft">
-            <CardHeader>
-              <CardTitle className="text-foreground">Əhval Bölgüsü</CardTitle>
-              <CardDescription>Ümumi rəylər</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {moodDistribution.map((item) => (
-                <div key={item.mood} className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium text-foreground">{item.mood}</span>
-                    <span className="text-muted-foreground">
-                      {item.count} ({item.percentage}%)
-                    </span>
-                  </div>
-                  <Progress
-                    value={item.percentage}
-                    className="h-3"
-                    style={{
-                      ["--progress-background" as any]: `hsl(var(--${item.color}))`,
-                    }}
-                  />
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+        {/* Charts Row 1 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <MoodPieChart data={moodDistribution} />
+          <ReasonsBarChart data={topReasons} />
+        </div>
 
-          {/* Top Reasons */}
-          <Card className="gradient-card border-border/50 shadow-soft">
-            <CardHeader>
-              <CardTitle className="text-foreground">Əsas Səbəblər</CardTitle>
-              <CardDescription>Problemli sahələr</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {topReasons.map((item, index) => (
-                  <div key={item.reason} className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2">
-                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold">
-                          {index + 1}
-                        </span>
-                        <span className="font-medium text-foreground">{item.reason}</span>
-                      </div>
-                      <span className="text-muted-foreground">
-                        {item.count} şikayət
-                      </span>
-                    </div>
-                    <Progress
-                      value={item.percentage}
-                      className="h-2"
-                    />
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+        {/* Charts Row 2 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <TrendLineChart responses={responses} dateRange={dateRange} />
+          <BranchComparisonChart responses={responses} />
         </div>
 
         {/* AI Analysis Section */}

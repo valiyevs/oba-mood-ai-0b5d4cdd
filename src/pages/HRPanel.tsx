@@ -29,6 +29,10 @@ import obaLogo from "@/assets/oba-logo.jpg";
 import { supabase } from "@/integrations/supabase/client";
 import { MobileNavMenu } from "@/components/MobileNavMenu";
 import { AIAnalysisCard } from "@/components/AIAnalysisCard";
+import { MoodPieChart } from "@/components/charts/MoodPieChart";
+import { TrendLineChart } from "@/components/charts/TrendLineChart";
+import { DepartmentRadarChart } from "@/components/charts/DepartmentRadarChart";
+import { BranchComparisonChart } from "@/components/charts/BranchComparisonChart";
 interface FilterState {
   country: string;
   branch: string;
@@ -123,6 +127,28 @@ const HRPanel = () => {
     'Normal': responses.filter(r => r.mood === 'Normal').length,
     'Pis': responses.filter(r => r.mood === 'Pis').length,
   };
+
+  // Mood distribution for charts
+  const moodDistribution = [
+    { 
+      mood: "Yaxşı", 
+      count: moodCounts['Yaxşı'], 
+      percentage: totalResponses > 0 ? Math.round((moodCounts['Yaxşı'] / totalResponses) * 100) : 0, 
+      color: "status-good" 
+    },
+    { 
+      mood: "Normal", 
+      count: moodCounts['Normal'], 
+      percentage: totalResponses > 0 ? Math.round((moodCounts['Normal'] / totalResponses) * 100) : 0, 
+      color: "status-normal" 
+    },
+    { 
+      mood: "Pis", 
+      count: moodCounts['Pis'], 
+      percentage: totalResponses > 0 ? Math.round((moodCounts['Pis'] / totalResponses) * 100) : 0, 
+      color: "status-bad" 
+    },
+  ];
 
   // Calculate average satisfaction (10 scale: Yaxşı=10, Normal=5, Pis=0)
   const avgSatisfaction = totalResponses > 0 
@@ -538,6 +564,34 @@ const HRPanel = () => {
           />
         </div>
 
+        {/* Charts Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <MoodPieChart 
+            data={moodDistribution} 
+            title="Əhval Bölgüsü" 
+            description="İşçilərin əhval paylanması" 
+          />
+          <TrendLineChart 
+            responses={responses} 
+            dateRange={dateRange}
+            title="Əhval Trendi" 
+            description="Günlər üzrə məmnuniyyət göstəricisi" 
+          />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <DepartmentRadarChart 
+            data={departmentStats} 
+            title="Şöbə Performansı" 
+            description="Şöbələr üzrə məmnuniyyət müqayisəsi" 
+          />
+          <BranchComparisonChart 
+            responses={responses}
+            title="Filial Müqayisəsi" 
+            description="Filiallar üzrə əhval bölgüsü" 
+          />
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Burnout Risk Cases */}
           <Card>
@@ -552,34 +606,38 @@ const HRPanel = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {burnoutCases.map((case_) => {
-                  const level = getRiskLevel(case_.risk_score);
-                  return (
-                    <div 
-                      key={case_.id}
-                      className="flex items-center justify-between p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors"
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium text-foreground">{case_.employee_code}</span>
-                          <span className={cn("text-xs font-semibold", getRiskColor(level))}>
-                            {getRiskLabel(level)}
-                          </span>
+                {burnoutCases.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-4">Risk halı yoxdur</p>
+                ) : (
+                  burnoutCases.map((case_) => {
+                    const level = getRiskLevel(case_.risk_score);
+                    return (
+                      <div 
+                        key={case_.id}
+                        className="flex items-center justify-between p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors"
+                      >
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-medium text-foreground">{case_.employee_code}</span>
+                            <span className={cn("text-xs font-semibold", getRiskColor(level))}>
+                              {getRiskLabel(level)}
+                            </span>
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {case_.department} • {case_.branch} • {case_.reason_category}
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            Son qeyd: {new Date(case_.detected_at).toLocaleString("az-Latn")}
+                          </div>
                         </div>
-                        <div className="text-sm text-muted-foreground">
-                          {case_.department} • {case_.branch} • {case_.reason_category}
-                        </div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          Son qeyd: {new Date(case_.detected_at).toLocaleString("az-Latn")}
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-destructive">{case_.risk_score}</div>
+                          <div className="text-xs text-muted-foreground">Risk Bal</div>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-destructive">{case_.risk_score}</div>
-                        <div className="text-xs text-muted-foreground">Risk Bal</div>
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                )}
               </div>
             </CardContent>
           </Card>
@@ -597,33 +655,36 @@ const HRPanel = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {departmentStats.map((dept, index) => (
-                  <div key={index}>
-                    <div className="flex items-center justify-between mb-2">
-                      <div>
-                        <div className="font-medium text-foreground">{dept.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {dept.employees} əməkdaş
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm font-semibold text-foreground">
-                          {dept.satisfaction}/10
-                        </div>
-                        {dept.burnout > 0 && (
-                          <div className="text-xs text-destructive">
-                            {dept.burnout} risk
+                {departmentStats.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-4">Məlumat yoxdur</p>
+                ) : (
+                  departmentStats.map((dept, index) => (
+                    <div key={index}>
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          <div className="font-medium text-foreground">{dept.name}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {dept.employees} əməkdaş
                           </div>
-                        )}
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm font-semibold text-foreground">
+                            {dept.satisfaction}/10
+                          </div>
+                          {dept.burnout > 0 && (
+                            <div className="text-xs text-destructive">
+                              {dept.burnout} risk
+                            </div>
+                          )}
+                        </div>
                       </div>
+                      <Progress 
+                        value={dept.satisfaction * 10} 
+                        className="h-2"
+                      />
                     </div>
-                    <Progress 
-                      value={dept.satisfaction * 10} 
-                      className="h-2"
-                      indicatorClassName={dept.satisfaction < 6 ? "bg-destructive" : "bg-primary"}
-                    />
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>
