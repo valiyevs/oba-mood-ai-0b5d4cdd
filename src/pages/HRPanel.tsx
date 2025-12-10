@@ -250,7 +250,7 @@ const HRPanel = () => {
       });
 
       if (response.error) throw response.error;
-      setAiAnalysis(response.data);
+      setAiAnalysis(response.data?.analysis || response.data);
     } catch (error) {
       console.error('AI analysis error:', error);
     } finally {
