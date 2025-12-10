@@ -529,16 +529,7 @@ const HRPanel = () => {
           </Alert>
         )}
 
-        {/* AI Analysis Section */}
-        <div className="mb-6">
-          <AIAnalysisCard
-            analysis={aiAnalysis}
-            isLoading={isAnalyzing}
-            onRefresh={runAIAnalysis}
-          />
-        </div>
-
-        {/* Charts Row */}
+        {/* Charts Row - FIRST */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <MoodPieChart 
             data={moodDistribution} 
@@ -566,7 +557,16 @@ const HRPanel = () => {
           />
         </div>
 
-        {/* Manager Branch Assignments - HR Only */}
+        {/* AI Analysis Section - AFTER CHARTS */}
+        <div className="mb-6">
+          <AIAnalysisCard
+            analysis={aiAnalysis}
+            isLoading={isAnalyzing}
+            onRefresh={runAIAnalysis}
+          />
+        </div>
+
+        {/* Manager Branch Assignments - Separate Section */}
         <div className="mb-6">
           <ManagerBranchAssignment />
         </div>
