@@ -196,7 +196,7 @@ const Index = () => {
               className="gap-2 rounded-xl border-border/50 hover:bg-primary/10 hover:border-primary/50 transition-all duration-300"
             >
               <TrendingUp className="w-4 h-4" />
-              <span className="hidden sm:inline">Dashboard</span>
+              <span className="hidden sm:inline">İdarəetmə Paneli</span>
             </Button>
           </div>
         </div>
