@@ -205,7 +205,7 @@ const EmployeeResponses = () => {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Burnout Riski</p>
+                  <p className="text-sm text-muted-foreground">Tükənmişlik Riski</p>
                   <p className="text-2xl font-bold text-destructive">{criticalCases.length}</p>
                 </div>
                 <AlertTriangle className="h-8 w-8 text-destructive/50" />
@@ -232,7 +232,7 @@ const EmployeeResponses = () => {
               <TrendingUp className="h-5 w-5" />
               Zaman üzrə Trendlər
             </CardTitle>
-            <CardDescription>Əhval və burnout hallarının dinamikası</CardDescription>
+            <CardDescription>Əhval və tükənmişlik hallarının dinamikası</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
@@ -268,7 +268,7 @@ const EmployeeResponses = () => {
                     stroke="hsl(var(--destructive))" 
                     strokeWidth={2}
                     dot={{ fill: "hsl(var(--destructive))" }}
-                    name="Burnout Halları"
+                    name="Tükənmişlik Halları"
                   />
                 </AreaChart>
               </ResponsiveContainer>

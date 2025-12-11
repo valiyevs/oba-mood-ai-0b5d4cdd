@@ -247,7 +247,7 @@ const ManagerActions = () => {
             <img src={obaLogo} alt="OBA Logo" className="h-10 w-10 rounded-lg object-cover" />
             <div>
               <h1 className="text-2xl font-bold text-foreground">Menecer Tapşırıqları</h1>
-              <p className="text-sm text-muted-foreground">Burnout hallarına görülən tədbirlər</p>
+              <p className="text-sm text-muted-foreground">Tükənmişlik hallarına görülən tədbirlər</p>
             </div>
           </div>
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
@@ -263,7 +263,7 @@ const ManagerActions = () => {
               </DialogHeader>
               <div className="space-y-4 mt-4">
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Burnout Alerti</label>
+                  <label className="text-sm font-medium mb-2 block">Tükənmişlik Xəbərdarlığı</label>
                   <Select value={selectedAlert} onValueChange={setSelectedAlert}>
                     <SelectTrigger>
                       <SelectValue placeholder="Alert seçin" />
@@ -400,7 +400,7 @@ const ManagerActions = () => {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-red-500" />
-                Aktiv Burnout Alertləri
+                Aktiv Tükənmişlik Xəbərdarlıqları
               </CardTitle>
               <CardDescription>Müdaxilə tələb edən hallar</CardDescription>
             </CardHeader>

@@ -536,7 +536,7 @@ const HRPanel = () => {
             <Alert className="border-destructive/50 bg-destructive/10 backdrop-blur-sm rounded-xl">
               <AlertTriangle className="h-5 w-5 text-destructive" />
               <AlertDescription className="text-destructive ml-2">
-                <strong>Diqqət!</strong> {stats.criticalCases} kritik burnout halı müəyyən edilib. Dərhal müdaxilə tələb olunur.
+                <strong>Diqqət!</strong> {stats.criticalCases} kritik tükənmişlik halı müəyyən edilib. Dərhal müdaxilə tələb olunur.
               </AlertDescription>
             </Alert>
           </motion.div>
