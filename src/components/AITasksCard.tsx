@@ -66,17 +66,21 @@ export const AITasksCard = ({ newTasks = [], isGenerating, onRefresh, branch }: 
 
   // Fetch existing tasks from database - only kritik and yüksək priority
   const { data: dbTasks = [], isLoading: loadingTasks } = useQuery({
-    queryKey: ['ai-tasks', branch],
+    queryKey: ['ai-tasks'],
     queryFn: async () => {
+      // Fetch all pending critical/high priority tasks (no branch filter for testing)
       const { data, error } = await supabase
         .from('ai_tasks')
         .select('*')
         .in('priority', ['kritik', 'yüksək'])
         .eq('status', 'pending')
         .order('created_at', { ascending: false })
-        .limit(5);
+        .limit(3);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching tasks:', error);
+        throw error;
+      }
       return data as DBTask[];
     },
   });
