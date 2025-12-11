@@ -456,11 +456,11 @@ const Dashboard = () => {
             delay={0.1}
           />
           <StatCard
-            title="Risk Hallları"
+            title="Risk Halları"
             value={stats.riskCount.toString()}
             change={-15.3}
             icon={AlertCircle}
-            description="Burnout riski"
+            description="Tükənmişlik riski"
             gradient="from-rose-500 to-red-500"
             delay={0.2}
           />
