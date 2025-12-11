@@ -40,8 +40,8 @@ import { ReasonsBarChart } from "@/components/charts/ReasonsBarChart";
 import { BranchComparisonChart } from "@/components/charts/BranchComparisonChart";
 
 interface FilterState {
-  country: string;
-  branch: string;
+  region: string;
+  district: string;
 }
 
 interface BurnoutCase {
@@ -108,28 +108,158 @@ const StatCard = ({ title, value, subtitle, icon: Icon, gradient, trend, trendUp
 const HRPanel = () => {
   const navigate = useNavigate();
   const [filters, setFilters] = useState<FilterState>({
-    country: "all",
-    branch: "all"
+    region: "all",
+    district: "all"
   });
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
     from: subDays(new Date(), 90),
     to: new Date(),
   });
 
-  const countries = [
-    { value: "all", label: "Bütün ölkələr" },
-    { value: "az", label: "Azərbaycan" },
-    { value: "tr", label: "Türkiyə" },
-    { value: "ge", label: "Gürcüstan" }
+  // Region-District hierarchy for Azerbaijan
+  const regionHierarchy = [
+    { id: "all", name: "Bütün regionlar", districts: [] },
+    {
+      id: "baku",
+      name: "Bakı",
+      districts: [
+        { id: "baku-center", name: "Bakı Mərkəz" },
+        { id: "baku-sabunchu", name: "Sabunçu" },
+        { id: "baku-nasimi", name: "Nəsimi" },
+        { id: "baku-yasamal", name: "Yasamal" },
+        { id: "baku-binagadi", name: "Binəqədi" },
+        { id: "baku-surakhani", name: "Suraxanı" },
+        { id: "baku-khazar", name: "Xəzər" },
+      ]
+    },
+    {
+      id: "absheron",
+      name: "Abşeron",
+      districts: [
+        { id: "sumgait", name: "Sumqayıt" },
+        { id: "khirdalan", name: "Xırdalan" },
+        { id: "absheron-r", name: "Abşeron rayonu" },
+      ]
+    },
+    {
+      id: "aran",
+      name: "Aran",
+      districts: [
+        { id: "agcabedi", name: "Ağcabədi" },
+        { id: "beylagan", name: "Beyləqan" },
+        { id: "imishli", name: "İmişli" },
+        { id: "kurdamir", name: "Kürdəmir" },
+        { id: "saatli", name: "Saatlı" },
+        { id: "sabirabad", name: "Sabirabad" },
+        { id: "shirvan", name: "Şirvan" },
+        { id: "hajigabul", name: "Hacıqabul" },
+        { id: "zardab", name: "Zərdab" },
+        { id: "ujar", name: "Ucar" },
+        { id: "bilasuvar", name: "Biləsuvar" },
+        { id: "salyan", name: "Salyan" },
+        { id: "neftchala", name: "Neftçala" },
+      ]
+    },
+    {
+      id: "ganja-gazakh",
+      name: "Gəncə-Qazax",
+      districts: [
+        { id: "ganja", name: "Gəncə" },
+        { id: "gazakh", name: "Qazax" },
+        { id: "agstafa", name: "Ağstafa" },
+        { id: "tovuz", name: "Tovuz" },
+        { id: "samukh", name: "Samux" },
+        { id: "goranboy", name: "Goranboy" },
+        { id: "goygol", name: "Göygöl" },
+        { id: "dashkasan", name: "Daşkəsən" },
+      ]
+    },
+    {
+      id: "guba-khachmaz",
+      name: "Quba-Xaçmaz",
+      districts: [
+        { id: "quba", name: "Quba" },
+        { id: "khachmaz", name: "Xaçmaz" },
+        { id: "gusar", name: "Qusar" },
+        { id: "shabran", name: "Şabran" },
+        { id: "siyazan", name: "Siyəzən" },
+      ]
+    },
+    {
+      id: "lankaran",
+      name: "Lənkəran",
+      districts: [
+        { id: "lankaran-city", name: "Lənkəran" },
+        { id: "astara", name: "Astara" },
+        { id: "lerik", name: "Lerik" },
+        { id: "masalli", name: "Masallı" },
+        { id: "yardimli", name: "Yardımlı" },
+        { id: "jalilabad", name: "Cəlilabad" },
+      ]
+    },
+    {
+      id: "sheki-zagatala",
+      name: "Şəki-Zaqatala",
+      districts: [
+        { id: "shaki", name: "Şəki" },
+        { id: "zagatala", name: "Zaqatala" },
+        { id: "balakan", name: "Balakən" },
+        { id: "gakh", name: "Qax" },
+        { id: "oguz", name: "Oğuz" },
+        { id: "gabala", name: "Qəbələ" },
+      ]
+    },
+    {
+      id: "central",
+      name: "Mərkəzi Aran",
+      districts: [
+        { id: "mingachevir", name: "Mingəçevir" },
+        { id: "yevlakh", name: "Yevlax" },
+        { id: "barda", name: "Bərdə" },
+        { id: "tartar", name: "Tərtər" },
+        { id: "agdam", name: "Ağdam" },
+      ]
+    },
+    {
+      id: "dagliq-shirvan",
+      name: "Dağlıq Şirvan",
+      districts: [
+        { id: "shamakhi", name: "Şamaxı" },
+        { id: "ismayilli", name: "İsmayıllı" },
+        { id: "gobustan", name: "Qobustan" },
+        { id: "agsu", name: "Ağsu" },
+      ]
+    },
+    {
+      id: "nakhchivan",
+      name: "Naxçıvan",
+      districts: [
+        { id: "nakhchivan-city", name: "Naxçıvan şəhəri" },
+        { id: "sharur", name: "Şərur" },
+        { id: "babek", name: "Babək" },
+        { id: "ordubad", name: "Ordubad" },
+        { id: "julfa", name: "Culfa" },
+        { id: "kangarli", name: "Kəngərli" },
+        { id: "shahbuz", name: "Şahbuz" },
+      ]
+    },
   ];
 
-  const branches = [
-    { value: "all", label: "Bütün filiallar" },
-    { value: "baku-center", label: "Bakı Mərkəz" },
-    { value: "baku-28may", label: "Bakı 28 May" },
-    { value: "ganja", label: "Gəncə" },
-    { value: "sumgayit", label: "Sumqayıt" }
-  ];
+  // Get available districts based on selected region
+  const getAvailableDistricts = () => {
+    if (filters.region === "all") return [];
+    const selectedRegion = regionHierarchy.find(r => r.id === filters.region);
+    return selectedRegion?.districts || [];
+  };
+
+  // Handle region change - reset district when region changes
+  const handleRegionChange = (regionId: string) => {
+    setFilters(prev => ({ ...prev, region: regionId, district: "all" }));
+  };
+
+  const handleDistrictChange = (districtId: string) => {
+    setFilters(prev => ({ ...prev, district: districtId }));
+  };
 
   const { data: burnoutCases = [] } = useQuery<BurnoutCase[]>({
     queryKey: ["hr-burnout-alerts", dateRange],
@@ -202,9 +332,6 @@ const HRPanel = () => {
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
 
-  const handleFilterChange = (key: keyof FilterState, value: string) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-  };
 
   const [aiAnalysis, setAiAnalysis] = useState<{
     score: number;
@@ -429,32 +556,40 @@ const HRPanel = () => {
                 <div>
                   <label className="block text-sm font-medium mb-2 text-foreground flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-muted-foreground" />
-                    Ölkə
+                    Region
                   </label>
                   <select
-                    value={filters.country}
-                    onChange={(e) => handleFilterChange("country", e.target.value)}
+                    value={filters.region}
+                    onChange={(e) => handleRegionChange(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-border/50 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                   >
-                    {countries.map(country => (
-                      <option key={country.value} value={country.value}>{country.label}</option>
+                    {regionHierarchy.map(region => (
+                      <option key={region.id} value={region.id}>{region.name}</option>
                     ))}
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2 text-foreground flex items-center gap-2">
                     <Building2 className="w-4 h-4 text-muted-foreground" />
-                    Bölgə / Filial
+                    Rayon / Bölgə
                   </label>
                   <select
-                    value={filters.branch}
-                    onChange={(e) => handleFilterChange("branch", e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-border/50 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                    value={filters.district}
+                    onChange={(e) => handleDistrictChange(e.target.value)}
+                    disabled={filters.region === "all"}
+                    className={cn(
+                      "w-full px-4 py-2.5 rounded-xl border border-border/50 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all",
+                      filters.region === "all" && "opacity-50 cursor-not-allowed"
+                    )}
                   >
-                    {branches.map(branch => (
-                      <option key={branch.value} value={branch.value}>{branch.label}</option>
+                    <option value="all">Bütün rayonlar</option>
+                    {getAvailableDistricts().map(district => (
+                      <option key={district.id} value={district.id}>{district.name}</option>
                     ))}
                   </select>
+                  {filters.region === "all" && (
+                    <p className="text-xs text-muted-foreground mt-1">Əvvəlcə region seçin</p>
+                  )}
                 </div>
               </div>
             </CardContent>
