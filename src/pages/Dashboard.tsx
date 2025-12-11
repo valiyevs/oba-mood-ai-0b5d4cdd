@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { TrendingUp, TrendingDown, Users, AlertCircle, BarChart3, Activity, Home, UserCog, CalendarIcon, LogOut } from "lucide-react";
+import { TrendingUp, TrendingDown, Users, AlertCircle, BarChart3, Activity, Home, UserCog, CalendarIcon, LogOut, Sparkles, ChevronRight } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -27,37 +28,64 @@ interface StatCardProps {
   change: number;
   icon: React.ElementType;
   description?: string;
+  gradient: string;
+  delay?: number;
 }
 
-const StatCard = ({ title, value, change, icon: Icon, description }: StatCardProps) => {
+const StatCard = ({ title, value, change, icon: Icon, description, gradient, delay = 0 }: StatCardProps) => {
   const isPositive = change >= 0;
   
   return (
-    <Card className="gradient-card border-border/50 shadow-soft hover:shadow-medium transition-all duration-300">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
-          {title}
-        </CardTitle>
-        <Icon className="h-5 w-5 text-primary" />
-      </CardHeader>
-      <CardContent>
-        <div className="text-3xl font-bold text-foreground mb-1">{value}</div>
-        {description && (
-          <p className="text-xs text-muted-foreground mb-2">{description}</p>
-        )}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay }}
+    >
+      <Card className="relative overflow-hidden border-border/50 bg-card/80 backdrop-blur-sm hover:shadow-xl transition-all duration-500 group">
+        {/* Gradient Background */}
         <div className={cn(
-          "flex items-center text-xs font-medium",
-          isPositive ? "text-status-good" : "text-status-bad"
-        )}>
-          {isPositive ? (
-            <TrendingUp className="mr-1 h-3 w-3" />
-          ) : (
-            <TrendingDown className="mr-1 h-3 w-3" />
+          "absolute inset-0 bg-gradient-to-br opacity-5 group-hover:opacity-10 transition-opacity duration-500",
+          gradient
+        )} />
+        
+        {/* Decorative Circle */}
+        <div className={cn(
+          "absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-10 group-hover:opacity-20 transition-opacity duration-500",
+          gradient.replace("from-", "bg-").split(" ")[0]
+        )} />
+
+        <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-3">
+          <CardTitle className="text-sm font-medium text-muted-foreground">
+            {title}
+          </CardTitle>
+          <div className={cn(
+            "p-2.5 rounded-xl bg-gradient-to-br shadow-lg",
+            gradient
+          )}>
+            <Icon className="h-5 w-5 text-white" />
+          </div>
+        </CardHeader>
+        <CardContent className="relative">
+          <div className="text-4xl font-bold text-foreground mb-1 tracking-tight">{value}</div>
+          {description && (
+            <p className="text-sm text-muted-foreground mb-3">{description}</p>
           )}
-          {Math.abs(change)}% son həftəyə nisbətən
-        </div>
-      </CardContent>
-    </Card>
+          <div className={cn(
+            "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold",
+            isPositive 
+              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" 
+              : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+          )}>
+            {isPositive ? (
+              <TrendingUp className="mr-1 h-3 w-3" />
+            ) : (
+              <TrendingDown className="mr-1 h-3 w-3" />
+            )}
+            {Math.abs(change)}% son həftəyə nisbətən
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 };
 
@@ -250,25 +278,40 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="min-h-screen gradient-subtle">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Enhanced Background */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-muted/50" />
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-primary/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-primary/5 to-transparent rounded-full blur-3xl" />
+      </div>
+
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-card/80 backdrop-blur-lg border-b border-border shadow-soft">
+      <header className="sticky top-0 z-50 bg-card/70 backdrop-blur-xl border-b border-border/50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0">
-              <img 
-                src={obaLogo} 
-                alt="OBA Logo" 
-                className="w-12 h-12 rounded-xl shadow-glow object-cover flex-shrink-0"
-              />
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="relative flex-shrink-0">
+                <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-lg" />
+                <img 
+                  src={obaLogo} 
+                  alt="OBA Logo" 
+                  className="relative w-14 h-14 rounded-2xl shadow-lg object-cover ring-2 ring-border/50"
+                />
+              </div>
               <div className="min-w-0">
-                <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">
+                <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate flex items-center gap-2">
                   OBA İdarəetmə Paneli
                   {managerBranch && (
-                    <span className="ml-2 text-primary">• {branchNames[managerBranch] || managerBranch}</span>
+                    <span className="text-primary flex items-center gap-1">
+                      <ChevronRight className="w-5 h-5" />
+                      {branchNames[managerBranch] || managerBranch}
+                    </span>
                   )}
                 </h1>
-                <p className="text-xs sm:text-sm text-muted-foreground truncate">
+                <p className="text-sm text-muted-foreground truncate flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                   {managerBranch ? `${branchNames[managerBranch] || managerBranch} Bölgəsi Məmnuniyyət Sistemi` : 'Personal Məmnuniyyət Sistemi'}
                 </p>
               </div>
@@ -280,7 +323,7 @@ const Dashboard = () => {
                   variant="ghost"
                   size="sm"
                   onClick={() => navigate("/")}
-                  className="gap-2"
+                  className="gap-2 rounded-xl hover:bg-primary/10"
                 >
                   <Home className="w-4 h-4" />
                   <span className="hidden md:inline">Ana Səhifə</span>
@@ -289,7 +332,7 @@ const Dashboard = () => {
                   variant="default"
                   size="sm"
                   onClick={() => navigate("/hr-panel")}
-                  className="gap-2"
+                  className="gap-2 rounded-xl bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shadow-primary/25"
                 >
                   <UserCog className="w-4 h-4" />
                   <span className="hidden md:inline">HR Paneli</span>
@@ -301,7 +344,7 @@ const Dashboard = () => {
                     await supabase.auth.signOut();
                     navigate("/auth");
                   }}
-                  className="gap-2 text-destructive hover:text-destructive"
+                  className="gap-2 rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10"
                 >
                   <LogOut className="w-4 h-4" />
                   <span className="hidden md:inline">Çıxış</span>
@@ -319,20 +362,20 @@ const Dashboard = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="gap-2 min-w-[200px] justify-start text-left font-normal"
+                    className="gap-2 min-w-[200px] justify-start text-left font-normal rounded-xl border-border/50 hover:bg-primary/5 hover:border-primary/50"
                   >
-                    <CalendarIcon className="h-4 w-4" />
+                    <CalendarIcon className="h-4 w-4 text-primary" />
                     {format(dateRange.from, "dd MMM", { locale: az })} - {format(dateRange.to, "dd MMM yyyy", { locale: az })}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="end">
-                  <div className="p-3 border-b border-border">
+                <PopoverContent className="w-auto p-0 bg-card border-border/50 shadow-xl rounded-xl" align="end">
+                  <div className="p-3 border-b border-border/50 bg-muted/30">
                     <div className="flex gap-2 flex-wrap">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => setDateRange({ from: subDays(new Date(), 7), to: new Date() })}
-                        className="text-xs"
+                        className="text-xs rounded-lg hover:bg-primary/10"
                       >
                         Son 7 gün
                       </Button>
@@ -340,7 +383,7 @@ const Dashboard = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => setDateRange({ from: subDays(new Date(), 30), to: new Date() })}
-                        className="text-xs"
+                        className="text-xs rounded-lg hover:bg-primary/10"
                       >
                         Son 30 gün
                       </Button>
@@ -348,7 +391,7 @@ const Dashboard = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => setDateRange({ from: subDays(new Date(), 90), to: new Date() })}
-                        className="text-xs"
+                        className="text-xs rounded-lg hover:bg-primary/10"
                       >
                         Son 90 gün
                       </Button>
@@ -375,6 +418,23 @@ const Dashboard = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        {/* Page Title */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5">
+              <Sparkles className="w-6 h-6 text-primary" />
+            </div>
+            <h2 className="text-2xl font-bold text-foreground">Ümumi Baxış</h2>
+          </div>
+          <p className="text-muted-foreground">
+            {format(dateRange.from, "dd MMMM", { locale: az })} - {format(dateRange.to, "dd MMMM yyyy", { locale: az })} tarixləri üçün statistika
+          </p>
+        </motion.div>
+
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
@@ -383,6 +443,8 @@ const Dashboard = () => {
             change={5.2}
             icon={Activity}
             description="Məmnuniyyət səviyyəsi"
+            gradient="from-emerald-500 to-green-500"
+            delay={0}
           />
           <StatCard
             title="Cavablar"
@@ -390,6 +452,8 @@ const Dashboard = () => {
             change={12.5}
             icon={Users}
             description="Aktiv iştirakçılar"
+            gradient="from-blue-500 to-cyan-500"
+            delay={0.1}
           />
           <StatCard
             title="Risk Hallları"
@@ -397,6 +461,8 @@ const Dashboard = () => {
             change={-15.3}
             icon={AlertCircle}
             description="Burnout riski"
+            gradient="from-rose-500 to-red-500"
+            delay={0.2}
           />
           <StatCard
             title="Cavab Dərəcəsi"
@@ -404,40 +470,67 @@ const Dashboard = () => {
             change={3.1}
             icon={BarChart3}
             description="İştirak aktivliyi"
+            gradient="from-violet-500 to-purple-500"
+            delay={0.3}
           />
         </div>
 
         {/* Charts Row 1 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6"
+        >
           <MoodPieChart data={moodDistribution} />
           <ReasonsBarChart data={topReasons} />
-        </div>
+        </motion.div>
 
         {/* Charts Row 2 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6"
+        >
           <TrendLineChart responses={responses} dateRange={dateRange} />
           <BranchComparisonChart responses={responses} />
-        </div>
+        </motion.div>
 
         {/* AI Analysis Section */}
-        <div className="mt-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="mt-6"
+        >
           <AIAnalysisCard
             analysis={aiAnalysis}
             isLoading={analysisMutation.isPending}
             onRefresh={() => analysisMutation.mutate()}
           />
-        </div>
+        </motion.div>
 
         {/* AI Tasks Section */}
-        <div className="mt-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+          className="mt-6"
+        >
           <AITasksCard
             newTasks={aiAnalysis?.tasks || []}
             isGenerating={analysisMutation.isPending}
             onRefresh={() => analysisMutation.mutate()}
             branch={managerBranch}
           />
-        </div>
+        </motion.div>
       </main>
+
+      {/* Footer */}
+      <footer className="py-6 text-center text-sm text-muted-foreground border-t border-border/50 bg-card/30 backdrop-blur-sm mt-8">
+        <p>© 2025 OBA İdarəetmə Paneli. Bütün hüquqlar qorunur.</p>
+      </footer>
     </div>
   );
 };
