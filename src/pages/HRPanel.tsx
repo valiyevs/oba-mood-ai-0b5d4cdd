@@ -29,6 +29,7 @@ import obaLogo from "@/assets/oba-logo.jpg";
 import { supabase } from "@/integrations/supabase/client";
 import { MobileNavMenu } from "@/components/MobileNavMenu";
 import { AIAnalysisCard } from "@/components/AIAnalysisCard";
+import { AITasksCard } from "@/components/AITasksCard";
 import { MoodPieChart } from "@/components/charts/MoodPieChart";
 import { TrendLineChart } from "@/components/charts/TrendLineChart";
 import { ReasonsBarChart } from "@/components/charts/ReasonsBarChart";
@@ -548,6 +549,15 @@ const HRPanel = () => {
           />
         </div>
 
+        {/* AI Tasks Section */}
+        <div className="mb-6">
+          <AITasksCard
+            newTasks={[]}
+            isGenerating={isAnalyzing}
+            onRefresh={runAIAnalysis}
+            branch={null}
+          />
+        </div>
 
         {/* Region Statistics - Full Width */}
         <Card className="mb-6">
