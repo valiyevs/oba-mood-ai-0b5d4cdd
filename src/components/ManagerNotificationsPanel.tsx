@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Bell, AlertTriangle, CheckCircle, Clock, X, ExternalLink } from "lucide-react";
+import { Bell, AlertTriangle, CheckCircle, Clock, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { az } from "date-fns/locale";
+import { useToast } from "@/hooks/use-toast";
 
 interface Notification {
   id: string;
@@ -29,6 +30,7 @@ interface ManagerNotificationsPanelProps {
 
 export const ManagerNotificationsPanel = ({ branch }: ManagerNotificationsPanelProps) => {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
 
   // Fetch notifications
@@ -49,6 +51,49 @@ export const ManagerNotificationsPanel = ({ branch }: ManagerNotificationsPanelP
       return (data || []) as Notification[];
     },
   });
+
+  // Subscribe to real-time updates
+  useEffect(() => {
+    const setupRealtimeSubscription = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const channel = supabase
+        .channel('manager-notifications-realtime')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'manager_notifications',
+            filter: `manager_user_id=eq.${user.id}`,
+          },
+          (payload) => {
+            console.log('New notification received:', payload);
+            // Invalidate query to refresh notifications list
+            queryClient.invalidateQueries({ queryKey: ['manager-notifications'] });
+            
+            // Show toast for new notification
+            const newNotification = payload.new as Notification;
+            toast({
+              title: "🔔 Yeni Bildiriş",
+              description: newNotification.title,
+              variant: "destructive",
+            });
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    };
+
+    const cleanup = setupRealtimeSubscription();
+    return () => {
+      cleanup.then((unsubscribe) => unsubscribe?.());
+    };
+  }, [queryClient, toast]);
 
   // Mark as read mutation
   const markAsReadMutation = useMutation({
