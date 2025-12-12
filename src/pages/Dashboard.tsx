@@ -21,6 +21,7 @@ import { MoodPieChart } from "@/components/charts/MoodPieChart";
 import { ReasonsBarChart } from "@/components/charts/ReasonsBarChart";
 import { TrendLineChart } from "@/components/charts/TrendLineChart";
 import { BranchComparisonChart } from "@/components/charts/BranchComparisonChart";
+import { ManagerNotificationsPanel } from "@/components/ManagerNotificationsPanel";
 
 interface StatCardProps {
   title: string;
@@ -497,13 +498,14 @@ const Dashboard = () => {
           <BranchComparisonChart responses={responses} />
         </motion.div>
 
-        {/* AI Analysis Section */}
+        {/* Manager Notifications + AI Analysis Row */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="mt-6"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6"
         >
+          <ManagerNotificationsPanel branch={managerBranch} />
           <AIAnalysisCard
             analysis={aiAnalysis}
             isLoading={analysisMutation.isPending}

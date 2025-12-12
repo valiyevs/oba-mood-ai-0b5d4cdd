@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -161,6 +162,45 @@ Bu məlumatlara əsasən JSON formatında analiz ver. Kritik şikayətlərə xü
         recommendations: ["Daha çox məlumat toplanmalıdır."],
         riskLevel: riskCount > 5 ? "yüksək" : riskCount > 0 ? "orta" : "aşağı"
       };
+    }
+
+    // If there are critical alerts, create notifications for managers
+    if (analysis.criticalAlerts && analysis.criticalAlerts.length > 0 && criticalComplaints.length > 0) {
+      try {
+        const supabaseUrl = Deno.env.get("SUPABASE_URL");
+        const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+        
+        if (supabaseUrl && supabaseServiceKey) {
+          const supabase = createClient(supabaseUrl, supabaseServiceKey);
+          
+          // Get unique branches from critical complaints
+          const branches = [...new Set(criticalComplaints.map((c: any) => c.branch))];
+          
+          for (const branch of branches) {
+            // Get managers for this branch
+            const { data: managers } = await supabase
+              .from('manager_branches')
+              .select('user_id')
+              .eq('branch', branch);
+            
+            if (managers && managers.length > 0) {
+              const notifications = managers.map((manager: any) => ({
+                manager_user_id: manager.user_id,
+                branch: branch,
+                notification_type: 'critical_complaint',
+                title: 'Kritik Şikayət Aşkarlandı',
+                message: analysis.criticalAlerts.join('; '),
+              }));
+              
+              await supabase.from('manager_notifications').insert(notifications);
+              console.log(`Created ${notifications.length} notifications for branch ${branch}`);
+            }
+          }
+        }
+      } catch (notifError) {
+        console.error("Error creating notifications:", notifError);
+        // Don't fail the main request if notification creation fails
+      }
     }
 
     return new Response(JSON.stringify({ analysis }), {
