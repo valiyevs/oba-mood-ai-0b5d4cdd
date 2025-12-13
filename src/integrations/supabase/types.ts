@@ -223,6 +223,50 @@ export type Database = {
         }
         Relationships: []
       }
+      manager_notifications: {
+        Row: {
+          branch: string
+          created_at: string
+          id: string
+          is_read: boolean
+          manager_user_id: string
+          message: string
+          notification_type: string
+          related_alert_id: string | null
+          title: string
+        }
+        Insert: {
+          branch: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          manager_user_id: string
+          message: string
+          notification_type?: string
+          related_alert_id?: string | null
+          title: string
+        }
+        Update: {
+          branch?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          manager_user_id?: string
+          message?: string
+          notification_type?: string
+          related_alert_id?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "manager_notifications_related_alert_id_fkey"
+            columns: ["related_alert_id"]
+            isOneToOne: false
+            referencedRelation: "burnout_alerts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string

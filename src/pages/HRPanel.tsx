@@ -398,11 +398,14 @@ const HRPanel = () => {
     }
   };
 
+  const [hasAutoLoaded, setHasAutoLoaded] = useState(false);
+  
   useEffect(() => {
-    if (responses.length > 0 && !aiAnalysis && !isAnalyzing) {
+    if (responses.length > 0 && !hasAutoLoaded && !isAnalyzing) {
+      setHasAutoLoaded(true);
       runAIAnalysis();
     }
-  }, [responses]);
+  }, [responses, hasAutoLoaded, isAnalyzing]);
 
   const regionNames: Record<string, string> = {
     'baku': 'Bakı', 'ganja': 'Gəncə', 'sumgait': 'Sumqayıt',
