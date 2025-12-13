@@ -269,13 +269,13 @@ const Dashboard = () => {
     },
   });
 
-  // Auto-load AI analysis on mount
+  // Auto-load AI analysis when responses are loaded
   useEffect(() => {
-    if (!hasAutoLoaded) {
+    if (!hasAutoLoaded && responses.length > 0) {
       setHasAutoLoaded(true);
       analysisMutation.mutate();
     }
-  }, []);
+  }, [responses, hasAutoLoaded]);
 
   return (
     <div className="min-h-screen relative overflow-hidden">
