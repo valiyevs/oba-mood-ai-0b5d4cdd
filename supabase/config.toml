@@ -2,6 +2,3 @@ project_id = "mzowwggiqvosvdyvlgpo"
 
 [functions.analyze-responses]
 verify_jwt = true
-
-[functions.create-manager-notifications]
-verify_jwt = true
