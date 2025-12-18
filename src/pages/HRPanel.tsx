@@ -465,7 +465,7 @@ const HRPanel = () => {
                   <Home className="w-4 h-4" />
                   <span className="hidden md:inline">İdarəetmə</span>
                 </Button>
-                <Button variant="outline" size="sm" className="gap-2 rounded-xl border-border/50 hover:bg-primary/5">
+                <Button variant="outline" size="sm" onClick={() => navigate("/reports")} className="gap-2 rounded-xl border-border/50 hover:bg-primary/5">
                   <Download className="w-4 h-4" />
                   <span className="hidden md:inline">Hesabat</span>
                 </Button>
