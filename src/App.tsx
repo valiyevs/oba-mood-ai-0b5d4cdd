@@ -9,6 +9,7 @@ import HRPanel from "./pages/HRPanel";
 import EmployeeResponses from "./pages/EmployeeResponses";
 import ManagerActions from "./pages/ManagerActions";
 import ManagerAssignments from "./pages/ManagerAssignments";
+import Reports from "./pages/Reports";
 import Auth from "./pages/Auth";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
@@ -47,6 +48,11 @@ const App = () => (
           <Route path="/manager-assignments" element={
             <ProtectedRoute>
               <ManagerAssignments />
+            </ProtectedRoute>
+          } />
+          <Route path="/reports" element={
+            <ProtectedRoute>
+              <Reports />
             </ProtectedRoute>
           } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
