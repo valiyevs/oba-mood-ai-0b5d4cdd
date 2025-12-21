@@ -74,6 +74,48 @@ export type Database = {
         }
         Relationships: []
       }
+      anonymous_suggestions: {
+        Row: {
+          admin_notes: string | null
+          branch: string
+          category: string
+          created_at: string
+          department: string
+          id: string
+          priority: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          suggestion_text: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          branch: string
+          category?: string
+          created_at?: string
+          department: string
+          id?: string
+          priority?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          suggestion_text: string
+        }
+        Update: {
+          admin_notes?: string | null
+          branch?: string
+          category?: string
+          created_at?: string
+          department?: string
+          id?: string
+          priority?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          suggestion_text?: string
+        }
+        Relationships: []
+      }
       burnout_alerts: {
         Row: {
           branch: string
@@ -233,7 +275,9 @@ export type Database = {
           message: string
           notification_type: string
           related_alert_id: string | null
+          sent_via_push: boolean | null
           title: string
+          urgency: string | null
         }
         Insert: {
           branch: string
@@ -244,7 +288,9 @@ export type Database = {
           message: string
           notification_type?: string
           related_alert_id?: string | null
+          sent_via_push?: boolean | null
           title: string
+          urgency?: string | null
         }
         Update: {
           branch?: string
@@ -255,7 +301,9 @@ export type Database = {
           message?: string
           notification_type?: string
           related_alert_id?: string | null
+          sent_via_push?: boolean | null
           title?: string
+          urgency?: string | null
         }
         Relationships: [
           {
@@ -266,6 +314,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      satisfaction_targets: {
+        Row: {
+          branch: string | null
+          created_at: string
+          created_by: string | null
+          current_value: number | null
+          department: string | null
+          id: string
+          period_end: string
+          period_start: string
+          status: string
+          target_type: string
+          target_value: number
+          updated_at: string
+        }
+        Insert: {
+          branch?: string | null
+          created_at?: string
+          created_by?: string | null
+          current_value?: number | null
+          department?: string | null
+          id?: string
+          period_end: string
+          period_start: string
+          status?: string
+          target_type?: string
+          target_value: number
+          updated_at?: string
+        }
+        Update: {
+          branch?: string | null
+          created_at?: string
+          created_by?: string | null
+          current_value?: number | null
+          department?: string | null
+          id?: string
+          period_end?: string
+          period_start?: string
+          status?: string
+          target_type?: string
+          target_value?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {

@@ -16,7 +16,9 @@ import {
   Sparkles,
   ChevronRight,
   BarChart3,
-  Shield
+  Shield,
+  Target,
+  Lightbulb
 } from "lucide-react";
 import { format, subDays } from "date-fns";
 import { az } from "date-fns/locale";

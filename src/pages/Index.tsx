@@ -258,17 +258,30 @@ const Index = () => {
                 </p>
               </div>
             </div>
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate("/dashboard")}
-                className="gap-2 rounded-xl border-border/50 bg-card/50 backdrop-blur-sm hover:bg-primary/10 hover:border-primary/50 transition-all duration-300 shadow-lg shadow-black/5"
-              >
-                <TrendingUp className="w-4 h-4" />
-                <span className="hidden sm:inline">İdarəetmə Paneli</span>
-              </Button>
-            </motion.div>
+            <div className="flex items-center gap-2">
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate("/suggestion-box")}
+                  className="gap-2 rounded-xl hover:bg-violet-500/10"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span className="hidden sm:inline">Təklif</span>
+                </Button>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate("/dashboard")}
+                  className="gap-2 rounded-xl border-border/50 bg-card/50 backdrop-blur-sm hover:bg-primary/10 hover:border-primary/50 transition-all duration-300 shadow-lg shadow-black/5"
+                >
+                  <TrendingUp className="w-4 h-4" />
+                  <span className="hidden sm:inline">İdarəetmə Paneli</span>
+                </Button>
+              </motion.div>
+            </div>
           </div>
         </div>
 

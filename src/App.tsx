@@ -13,6 +13,9 @@ import Reports from "./pages/Reports";
 import Auth from "./pages/Auth";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
+import SuggestionBox from "./pages/SuggestionBox";
+import SuggestionsManagement from "./pages/SuggestionsManagement";
+import Targets from "./pages/Targets";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +56,17 @@ const App = () => (
           <Route path="/reports" element={
             <ProtectedRoute>
               <Reports />
+            </ProtectedRoute>
+          } />
+          <Route path="/suggestion-box" element={<SuggestionBox />} />
+          <Route path="/suggestions-management" element={
+            <ProtectedRoute>
+              <SuggestionsManagement />
+            </ProtectedRoute>
+          } />
+          <Route path="/targets" element={
+            <ProtectedRoute>
+              <Targets />
             </ProtectedRoute>
           } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
