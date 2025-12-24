@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Loader2, TrendingUp, TrendingDown, Minus, AlertTriangle, Brain, RefreshCw, Target, Users, ShoppingCart } from "lucide-react";
+import { Loader2, TrendingUp, TrendingDown, Minus, AlertTriangle, Brain, RefreshCw, Target, Users, ShoppingCart, Activity, BarChart3, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar, Legend, ScatterChart, Scatter, ZAxis } from "recharts";
 
 interface Prediction {
   stressChangePercent: number;
@@ -32,11 +33,35 @@ interface Metrics {
   avgComplaints: number;
 }
 
-// Branches matching database values in external_metrics
+interface BranchComparison {
+  branch: string;
+  avgSales: number;
+  avgComplaints: number;
+  avgMood: number;
+  stressLevel: number;
+  correlation: number;
+}
+
+interface DailyTrend {
+  date: string;
+  sales: number;
+  complaints: number;
+  stressIndex: number;
+}
+
+// All branches from database
 const branches = [
+  "Bakı Mərkəz",
+  "Bakı 28 May",
   "Bakı - Nərimanov",
   "Bakı - Yasamal",
+  "Gəncə",
+  "Lənkəran",
+  "Mingəçevir",
+  "Quba",
   "Sumqayıt",
+  "Şəki",
+  "Şirvan",
 ];
 
 const TrendIcon = ({ trend }: { trend?: string }) => {
@@ -51,7 +76,85 @@ export const PredictiveAnalytics = () => {
   const [prediction, setPrediction] = useState<Prediction | null>(null);
   const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [source, setSource] = useState<string>("");
+  const [branchComparisons, setBranchComparisons] = useState<BranchComparison[]>([]);
+  const [dailyTrends, setDailyTrends] = useState<DailyTrend[]>([]);
+  const [loadingComparison, setLoadingComparison] = useState(true);
   const { toast } = useToast();
+
+  // Load branch comparisons on mount
+  useEffect(() => {
+    loadBranchComparisons();
+  }, []);
+
+  const loadBranchComparisons = async () => {
+    setLoadingComparison(true);
+    try {
+      // Get external metrics for all branches
+      const { data: metricsData, error: metricsError } = await supabase
+        .from('external_metrics')
+        .select('*')
+        .gte('metric_date', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+        .order('metric_date', { ascending: false });
+
+      if (metricsError) throw metricsError;
+
+      // Get mood responses
+      const { data: responsesData, error: responsesError } = await supabase
+        .from('employee_responses')
+        .select('*')
+        .gte('response_date', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
+
+      if (responsesError) throw responsesError;
+
+      // Calculate branch comparisons
+      const branchMap = new Map<string, { sales: number[], complaints: number[], moods: number[] }>();
+      
+      metricsData?.forEach(m => {
+        if (!branchMap.has(m.branch)) {
+          branchMap.set(m.branch, { sales: [], complaints: [], moods: [] });
+        }
+        const branch = branchMap.get(m.branch)!;
+        branch.sales.push(Number(m.daily_sales) || 0);
+        branch.complaints.push(m.customer_complaints || 0);
+      });
+
+      responsesData?.forEach(r => {
+        if (!branchMap.has(r.branch)) {
+          branchMap.set(r.branch, { sales: [], complaints: [], moods: [] });
+        }
+        const moodScore = r.mood === 'Yaxşı' ? 100 : r.mood === 'Normal' ? 50 : 0;
+        branchMap.get(r.branch)!.moods.push(moodScore);
+      });
+
+      const comparisons: BranchComparison[] = [];
+      branchMap.forEach((data, branch) => {
+        if (data.sales.length > 0) {
+          const avgSales = data.sales.reduce((a, b) => a + b, 0) / data.sales.length;
+          const avgComplaints = data.complaints.reduce((a, b) => a + b, 0) / data.complaints.length;
+          const avgMood = data.moods.length > 0 ? data.moods.reduce((a, b) => a + b, 0) / data.moods.length : 50;
+          const stressLevel = 100 - avgMood;
+          
+          // Simple correlation calculation (stress vs complaints)
+          const correlation = Math.min(100, Math.max(0, (stressLevel * 0.5 + avgComplaints * 3)));
+
+          comparisons.push({
+            branch,
+            avgSales,
+            avgComplaints,
+            avgMood,
+            stressLevel,
+            correlation
+          });
+        }
+      });
+
+      setBranchComparisons(comparisons.sort((a, b) => b.correlation - a.correlation));
+    } catch (err) {
+      console.error("Error loading comparisons:", err);
+    } finally {
+      setLoadingComparison(false);
+    }
+  };
 
   const runPrediction = async () => {
     if (!selectedBranch) {
@@ -65,6 +168,58 @@ export const PredictiveAnalytics = () => {
 
     setLoading(true);
     try {
+      // Fetch daily trends for selected branch
+      const { data: metricsData } = await supabase
+        .from('external_metrics')
+        .select('*')
+        .eq('branch', selectedBranch)
+        .gte('metric_date', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+        .order('metric_date', { ascending: true });
+
+      const { data: responsesData } = await supabase
+        .from('employee_responses')
+        .select('*')
+        .eq('branch', selectedBranch)
+        .gte('response_date', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
+
+      // Build daily trends
+      const trendMap = new Map<string, { sales: number, complaints: number, stressScores: number[] }>();
+      
+      metricsData?.forEach(m => {
+        const date = m.metric_date;
+        if (!trendMap.has(date)) {
+          trendMap.set(date, { sales: 0, complaints: 0, stressScores: [] });
+        }
+        const day = trendMap.get(date)!;
+        day.sales += Number(m.daily_sales) || 0;
+        day.complaints += m.customer_complaints || 0;
+      });
+
+      responsesData?.forEach(r => {
+        const date = r.response_date;
+        if (!trendMap.has(date)) {
+          trendMap.set(date, { sales: 0, complaints: 0, stressScores: [] });
+        }
+        const stressScore = r.mood === 'Pis' ? 100 : r.mood === 'Normal' ? 50 : 0;
+        trendMap.get(date)!.stressScores.push(stressScore);
+      });
+
+      const trends: DailyTrend[] = [];
+      trendMap.forEach((data, date) => {
+        const avgStress = data.stressScores.length > 0 
+          ? data.stressScores.reduce((a, b) => a + b, 0) / data.stressScores.length 
+          : 30;
+        trends.push({
+          date: new Date(date).toLocaleDateString('az-AZ', { day: 'numeric', month: 'short' }),
+          sales: Math.round(data.sales / 1000), // in thousands
+          complaints: data.complaints,
+          stressIndex: Math.round(avgStress)
+        });
+      });
+
+      setDailyTrends(trends.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()));
+
+      // Call prediction API
       const { data, error } = await supabase.functions.invoke("predict-risk", {
         body: { branch: selectedBranch }
       });
@@ -103,6 +258,13 @@ export const PredictiveAnalytics = () => {
     if (risk >= 60) return { variant: "default" as const, text: "Yüksək" };
     if (risk >= 40) return { variant: "secondary" as const, text: "Orta" };
     return { variant: "outline" as const, text: "Aşağı" };
+  };
+
+  const getCorrelationColor = (corr: number) => {
+    if (corr >= 70) return "bg-red-500";
+    if (corr >= 50) return "bg-orange-500";
+    if (corr >= 30) return "bg-yellow-500";
+    return "bg-green-500";
   };
 
   return (
@@ -151,6 +313,129 @@ export const PredictiveAnalytics = () => {
         </CardContent>
       </Card>
 
+      {/* Branch Comparison Overview */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-primary" />
+            <CardTitle className="text-lg">Filiallar arası müqayisə</CardTitle>
+          </div>
+          <CardDescription>
+            Stress-Satış korrelyasiyası (yüksək = daha çox risk)
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {loadingComparison ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {branchComparisons.slice(0, 8).map((branch, index) => (
+                <motion.div
+                  key={branch.branch}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="flex items-center gap-3"
+                >
+                  <div className="w-32 sm:w-40 text-sm font-medium truncate">{branch.branch}</div>
+                  <div className="flex-1">
+                    <div className="h-6 bg-muted rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${branch.correlation}%` }}
+                        transition={{ duration: 0.5, delay: index * 0.05 }}
+                        className={`h-full ${getCorrelationColor(branch.correlation)} flex items-center justify-end pr-2`}
+                      >
+                        <span className="text-xs text-white font-medium">
+                          {branch.correlation.toFixed(0)}%
+                        </span>
+                      </motion.div>
+                    </div>
+                  </div>
+                  <div className="text-xs text-muted-foreground w-20 text-right hidden sm:block">
+                    ₼{(branch.avgSales / 1000).toFixed(0)}k/gün
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Stress Impact Chart */}
+      {branchComparisons.length > 0 && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Zap className="h-5 w-5 text-orange-500" />
+              <CardTitle className="text-lg">Stressin Satışa Təsiri</CardTitle>
+            </div>
+            <CardDescription>
+              Hər filialda stress səviyyəsi vs gündəlik şikayət
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <ScatterChart margin={{ top: 20, right: 20, bottom: 60, left: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
+                  <XAxis 
+                    type="number" 
+                    dataKey="stressLevel" 
+                    name="Stress" 
+                    domain={[0, 100]}
+                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                    label={{ value: 'Stress Səviyyəsi (%)', position: 'bottom', offset: 40, fill: 'hsl(var(--muted-foreground))' }}
+                  />
+                  <YAxis 
+                    type="number" 
+                    dataKey="avgComplaints" 
+                    name="Şikayətlər"
+                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                    label={{ value: 'Ort. Şikayət/gün', angle: -90, position: 'insideLeft', fill: 'hsl(var(--muted-foreground))' }}
+                  />
+                  <ZAxis 
+                    type="number" 
+                    dataKey="avgSales" 
+                    range={[100, 500]} 
+                    name="Satış"
+                  />
+                  <Tooltip 
+                    cursor={{ strokeDasharray: '3 3' }}
+                    contentStyle={{ 
+                      backgroundColor: "hsl(var(--card))", 
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "12px"
+                    }}
+                    formatter={(value: number, name: string) => {
+                      if (name === "Satış") return [`₼${(value / 1000).toFixed(0)}k`, name];
+                      if (name === "Stress") return [`${value.toFixed(0)}%`, name];
+                      return [value.toFixed(1), name];
+                    }}
+                    labelFormatter={(label: string, payload: any) => {
+                      if (payload && payload.length > 0) {
+                        return payload[0].payload.branch;
+                      }
+                      return label;
+                    }}
+                  />
+                  <Scatter 
+                    name="Filiallar" 
+                    data={branchComparisons} 
+                    fill="hsl(var(--primary))"
+                  />
+                </ScatterChart>
+              </ResponsiveContainer>
+            </div>
+            <p className="text-xs text-muted-foreground text-center mt-2">
+              Dairə ölçüsü = satış həcmi. Sağ üst = yüksək stress, çox şikayət (kritik)
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
       <AnimatePresence mode="wait">
         {prediction && (
           <motion.div
@@ -159,6 +444,72 @@ export const PredictiveAnalytics = () => {
             exit={{ opacity: 0, y: -20 }}
             className="space-y-6"
           >
+            {/* Daily Trend Chart */}
+            {dailyTrends.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <Activity className="h-5 w-5 text-primary" />
+                    <CardTitle className="text-lg">{selectedBranch} - Gündəlik Trend</CardTitle>
+                  </div>
+                  <CardDescription>Son 7 gün ərzində satış, şikayət və stress</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[250px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={dailyTrends}>
+                        <defs>
+                          <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
+                          </linearGradient>
+                          <linearGradient id="colorStress" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
+                        <XAxis dataKey="date" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
+                        <YAxis tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: "hsl(var(--card))", 
+                            border: "1px solid hsl(var(--border))",
+                            borderRadius: "12px"
+                          }}
+                        />
+                        <Legend />
+                        <Area 
+                          type="monotone" 
+                          dataKey="sales" 
+                          name="Satış (min ₼)" 
+                          stroke="#22c55e" 
+                          fillOpacity={1}
+                          fill="url(#colorSales)" 
+                        />
+                        <Area 
+                          type="monotone" 
+                          dataKey="stressIndex" 
+                          name="Stress İndeksi" 
+                          stroke="#ef4444" 
+                          fillOpacity={1}
+                          fill="url(#colorStress)" 
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="complaints" 
+                          name="Şikayətlər" 
+                          stroke="#f97316" 
+                          strokeWidth={2}
+                          dot={{ fill: "#f97316" }}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Main Prediction Card */}
             <Card className="border-2 border-primary/30">
               <CardHeader className="pb-2">
