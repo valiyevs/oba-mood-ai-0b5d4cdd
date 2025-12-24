@@ -148,8 +148,8 @@ export const ReasonsBarChart = ({
         <CardContent className="relative">
           {/* Top reasons summary */}
           <div className="flex flex-wrap gap-2 mb-4">
-            {data.slice(0, 3).map((item, idx) => {
-              const colors = GRADIENT_COLORS[idx];
+          {data.slice(0, 3).map((item, idx) => {
+              const colors = GRADIENT_COLORS[idx % GRADIENT_COLORS.length];
               return (
                 <motion.div
                   key={item.reason}
