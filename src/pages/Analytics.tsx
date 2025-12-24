@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Brain } from "lucide-react";
 import { PredictiveAnalytics } from "@/components/PredictiveAnalytics";
+import { MobileNavMenu } from "@/components/MobileNavMenu";
 
 const Analytics = () => {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ const Analytics = () => {
               variant="ghost"
               size="icon"
               onClick={() => navigate(-1)}
-              className="hover:bg-primary/10"
+              className="hover:bg-primary/10 hidden sm:flex"
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
@@ -30,13 +31,14 @@ const Analytics = () => {
                 <Brain className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold">Proqnozlaşdırıcı Analitika</h1>
-                <p className="text-sm text-muted-foreground">
+                <h1 className="text-xl sm:text-2xl font-bold">Proqnozlaşdırıcı Analitika</h1>
+                <p className="text-sm text-muted-foreground hidden sm:block">
                   1C/SAP məlumatları ilə stress korrelyasiyası
                 </p>
               </div>
             </div>
           </div>
+          <MobileNavMenu />
         </motion.div>
 
         {/* Main Content */}
