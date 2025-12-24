@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Menu, Home, LayoutDashboard, UserCog, ClipboardCheck, MessageSquare, CalendarIcon, LogOut, Users } from "lucide-react";
+import { Menu, Home, LayoutDashboard, UserCog, ClipboardCheck, MessageSquare, CalendarIcon, LogOut, Users, Brain } from "lucide-react";
 import { format, subDays } from "date-fns";
 import { az } from "date-fns/locale";
 import { Calendar } from "@/components/ui/calendar";
@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 const navItems = [
   { label: "Ana Səhifə", to: "/", icon: Home },
   { label: "İdarəetmə Paneli", to: "/dashboard", icon: LayoutDashboard },
+  { label: "Proqnozlaşdırıcı Analitika", to: "/analytics", icon: Brain },
   { label: "HR Paneli", to: "/hr-panel", icon: UserCog },
   { label: "Menecer Təyinatları", to: "/manager-assignments", icon: Users },
   { label: "Menecer Tapşırıqları", to: "/manager-actions", icon: ClipboardCheck },
