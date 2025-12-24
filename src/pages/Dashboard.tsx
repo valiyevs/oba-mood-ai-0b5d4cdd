@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { TrendingUp, TrendingDown, Users, AlertCircle, BarChart3, Activity, Home, UserCog, CalendarIcon, LogOut, Sparkles, ChevronRight } from "lucide-react";
+import { TrendingUp, TrendingDown, Users, AlertCircle, BarChart3, Activity, Home, UserCog, CalendarIcon, LogOut, Sparkles, ChevronRight, Brain } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -327,6 +327,15 @@ const Dashboard = () => {
                 >
                   <Home className="w-4 h-4" />
                   <span className="hidden md:inline">Ana Səhifə</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate("/analytics")}
+                  className="gap-2 rounded-xl border-primary/30 hover:bg-primary/10"
+                >
+                  <Brain className="w-4 h-4 text-primary" />
+                  <span className="hidden md:inline">Proqnoz</span>
                 </Button>
                 <Button
                   variant="default"

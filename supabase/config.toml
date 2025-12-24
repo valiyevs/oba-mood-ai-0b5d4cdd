@@ -2,3 +2,6 @@ project_id = "mzowwggiqvosvdyvlgpo"
 
 [functions.analyze-responses]
 verify_jwt = true
+
+[functions.predict-risk]
+verify_jwt = true

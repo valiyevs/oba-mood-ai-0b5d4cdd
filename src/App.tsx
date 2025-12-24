@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import SuggestionBox from "./pages/SuggestionBox";
 import SuggestionsManagement from "./pages/SuggestionsManagement";
 import Targets from "./pages/Targets";
+import Analytics from "./pages/Analytics";
 
 const queryClient = new QueryClient();
 
@@ -67,6 +68,11 @@ const App = () => (
           <Route path="/targets" element={
             <ProtectedRoute>
               <Targets />
+            </ProtectedRoute>
+          } />
+          <Route path="/analytics" element={
+            <ProtectedRoute>
+              <Analytics />
             </ProtectedRoute>
           } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
