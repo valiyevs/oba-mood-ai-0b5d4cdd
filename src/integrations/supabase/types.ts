@@ -188,6 +188,45 @@ export type Database = {
         }
         Relationships: []
       }
+      external_metrics: {
+        Row: {
+          branch: string
+          created_at: string
+          customer_complaints: number | null
+          customer_count: number | null
+          daily_sales: number | null
+          id: string
+          metric_date: string
+          returns_count: number | null
+          source_system: string | null
+          updated_at: string
+        }
+        Insert: {
+          branch: string
+          created_at?: string
+          customer_complaints?: number | null
+          customer_count?: number | null
+          daily_sales?: number | null
+          id?: string
+          metric_date?: string
+          returns_count?: number | null
+          source_system?: string | null
+          updated_at?: string
+        }
+        Update: {
+          branch?: string
+          created_at?: string
+          customer_complaints?: number | null
+          customer_count?: number | null
+          daily_sales?: number | null
+          id?: string
+          metric_date?: string
+          returns_count?: number | null
+          source_system?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       manager_actions: {
         Row: {
           action_description: string
@@ -314,6 +353,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      risk_predictions: {
+        Row: {
+          branch: string
+          complaint_risk_percent: number | null
+          confidence_score: number | null
+          created_at: string
+          expires_at: string | null
+          factors: Json | null
+          id: string
+          prediction_date: string
+          prediction_text: string | null
+          sales_impact_percent: number | null
+          stress_change_percent: number | null
+        }
+        Insert: {
+          branch: string
+          complaint_risk_percent?: number | null
+          confidence_score?: number | null
+          created_at?: string
+          expires_at?: string | null
+          factors?: Json | null
+          id?: string
+          prediction_date?: string
+          prediction_text?: string | null
+          sales_impact_percent?: number | null
+          stress_change_percent?: number | null
+        }
+        Update: {
+          branch?: string
+          complaint_risk_percent?: number | null
+          confidence_score?: number | null
+          created_at?: string
+          expires_at?: string | null
+          factors?: Json | null
+          id?: string
+          prediction_date?: string
+          prediction_text?: string | null
+          sales_impact_percent?: number | null
+          stress_change_percent?: number | null
+        }
+        Relationships: []
       }
       satisfaction_targets: {
         Row: {
