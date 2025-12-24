@@ -28,6 +28,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { az } from "date-fns/locale";
 import obaLogo from "@/assets/oba-logo.jpg";
+import { MobileNavMenu } from "@/components/MobileNavMenu";
 
 type ActionStatus = "pending" | "in_progress" | "completed" | "cancelled";
 type ActionType = "one_on_one" | "workload_adjustment" | "schedule_change" | "team_meeting" | "training" | "other";
@@ -240,89 +241,92 @@ const ManagerActions = () => {
               variant="ghost"
               size="icon"
               onClick={() => navigate('/hr-panel')}
-              className="rounded-full"
+              className="rounded-full hidden sm:flex"
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <img src={obaLogo} alt="OBA Logo" className="h-10 w-10 rounded-lg object-cover" />
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Menecer Tapşırıqları</h1>
-              <p className="text-sm text-muted-foreground">Tükənmişlik hallarına görülən tədbirlər</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground">Menecer Tapşırıqları</h1>
+              <p className="text-sm text-muted-foreground hidden sm:block">Tükənmişlik hallarına görülən tədbirlər</p>
             </div>
           </div>
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="gap-2">
-                <Plus className="w-4 h-4" />
-                Yeni Tapşırıq
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md">
-              <DialogHeader>
-                <DialogTitle>Yeni Tapşırıq Əlavə Et</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4 mt-4">
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Tükənmişlik Xəbərdarlığı</label>
-                  <Select value={selectedAlert} onValueChange={setSelectedAlert}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Alert seçin" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {alerts.filter(a => !a.is_resolved).map(alert => (
-                        <SelectItem key={alert.id} value={alert.id}>
-                          {alert.employee_code} - {alert.department} ({alert.risk_score}%)
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Menecer Adı</label>
-                  <Input
-                    placeholder="Ad Soyad"
-                    value={newAction.manager_name}
-                    onChange={(e) => setNewAction({ ...newAction, manager_name: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Tapşırıq Növü</label>
-                  <Select 
-                    value={newAction.action_type} 
-                    onValueChange={(v) => setNewAction({ ...newAction, action_type: v as ActionType })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Növ seçin" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(actionTypeLabels).map(([key, label]) => (
-                        <SelectItem key={key} value={key}>{label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Təsvir</label>
-                  <Textarea
-                    placeholder="Tapşırıq haqqında ətraflı məlumat"
-                    value={newAction.action_description}
-                    onChange={(e) => setNewAction({ ...newAction, action_description: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Qeydlər (opsional)</label>
-                  <Textarea
-                    placeholder="Əlavə qeydlər"
-                    value={newAction.notes}
-                    onChange={(e) => setNewAction({ ...newAction, notes: e.target.value })}
-                  />
-                </div>
-                <Button onClick={handleAddAction} className="w-full">
-                  Əlavə Et
+          <div className="flex items-center gap-2">
+            <MobileNavMenu />
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="gap-2">
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden sm:inline">Yeni Tapşırıq</span>
                 </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Yeni Tapşırıq Əlavə Et</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 mt-4">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Tükənmişlik Xəbərdarlığı</label>
+                    <Select value={selectedAlert} onValueChange={setSelectedAlert}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Alert seçin" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {alerts.filter(a => !a.is_resolved).map(alert => (
+                          <SelectItem key={alert.id} value={alert.id}>
+                            {alert.employee_code} - {alert.department} ({alert.risk_score}%)
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Menecer Adı</label>
+                    <Input
+                      placeholder="Ad Soyad"
+                      value={newAction.manager_name}
+                      onChange={(e) => setNewAction({ ...newAction, manager_name: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Tapşırıq Növü</label>
+                    <Select 
+                      value={newAction.action_type} 
+                      onValueChange={(v) => setNewAction({ ...newAction, action_type: v as ActionType })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Növ seçin" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(actionTypeLabels).map(([key, label]) => (
+                          <SelectItem key={key} value={key}>{label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Təsvir</label>
+                    <Textarea
+                      placeholder="Tapşırıq haqqında ətraflı məlumat"
+                      value={newAction.action_description}
+                      onChange={(e) => setNewAction({ ...newAction, action_description: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Qeydlər (opsional)</label>
+                    <Textarea
+                      placeholder="Əlavə qeydlər"
+                      value={newAction.notes}
+                      onChange={(e) => setNewAction({ ...newAction, notes: e.target.value })}
+                    />
+                  </div>
+                  <Button onClick={handleAddAction} className="w-full">
+                    Əlavə Et
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
         {/* Statistics Cards */}

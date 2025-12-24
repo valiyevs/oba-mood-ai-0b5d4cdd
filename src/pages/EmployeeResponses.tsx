@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, Brain, TrendingUp, TrendingDown, Minus, AlertTriangle, MessageSquare, Calendar, Filter, Sparkles, Activity, Users, Building2 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
+import { MobileNavMenu } from "@/components/MobileNavMenu";
 
 // Mock data for anonymized responses
 const mockResponses = [
@@ -254,7 +255,7 @@ const EmployeeResponses = () => {
       <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-4">
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="hidden sm:block">
               <Button 
                 variant="ghost" 
                 size="icon" 
@@ -266,20 +267,23 @@ const EmployeeResponses = () => {
             </motion.div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent">
+                <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent">
                   İşçi Cavabları
                 </h1>
                 <Sparkles className="h-4 w-4 text-primary animate-pulse" />
               </div>
-              <p className="text-sm text-muted-foreground">Anonim geri bildiriş və AI analizi</p>
+              <p className="text-sm text-muted-foreground hidden sm:block">Anonim geri bildiriş və AI analizi</p>
             </div>
           </div>
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Button variant="outline" size="sm" className="rounded-xl border-primary/20 hover:bg-primary/10 hover:border-primary/40">
-              <Calendar className="mr-2 h-4 w-4 text-primary" />
-              Son 30 gün
-            </Button>
-          </motion.div>
+          <div className="flex items-center gap-2">
+            <MobileNavMenu />
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="hidden sm:block">
+              <Button variant="outline" size="sm" className="rounded-xl border-primary/20 hover:bg-primary/10 hover:border-primary/40">
+                <Calendar className="mr-2 h-4 w-4 text-primary" />
+                Son 30 gün
+              </Button>
+            </motion.div>
+          </div>
         </div>
       </header>
 
