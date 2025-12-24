@@ -17,6 +17,7 @@ import SuggestionBox from "./pages/SuggestionBox";
 import SuggestionsManagement from "./pages/SuggestionsManagement";
 import Targets from "./pages/Targets";
 import Analytics from "./pages/Analytics";
+import Install from "./pages/Install";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,7 @@ const App = () => (
             </ProtectedRoute>
           } />
           <Route path="/suggestion-box" element={<SuggestionBox />} />
+          <Route path="/install" element={<Install />} />
           <Route path="/suggestions-management" element={
             <ProtectedRoute>
               <SuggestionsManagement />
