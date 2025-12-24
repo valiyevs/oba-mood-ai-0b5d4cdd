@@ -123,8 +123,80 @@ Bu məlumatlara əsasən JSON formatında analiz ver. Kritik şikayətlərə xü
         });
       }
       if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Kredit tələb olunur, hesabınıza balans əlavə edin." }), {
-          status: 402,
+        // No credits: return a safe fallback analysis (so the UI doesn't break)
+        const keywordList = [
+          "zorakılıq",
+          "döy",
+          "doy",
+          "döyül",
+          "söy",
+          "söyüş",
+          "təhqir",
+          "mobbing",
+          "təzyiq",
+          "hədə",
+          "hədəl",
+          "qorxu",
+          "vur",
+          "şiddət",
+          "şikayət"
+        ];
+
+        const complaintReasons = Array.isArray(criticalComplaints)
+          ? criticalComplaints
+              .map((c: any) => String(c?.reason ?? "").trim())
+              .filter(Boolean)
+          : [];
+
+        const flaggedComplaints = complaintReasons.filter((txt) => {
+          const lower = txt.toLowerCase();
+          return keywordList.some((k) => lower.includes(k));
+        });
+
+        const hasCritical = flaggedComplaints.length > 0;
+
+        const riskLevel = hasCritical
+          ? "kritik"
+          : riskCount > 5
+            ? "yüksək"
+            : riskCount > 0
+              ? "orta"
+              : "aşağı";
+
+        const scoreBase = typeof overallIndex === "number" ? overallIndex : 0;
+        const score = hasCritical ? Math.min(scoreBase, 20) : scoreBase;
+
+        const topReasonLine = Array.isArray(topReasons) && topReasons.length > 0
+          ? `Əsas səbəb: ${topReasons[0]?.reason ?? ""} (${topReasons[0]?.percentage ?? 0}%)`
+          : "Əsas səbəb: Qeyd olunmayıb";
+
+        const analysis = {
+          score,
+          summary: "AI krediti tələb olunduğu üçün əsas göstəricilər əsasında analiz göstərilir.",
+          observations: [
+            `Ümumi indeks: ${scoreBase}%`,
+            `Risk halları: ${riskCount}`,
+            topReasonLine,
+          ],
+          recommendations: hasCritical
+            ? [
+                "Kritik şikayətləri dərhal araşdırın və müdaxilə edin.",
+                "Şikayət edən işçi(lər) üçün 1-1 görüş planlayın.",
+                "Filial rəhbərliyi ilə təcili tədbir planı hazırlayın.",
+              ]
+            : [
+                "Əsas şikayət səbəbləri üzrə qısa fəaliyyət planı hazırlayın.",
+                "Komanda yüklənməsini və qrafiki yenidən qiymətləndirin.",
+                "Növbəti həftə üçün izləmə indikatorları təyin edin.",
+              ],
+          riskLevel,
+          criticalAlerts: hasCritical
+            ? flaggedComplaints.slice(0, 3).map((t) => `Kritik şikayət: "${t.slice(0, 140)}"`)
+            : [],
+          tasks: [],
+        };
+
+        return new Response(JSON.stringify({ analysis }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
