@@ -32,12 +32,11 @@ interface Metrics {
   avgComplaints: number;
 }
 
+// Branches matching database values in external_metrics
 const branches = [
   "Bakı - Nərimanov",
   "Bakı - Yasamal",
   "Sumqayıt",
-  "Gəncə",
-  "Lənkəran"
 ];
 
 const TrendIcon = ({ trend }: { trend?: string }) => {
