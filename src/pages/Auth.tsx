@@ -254,6 +254,45 @@ const Auth = () => {
             </motion.div>
           </div>
 
+          {/* Demo Account Info */}
+          {!isSignUp && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35 }}
+              className="mx-8 mb-4"
+            >
+              <div className="rounded-xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-green-500/5 p-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500/30 to-green-500/20 flex items-center justify-center">
+                    <Sparkles className="h-4 w-4 text-emerald-500" />
+                  </div>
+                  <span className="text-sm font-semibold text-foreground">Demo Hesab</span>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center justify-between bg-background/50 rounded-lg px-3 py-2">
+                    <span className="text-muted-foreground">Email:</span>
+                    <code className="font-mono text-foreground bg-muted/50 px-2 py-0.5 rounded">demo@oba.az</code>
+                  </div>
+                  <div className="flex items-center justify-between bg-background/50 rounded-lg px-3 py-2">
+                    <span className="text-muted-foreground">Şifrə:</span>
+                    <code className="font-mono text-foreground bg-muted/50 px-2 py-0.5 rounded">demo123</code>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail("demo@oba.az");
+                    setPassword("demo123");
+                  }}
+                  className="w-full mt-3 text-xs text-emerald-600 hover:text-emerald-500 font-medium transition-colors"
+                >
+                  Avtomatik doldur →
+                </button>
+              </div>
+            </motion.div>
+          )}
+
           {/* Form */}
           <div className="px-8 pb-8">
             <form onSubmit={handleAuth} className="space-y-5">
