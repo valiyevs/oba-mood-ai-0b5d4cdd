@@ -5,6 +5,59 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Helper function to create fallback analysis
+function createFallbackAnalysis(overallIndex: number, riskCount: number, topReasons: any[], criticalComplaints: any[]) {
+  const keywordList = [
+    "zorakılıq", "döy", "doy", "döyül", "söy", "söyüş",
+    "təhqir", "mobbing", "təzyiq", "hədə", "hədəl",
+    "qorxu", "vur", "şiddət", "şikayət"
+  ];
+
+  const complaintReasons = Array.isArray(criticalComplaints)
+    ? criticalComplaints.map((c: any) => String(c?.reason ?? "").trim()).filter(Boolean)
+    : [];
+
+  const flaggedComplaints = complaintReasons.filter((txt) => {
+    const lower = txt.toLowerCase();
+    return keywordList.some((k) => lower.includes(k));
+  });
+
+  const hasCritical = flaggedComplaints.length > 0;
+  const riskLevel = hasCritical ? "kritik" : riskCount > 5 ? "yüksək" : riskCount > 0 ? "orta" : "aşağı";
+  const scoreBase = typeof overallIndex === "number" ? overallIndex : 0;
+  const score = hasCritical ? Math.min(scoreBase, 20) : scoreBase;
+
+  const topReasonLine = Array.isArray(topReasons) && topReasons.length > 0
+    ? `Əsas səbəb: ${topReasons[0]?.reason ?? ""} (${topReasons[0]?.percentage ?? 0}%)`
+    : "Əsas səbəb: Qeyd olunmayıb";
+
+  return {
+    score,
+    summary: "Gemini API limiti səbəbindən əsas göstəricilər əsasında analiz göstərilir.",
+    observations: [
+      `Ümumi indeks: ${scoreBase}%`,
+      `Risk halları: ${riskCount}`,
+      topReasonLine,
+    ],
+    recommendations: hasCritical
+      ? [
+          "Kritik şikayətləri dərhal araşdırın və müdaxilə edin.",
+          "Şikayət edən işçi(lər) üçün 1-1 görüş planlayın.",
+          "Filial rəhbərliyi ilə təcili tədbir planı hazırlayın.",
+        ]
+      : [
+          "Əsas şikayət səbəbləri üzrə qısa fəaliyyət planı hazırlayın.",
+          "Komanda yüklənməsini və qrafiki yenidən qiymətləndirin.",
+          "Növbəti həftə üçün izləmə indikatorları təyin edin.",
+        ],
+    riskLevel,
+    criticalAlerts: hasCritical
+      ? flaggedComplaints.slice(0, 3).map((t) => `Kritik şikayət: "${t.slice(0, 140)}"`)
+      : [],
+    tasks: [],
+  };
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -120,95 +173,15 @@ Bu məlumatlara əsasən JSON formatında analiz ver. Kritik şikayətlərə xü
       }),
     });
 
+    // Handle errors - return fallback analysis instead of error
     if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit aşıldı, zəhmət olmasa bir az gözləyin." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (response.status === 402) {
-        // No credits: return a safe fallback analysis (so the UI doesn't break)
-        const keywordList = [
-          "zorakılıq",
-          "döy",
-          "doy",
-          "döyül",
-          "söy",
-          "söyüş",
-          "təhqir",
-          "mobbing",
-          "təzyiq",
-          "hədə",
-          "hədəl",
-          "qorxu",
-          "vur",
-          "şiddət",
-          "şikayət"
-        ];
-
-        const complaintReasons = Array.isArray(criticalComplaints)
-          ? criticalComplaints
-              .map((c: any) => String(c?.reason ?? "").trim())
-              .filter(Boolean)
-          : [];
-
-        const flaggedComplaints = complaintReasons.filter((txt) => {
-          const lower = txt.toLowerCase();
-          return keywordList.some((k) => lower.includes(k));
-        });
-
-        const hasCritical = flaggedComplaints.length > 0;
-
-        const riskLevel = hasCritical
-          ? "kritik"
-          : riskCount > 5
-            ? "yüksək"
-            : riskCount > 0
-              ? "orta"
-              : "aşağı";
-
-        const scoreBase = typeof overallIndex === "number" ? overallIndex : 0;
-        const score = hasCritical ? Math.min(scoreBase, 20) : scoreBase;
-
-        const topReasonLine = Array.isArray(topReasons) && topReasons.length > 0
-          ? `Əsas səbəb: ${topReasons[0]?.reason ?? ""} (${topReasons[0]?.percentage ?? 0}%)`
-          : "Əsas səbəb: Qeyd olunmayıb";
-
-        const analysis = {
-          score,
-          summary: "AI krediti tələb olunduğu üçün əsas göstəricilər əsasında analiz göstərilir.",
-          observations: [
-            `Ümumi indeks: ${scoreBase}%`,
-            `Risk halları: ${riskCount}`,
-            topReasonLine,
-          ],
-          recommendations: hasCritical
-            ? [
-                "Kritik şikayətləri dərhal araşdırın və müdaxilə edin.",
-                "Şikayət edən işçi(lər) üçün 1-1 görüş planlayın.",
-                "Filial rəhbərliyi ilə təcili tədbir planı hazırlayın.",
-              ]
-            : [
-                "Əsas şikayət səbəbləri üzrə qısa fəaliyyət planı hazırlayın.",
-                "Komanda yüklənməsini və qrafiki yenidən qiymətləndirin.",
-                "Növbəti həftə üçün izləmə indikatorları təyin edin.",
-              ],
-          riskLevel,
-          criticalAlerts: hasCritical
-            ? flaggedComplaints.slice(0, 3).map((t) => `Kritik şikayət: "${t.slice(0, 140)}"`)
-            : [],
-          tasks: [],
-        };
-
-        return new Response(JSON.stringify({ analysis }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
-      return new Response(JSON.stringify({ error: "AI xətası baş verdi" }), {
-        status: 500,
+      const errorData = await response.json().catch(() => ({}));
+      console.error("Gemini API error:", response.status, JSON.stringify(errorData));
+      
+      // For any API error (rate limit, quota, etc.), return fallback analysis
+      console.log("Returning fallback analysis due to API error");
+      const analysis = createFallbackAnalysis(overallIndex, riskCount, topReasons, criticalComplaints);
+      return new Response(JSON.stringify({ analysis, source: "fallback" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -217,7 +190,7 @@ Bu məlumatlara əsasən JSON formatında analiz ver. Kritik şikayətlərə xü
     // Gemini API response format: data.candidates[0].content.parts[0].text
     const content = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
     
-    console.log("Gemini API response:", content);
+    console.log("Gemini API response received, length:", content.length);
     
     // Parse JSON from response
     let analysis;
@@ -232,16 +205,10 @@ Bu məlumatlara əsasən JSON formatında analiz ver. Kritik şikayətlərə xü
     } catch (parseError) {
       console.error("Failed to parse AI response:", parseError);
       // Fallback response
-      analysis = {
-        score: overallIndex,
-        summary: "Analiz aparıldı.",
-        observations: ["Məlumatlar analiz edildi."],
-        recommendations: ["Daha çox məlumat toplanmalıdır."],
-        riskLevel: riskCount > 5 ? "yüksək" : riskCount > 0 ? "orta" : "aşağı"
-      };
+      analysis = createFallbackAnalysis(overallIndex, riskCount, topReasons, criticalComplaints);
     }
 
-    return new Response(JSON.stringify({ analysis }), {
+    return new Response(JSON.stringify({ analysis, source: "gemini" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
