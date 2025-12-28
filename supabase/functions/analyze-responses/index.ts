@@ -33,7 +33,7 @@ function createFallbackAnalysis(overallIndex: number, riskCount: number, topReas
 
   return {
     score,
-    summary: "Gemini API limiti səbəbindən əsas göstəricilər əsasında analiz göstərilir.",
+    summary: "AI analizi hazırlanır...",
     observations: [
       `Ümumi indeks: ${scoreBase}%`,
       `Risk halları: ${riskCount}`,
@@ -66,9 +66,9 @@ serve(async (req) => {
   try {
     const { moodDistribution, topReasons, riskCount, responseRate, overallIndex, criticalComplaints } = await req.json();
     
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) {
-      throw new Error("GEMINI_API_KEY is not configured");
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      throw new Error("LOVABLE_API_KEY is not configured");
     }
 
     const systemPrompt = `Sən HR analitika ekspertisən. Sənə işçilərin əhval sorğularının nəticələri veriləcək. 
@@ -103,6 +103,13 @@ Tapşırıqlar yaratma qaydaları:
 - Ən az 3, ən çox 7 tapşırıq yarat
 - Zorakılıq/mobbing halları varsa "kritik" prioritetli tapşırıq MÜTLƏQ olmalıdır!
 
+PİS ƏHVAL SƏBƏBLƏRİNƏ XÜSUSİ DİQQƏT:
+- "İş yükü" səbəbi varsa - iş bölgüsünü analiz et
+- "Əmək haqqı" səbəbi varsa - motivasiya problemləri qeyd et
+- "Rəhbərlik" səbəbi varsa - idarəetmə tərzini araşdır
+- "İş mühiti" səbəbi varsa - komanda dinamikasını yoxla
+- "Şəxsi" səbəbi varsa - fərdi dəstək tövsiyə et
+
 Score hesablama meyarları:
 - Yaxşı əhval % yüksəkdirsə +
 - Risk halları azdırsa +
@@ -123,10 +130,10 @@ Azərbaycan dilində yaz. Qısa və konkret ol.`;
     // Handle both array formats for topReasons
     let topReasonsText = "";
     if (Array.isArray(topReasons)) {
-      topReasonsText = topReasons.map((r: any, i: number) => `${i + 1}. ${r.reason}: ${r.count || ''} (${r.percentage}%)`).join('\n');
+      topReasonsText = topReasons.map((r: any, i: number) => `${i + 1}. ${r.reason}: ${r.count || ''} nəfər (${r.percentage}%)`).join('\n');
     }
 
-    // Handle critical complaints (free text from employees)
+    // Handle critical complaints (free text reasons from bad moods)
     let criticalComplaintsText = "";
     if (Array.isArray(criticalComplaints) && criticalComplaints.length > 0) {
       criticalComplaintsText = criticalComplaints.map((c: any, i: number) => 
@@ -143,54 +150,61 @@ Risk halları sayı: ${riskCount}
 Əhval bölgüsü:
 ${moodDistributionText}
 
-Əsas şikayət səbəbləri:
+PİS ƏHVALIN KÖK SƏBƏBLƏRİ (ən çox qeyd edilənlər):
 ${topReasonsText || "Qeyd olunmayıb"}
 
 ⚠️ KRİTİK ŞİKAYƏTLƏR (işçilərin sərbəst mətn cavabları):
 ${criticalComplaintsText || "Kritik şikayət yoxdur"}
 
-Bu məlumatlara əsasən JSON formatında analiz ver. Kritik şikayətlərə xüsusi diqqət yetir!`;
+Bu məlumatlara əsasən JSON formatında ətraflı analiz ver. Xüsusilə pis əhvalın kök səbəblərini analiz et və hər səbəb üçün konkret tövsiyyələr ver!`;
 
-    console.log("Calling Gemini API...");
+    console.log("Calling Lovable AI gateway...");
+    console.log("Top reasons being sent:", JSON.stringify(topReasons));
+    console.log("Critical complaints count:", criticalComplaints?.length || 0);
     
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              { text: systemPrompt + "\n\n" + userPrompt }
-            ]
-          }
+        model: "google/gemini-2.5-flash",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
         ],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 2048
-        }
       }),
     });
 
     // Handle errors - return fallback analysis instead of error
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      console.error("Gemini API error:", response.status, JSON.stringify(errorData));
+      console.error("AI gateway error:", response.status, JSON.stringify(errorData));
       
-      // For any API error (rate limit, quota, etc.), return fallback analysis
-      console.log("Returning fallback analysis due to API error");
-      const analysis = createFallbackAnalysis(overallIndex, riskCount, topReasons, criticalComplaints);
-      return new Response(JSON.stringify({ analysis, source: "fallback" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      if (response.status === 429) {
+        console.log("Rate limit hit, returning fallback");
+        const analysis = createFallbackAnalysis(overallIndex, riskCount, topReasons, criticalComplaints);
+        return new Response(JSON.stringify({ analysis, source: "fallback" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      
+      if (response.status === 402) {
+        console.log("Credits exhausted, returning fallback");
+        const analysis = createFallbackAnalysis(overallIndex, riskCount, topReasons, criticalComplaints);
+        return new Response(JSON.stringify({ analysis, source: "fallback" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      
+      throw new Error("AI xətası baş verdi");
     }
 
     const data = await response.json();
-    // Gemini API response format: data.candidates[0].content.parts[0].text
-    const content = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    const content = data.choices?.[0]?.message?.content || "";
     
-    console.log("Gemini API response received, length:", content.length);
+    console.log("AI response received, length:", content.length);
     
     // Parse JSON from response
     let analysis;
@@ -204,11 +218,10 @@ Bu məlumatlara əsasən JSON formatında analiz ver. Kritik şikayətlərə xü
       }
     } catch (parseError) {
       console.error("Failed to parse AI response:", parseError);
-      // Fallback response
       analysis = createFallbackAnalysis(overallIndex, riskCount, topReasons, criticalComplaints);
     }
 
-    return new Response(JSON.stringify({ analysis, source: "gemini" }), {
+    return new Response(JSON.stringify({ analysis, source: "lovable-ai" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
