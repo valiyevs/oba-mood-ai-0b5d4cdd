@@ -83,10 +83,26 @@ serve(async (req) => {
     const totalComplaints = metrics?.reduce((sum, m) => sum + (m.customer_complaints || 0), 0) || 0;
     const avgComplaints = metrics && metrics.length > 0 ? totalComplaints / metrics.length : 0;
 
+    // Helper function for fallback prediction
+    const createFallbackPrediction = () => ({
+      stressChangePercent: stressChange,
+      complaintRiskPercent: Math.min(100, Math.max(0, 50 + stressChange * 2)),
+      salesImpactPercent: salesTrend,
+      predictionText: `Stress ${stressChange > 0 ? 'artıb' : 'azalıb'}. Satış trendi: ${salesTrend.toFixed(1)}%`,
+      confidenceScore: 60,
+      factors: {
+        stressTrend: stressChange > 5 ? "artan" : stressChange < -5 ? "azalan" : "sabit",
+        salesTrend: salesTrend > 5 ? "artan" : salesTrend < -5 ? "azalan" : "sabit",
+        complaintTrend: avgComplaints > 5 ? "artan" : "sabit",
+        keyRisks: stressChange > 10 ? ["Yüksək stress səviyyəsi"] : [],
+        recommendations: ["İşçilərlə görüşlər keçirin"]
+      }
+    });
+
     // Prepare data for AI analysis
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) {
-      throw new Error("GEMINI_API_KEY is not configured");
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      throw new Error("LOVABLE_API_KEY is not configured");
     }
 
     const analysisPrompt = `Sən HR və satış analitika ekspertisən. Aşağıdakı məlumatlara əsasən risk proqnozu ver.
@@ -104,12 +120,17 @@ ${metrics?.map(m => `- ${m.metric_date}: Satış: ${m.daily_sales}₼, Şikayət
 Satış trendi: ${salesTrend.toFixed(1)}%
 Orta gündəlik şikayət: ${avgComplaints.toFixed(1)}
 
+STRES-SATIŞ ƏLAQƏSİ ANALİZİ:
+- İşçi stresinin satışa birbaşa təsirini analiz et
+- Yüksək stress = aşağı müştəri xidməti = aşağı satış
+- Şikayət artımı stress artımı ilə əlaqələndirilsin
+
 JSON formatında cavab ver:
 {
   "stressChangePercent": <stress dəyişimi faizi>,
   "complaintRiskPercent": <növbəti 3 gündə şikayət riski 0-100>,
   "salesImpactPercent": <gözlənilən satış təsiri -100 ilə +100>,
-  "predictionText": "<1-2 cümlə qısa proqnoz>",
+  "predictionText": "<1-2 cümlə qısa proqnoz - stres və satış əlaqəsini vurğula>",
   "confidenceScore": <etibarlılıq balı 0-100>,
   "factors": {
     "stressTrend": "<artan|sabit|azalan>",
@@ -122,82 +143,55 @@ JSON formatında cavab ver:
 
 Konkret rəqəmlər və əlaqələr göstər. Azərbaycan dilində yaz.`;
 
-    console.log("Calling Gemini API for prediction...");
+    console.log("Calling Lovable AI gateway for prediction...");
+    console.log("Branch:", branch, "Total responses:", totalResponses, "Stress change:", stressChange);
     
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              { text: analysisPrompt }
-            ]
-          }
+        model: "google/gemini-2.5-flash",
+        messages: [
+          { role: "user", content: analysisPrompt },
         ],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 2048
-        }
       }),
     });
 
     if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit aşıldı, zəhmət olmasa bir az gözləyin." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (response.status === 402) {
-        // Return fallback prediction without AI
-        const fallbackPrediction = {
-          stressChangePercent: stressChange,
-          complaintRiskPercent: Math.min(100, Math.max(0, 50 + stressChange * 2)),
-          salesImpactPercent: salesTrend,
-          predictionText: `Stress ${stressChange > 0 ? 'artıb' : 'azalıb'}. Satış trendi: ${salesTrend.toFixed(1)}%`,
-          confidenceScore: 60,
-          factors: {
-            stressTrend: stressChange > 5 ? "artan" : stressChange < -5 ? "azalan" : "sabit",
-            salesTrend: salesTrend > 5 ? "artan" : salesTrend < -5 ? "azalan" : "sabit",
-            complaintTrend: avgComplaints > 5 ? "artan" : "sabit",
-            keyRisks: stressChange > 10 ? ["Yüksək stress səviyyəsi"] : [],
-            recommendations: ["İşçilərlə görüşlər keçirin"]
-          }
-        };
+      const errorData = await response.json().catch(() => ({}));
+      console.error("AI gateway error:", response.status, JSON.stringify(errorData));
+      
+      // Return fallback prediction for any error
+      const fallbackPrediction = createFallbackPrediction();
+      
+      // Save fallback prediction
+      await supabase.from("risk_predictions").upsert({
+        branch,
+        prediction_date: new Date().toISOString().split("T")[0],
+        stress_change_percent: fallbackPrediction.stressChangePercent,
+        complaint_risk_percent: fallbackPrediction.complaintRiskPercent,
+        sales_impact_percent: fallbackPrediction.salesImpactPercent,
+        prediction_text: fallbackPrediction.predictionText,
+        confidence_score: fallbackPrediction.confidenceScore,
+        factors: fallbackPrediction.factors
+      }, { onConflict: 'branch,prediction_date' });
 
-        // Save fallback prediction
-        await supabase.from("risk_predictions").upsert({
-          branch,
-          prediction_date: new Date().toISOString().split("T")[0],
-          stress_change_percent: fallbackPrediction.stressChangePercent,
-          complaint_risk_percent: fallbackPrediction.complaintRiskPercent,
-          sales_impact_percent: fallbackPrediction.salesImpactPercent,
-          prediction_text: fallbackPrediction.predictionText,
-          confidence_score: fallbackPrediction.confidenceScore,
-          factors: fallbackPrediction.factors
-        }, { onConflict: 'branch,prediction_date' });
-
-        return new Response(JSON.stringify({ 
-          prediction: fallbackPrediction,
-          source: "fallback",
-          metrics: { totalResponses, avgMoodScore, stressChange, salesTrend, avgComplaints }
-        }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
-      throw new Error("AI xətası baş verdi");
+      return new Response(JSON.stringify({ 
+        prediction: fallbackPrediction,
+        source: "fallback",
+        metrics: { totalResponses, avgMoodScore, stressChange, salesTrend, avgComplaints }
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const data = await response.json();
-    // Gemini API response format: data.candidates[0].content.parts[0].text
-    const content = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    const content = data.choices?.[0]?.message?.content || "";
     
-    console.log("Gemini API response:", content);
+    console.log("AI response received, length:", content.length);
     
     // Parse JSON from response
     let prediction;
@@ -210,14 +204,7 @@ Konkret rəqəmlər və əlaqələr göstər. Azərbaycan dilində yaz.`;
       }
     } catch (parseError) {
       console.error("Failed to parse AI response:", parseError);
-      prediction = {
-        stressChangePercent: stressChange,
-        complaintRiskPercent: 50,
-        salesImpactPercent: salesTrend,
-        predictionText: "Proqnoz hesablandı.",
-        confidenceScore: 50,
-        factors: {}
-      };
+      prediction = createFallbackPrediction();
     }
 
     // Save prediction to database
@@ -240,7 +227,7 @@ Konkret rəqəmlər və əlaqələr göstər. Azərbaycan dilində yaz.`;
 
     return new Response(JSON.stringify({ 
       prediction,
-      source: "ai",
+      source: "lovable-ai",
       metrics: { totalResponses, avgMoodScore, stressChange, salesTrend, avgComplaints }
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
