@@ -13,9 +13,9 @@ serve(async (req) => {
   try {
     const { moodDistribution, topReasons, riskCount, responseRate, overallIndex, criticalComplaints } = await req.json();
     
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    if (!GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY is not configured");
     }
 
     const systemPrompt = `Sən HR analitika ekspertisən. Sənə işçilərin əhval sorğularının nəticələri veriləcək. 
@@ -98,20 +98,25 @@ ${criticalComplaintsText || "Kritik şikayət yoxdur"}
 
 Bu məlumatlara əsasən JSON formatında analiz ver. Kritik şikayətlərə xüsusi diqqət yetir!`;
 
-    console.log("Calling AI gateway...");
+    console.log("Calling Gemini API...");
     
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
+        contents: [
+          {
+            parts: [
+              { text: systemPrompt + "\n\n" + userPrompt }
+            ]
+          }
         ],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 2048
+        }
       }),
     });
 
@@ -209,9 +214,10 @@ Bu məlumatlara əsasən JSON formatında analiz ver. Kritik şikayətlərə xü
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || "";
+    // Gemini API response format: data.candidates[0].content.parts[0].text
+    const content = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
     
-    console.log("AI response:", content);
+    console.log("Gemini API response:", content);
     
     // Parse JSON from response
     let analysis;
