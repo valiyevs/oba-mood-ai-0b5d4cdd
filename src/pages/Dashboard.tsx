@@ -21,6 +21,9 @@ import { MoodPieChart } from "@/components/charts/MoodPieChart";
 import { ReasonsBarChart } from "@/components/charts/ReasonsBarChart";
 import { TrendLineChart } from "@/components/charts/TrendLineChart";
 import { BranchComparisonChart } from "@/components/charts/BranchComparisonChart";
+import { NotificationButton } from "@/components/NotificationButton";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { useNotifications } from "@/hooks/useNotifications";
 
 interface StatCardProps {
   title: string;
@@ -92,6 +95,7 @@ const StatCard = ({ title, value, change, icon: Icon, description, gradient, del
 const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { subscribeToAlerts } = useNotifications();
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
     from: subDays(new Date(), 7),
     to: new Date(),
@@ -277,6 +281,12 @@ const Dashboard = () => {
     }
   }, [responses, hasAutoLoaded]);
 
+  // Subscribe to real-time alerts for push notifications
+  useEffect(() => {
+    const unsubscribe = subscribeToAlerts(managerBranch || undefined);
+    return unsubscribe;
+  }, [subscribeToAlerts, managerBranch]);
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Enhanced Background */}
@@ -317,6 +327,12 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              {/* Theme & Notification controls */}
+              <div className="hidden sm:flex items-center gap-2">
+                <ThemeToggle />
+                <NotificationButton />
+              </div>
+              
               {/* Desktop navigation */}
               <div className="hidden sm:flex items-center gap-2">
                 <Button
