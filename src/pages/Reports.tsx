@@ -23,7 +23,8 @@ import {
   Sparkles,
   CheckCircle2,
   Clock,
-  Filter
+  Filter,
+  FileDown
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { exportToExcel, exportToPDF, formatReportData } from "@/lib/exportUtils";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -218,6 +221,64 @@ const Reports = () => {
     });
   };
 
+  const handleExportExcel = () => {
+    const data = formatReportData(filteredResponses, burnoutAlerts, managerActions);
+    exportToExcel(data.responses, `hesabat_${format(new Date(), 'yyyy-MM-dd')}`);
+    toast({
+      title: "Excel yükləndi",
+      description: "Excel faylı uğurla yükləndi",
+    });
+  };
+
+  const handleExportPDF = () => {
+    exportToPDF(
+      "OBA Məmnuniyyət Hesabatı",
+      `${periodLabels[selectedPeriod]} hesabat - ${format(dateRange.from, "d MMM", { locale: az })} - ${format(dateRange.to, "d MMM yyyy", { locale: az })}`,
+      [
+        {
+          title: "Əhval Paylanması",
+          content: `
+            <table>
+              <tr><th>Əhval</th><th>Say</th><th>Faiz</th></tr>
+              <tr><td>Yaxşı</td><td>${moodCounts['Yaxşı']}</td><td>${totalResponses > 0 ? Math.round((moodCounts['Yaxşı'] / totalResponses) * 100) : 0}%</td></tr>
+              <tr><td>Normal</td><td>${moodCounts['Normal']}</td><td>${totalResponses > 0 ? Math.round((moodCounts['Normal'] / totalResponses) * 100) : 0}%</td></tr>
+              <tr><td>Pis</td><td>${moodCounts['Pis']}</td><td>${totalResponses > 0 ? Math.round((moodCounts['Pis'] / totalResponses) * 100) : 0}%</td></tr>
+            </table>
+          `
+        },
+        {
+          title: "Əsas Şikayət Səbəbləri",
+          content: topReasons.length > 0 
+            ? `<table><tr><th>Səbəb</th><th>Say</th><th>Faiz</th></tr>${topReasons.map(r => `<tr><td>${r.reason}</td><td>${r.count}</td><td>${r.percentage}%</td></tr>`).join("")}</table>`
+            : "<p>Şikayət qeyd edilməyib</p>"
+        },
+        {
+          title: "Filiallara görə statistika",
+          content: branchStats.length > 0
+            ? `<table><tr><th>Filial</th><th>Cavab</th><th>Məmnuniyyət</th><th>Xəbərdarlıq</th></tr>${branchStats.map(b => `<tr><td>${b.branch}</td><td>${b.totalResponses}</td><td>${b.satisfactionRate}%</td><td>${b.alerts}</td></tr>`).join("")}</table>`
+            : "<p>Məlumat yoxdur</p>"
+        }
+      ],
+      [
+        { label: "Ümumi Cavablar", value: totalResponses },
+        { label: "Məmnuniyyət", value: `${satisfactionRate}%` },
+        { label: "Kritik Xəbərdarlıqlar", value: criticalAlerts },
+        { label: "Tamamlanmış Tapşırıqlar", value: completedActions }
+      ]
+    );
+    toast({
+      title: "PDF hazırlandı",
+      description: "Hesabat PDF formatında açıldı",
+    });
+  };
+
+  const periodLabels: Record<string, string> = {
+    week: "Həftəlik",
+    month: "Aylıq",
+    quarter: "Rüblük",
+    year: "İllik"
+  };
+
   const reportCards = [
     {
       title: "Ümumi Cavablar",
@@ -253,13 +314,6 @@ const Reports = () => {
       bgGlow: "bg-violet-500/10"
     }
   ];
-
-  const periodLabels: Record<string, string> = {
-    week: "Həftəlik",
-    month: "Aylıq",
-    quarter: "Rüblük",
-    year: "İllik"
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 relative overflow-hidden">
@@ -304,6 +358,7 @@ const Reports = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
               <SelectTrigger className="w-[130px] rounded-xl border-primary/20">
                 <Clock className="h-4 w-4 mr-2 text-primary" />
@@ -325,6 +380,28 @@ const Reports = () => {
               >
                 <Download className="h-4 w-4" />
                 <span className="hidden sm:inline">CSV</span>
+              </Button>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleExportExcel}
+                className="rounded-xl border-primary/20 hover:bg-primary/10 gap-2"
+              >
+                <FileSpreadsheet className="h-4 w-4" />
+                <span className="hidden sm:inline">Excel</span>
+              </Button>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button 
+                variant="default" 
+                size="sm" 
+                onClick={handleExportPDF}
+                className="rounded-xl gap-2 bg-gradient-to-r from-primary to-primary/80"
+              >
+                <FileDown className="h-4 w-4" />
+                <span className="hidden sm:inline">PDF</span>
               </Button>
             </motion.div>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
