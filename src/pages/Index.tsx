@@ -3,7 +3,7 @@ import { MoodSelector, type MoodType } from "@/components/MoodSelector";
 import { ReasonSelector, type ReasonType } from "@/components/ReasonSelector";
 import { BranchSelector, type BranchType } from "@/components/BranchSelector";
 import { SuccessScreen } from "@/components/SuccessScreen";
-import { TrendingUp, Sparkles, Star } from "lucide-react";
+import { TrendingUp, Sparkles, Star, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -259,6 +259,17 @@ const Index = () => {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate("/install")}
+                  className="gap-2 rounded-xl hover:bg-emerald-500/10"
+                >
+                  <Download className="w-4 h-4" />
+                  <span className="hidden sm:inline">Quraşdır</span>
+                </Button>
+              </motion.div>
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
                   variant="ghost"
