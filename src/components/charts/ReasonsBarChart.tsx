@@ -27,8 +27,8 @@ const GRADIENT_COLORS = [
 
 export const ReasonsBarChart = ({ 
   data, 
-  title = "Şikayət Səbəbləri", 
-  description = "Ən çox qeyd olunan problemlər" 
+  title = "Complaint Reasons", 
+  description = "Most common issues reported" 
 }: ReasonsBarChartProps) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
@@ -52,7 +52,7 @@ export const ReasonsBarChart = ({
             <p className="font-bold text-foreground">{label}</p>
           </div>
           <p className="text-sm text-muted-foreground">
-            <span className="text-foreground font-semibold text-lg">{payload[0].value}</span> şikayət
+            <span className="text-foreground font-semibold text-lg">{payload[0].value}</span> complaints
           </p>
           <div className="flex items-center gap-1 mt-1">
             <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">

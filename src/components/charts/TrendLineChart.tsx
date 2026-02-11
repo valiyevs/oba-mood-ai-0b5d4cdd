@@ -3,7 +3,6 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Activity, Calendar } from "lucide-react";
 import { format, parseISO, eachDayOfInterval } from "date-fns";
-import { az } from "date-fns/locale";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -22,8 +21,8 @@ interface TrendLineChartProps {
 export const TrendLineChart = ({ 
   responses, 
   dateRange,
-  title = "Əhval Trendi", 
-  description = "Günlər üzrə məmnuniyyət göstəricisi" 
+  title = "Mood Trend", 
+  description = "Satisfaction score over time" 
 }: TrendLineChartProps) => {
   const [activePoint, setActivePoint] = useState<any>(null);
 
@@ -42,15 +41,15 @@ export const TrendLineChart = ({
     const dateStr = r.response_date;
     if (responsesByDate[dateStr]) {
       responsesByDate[dateStr].total++;
-      if (r.mood === "Yaxşı") responsesByDate[dateStr].good++;
+      if (r.mood === "Yaxşı" || r.mood === "Good") responsesByDate[dateStr].good++;
       else if (r.mood === "Normal") responsesByDate[dateStr].normal++;
-      else if (r.mood === "Pis") responsesByDate[dateStr].bad++;
+      else if (r.mood === "Pis" || r.mood === "Bad") responsesByDate[dateStr].bad++;
     }
   });
 
   const chartData = Object.entries(responsesByDate).map(([date, counts]) => ({
     date,
-    displayDate: format(parseISO(date), "dd MMM", { locale: az }),
+    displayDate: format(parseISO(date), "dd MMM"),
     satisfaction: counts.total > 0 
       ? Math.round(((counts.good * 100 + counts.normal * 50) / counts.total))
       : null,
@@ -95,7 +94,7 @@ export const TrendLineChart = ({
           {data.satisfaction !== null ? (
             <>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-muted-foreground">Məmnuniyyət</span>
+                <span className="text-sm text-muted-foreground">Satisfaction</span>
                 <span className={cn(
                   "text-lg font-bold",
                   data.satisfaction >= 70 ? "text-emerald-500" : 
@@ -109,7 +108,7 @@ export const TrendLineChart = ({
                 <div className="flex items-center justify-between text-xs">
                   <span className="flex items-center gap-1">
                     <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                    Yaxşı
+                    Good
                   </span>
                   <span className="font-medium">{data.good}</span>
                 </div>
@@ -123,18 +122,18 @@ export const TrendLineChart = ({
                 <div className="flex items-center justify-between text-xs">
                   <span className="flex items-center gap-1">
                     <span className="w-2 h-2 rounded-full bg-rose-500" />
-                    Pis
+                    Bad
                   </span>
                   <span className="font-medium">{data.bad}</span>
                 </div>
               </div>
 
               <div className="mt-2 pt-2 border-t border-border text-xs text-muted-foreground">
-                Ümumi cavab: <span className="font-semibold text-foreground">{data.responses}</span>
+                Total responses: <span className="font-semibold text-foreground">{data.responses}</span>
               </div>
             </>
           ) : (
-            <p className="text-sm text-muted-foreground">Məlumat yoxdur</p>
+            <p className="text-sm text-muted-foreground">No data</p>
           )}
         </motion.div>
       );
@@ -199,7 +198,7 @@ export const TrendLineChart = ({
             {/* Stats badges */}
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1 text-sm bg-muted/50 px-3 py-1.5 rounded-full">
-                <span className="text-muted-foreground">Ort:</span>
+                <span className="text-muted-foreground">Avg:</span>
                 <span className={cn(
                   "font-bold",
                   avgSatisfaction >= 70 ? "text-emerald-500" : 
@@ -291,11 +290,11 @@ export const TrendLineChart = ({
           <div className="flex justify-center gap-6 mt-4 text-xs text-muted-foreground">
             <div className="flex items-center gap-2">
               <div className="w-8 h-0.5 bg-gradient-to-r from-emerald-500 via-blue-500 to-emerald-500 rounded" />
-              <span>Məmnuniyyət trendi</span>
+              <span>Satisfaction trend</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-8 h-0.5 border-t-2 border-dashed border-muted-foreground/50" />
-              <span>Orta göstərici ({avgSatisfaction}%)</span>
+              <span>Average ({avgSatisfaction}%)</span>
             </div>
           </div>
         </CardContent>
