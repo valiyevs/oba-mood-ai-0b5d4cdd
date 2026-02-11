@@ -24,6 +24,7 @@ import { BranchComparisonChart } from "@/components/charts/BranchComparisonChart
 import { NotificationButton } from "@/components/NotificationButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useNotifications } from "@/hooks/useNotifications";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
 interface StatCardProps {
   title: string;
@@ -329,6 +330,7 @@ const Dashboard = () => {
             <div className="flex items-center gap-2">
               {/* Theme & Notification controls */}
               <div className="hidden sm:flex items-center gap-2">
+                <LanguageToggle />
                 <ThemeToggle />
                 <NotificationButton />
               </div>
