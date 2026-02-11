@@ -9,16 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/hooks/useLanguage";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
-const navItems = [
-  { label: "Home", to: "/", icon: Home },
-  { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
-  { label: "Predictive Analytics", to: "/analytics", icon: Brain },
-  { label: "HR Panel", to: "/hr-panel", icon: UserCog },
-  { label: "Manager Assignments", to: "/manager-assignments", icon: Users },
-  { label: "Manager Tasks", to: "/manager-actions", icon: ClipboardCheck },
-  { label: "Employee Responses", to: "/employee-responses", icon: MessageSquare },
-];
+// navItems moved inside component for i18n
 
 interface MobileNavMenuProps {
   dateRange?: { from: Date; to: Date };
@@ -30,6 +24,17 @@ export const MobileNavMenu = ({ dateRange, onDateRangeChange, showDatePicker = f
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useLanguage();
+
+  const navItems = [
+    { label: t("common.home"), to: "/", icon: Home },
+    { label: t("common.dashboard"), to: "/dashboard", icon: LayoutDashboard },
+    { label: t("common.analytics"), to: "/analytics", icon: Brain },
+    { label: t("common.hrPanel"), to: "/hr-panel", icon: UserCog },
+    { label: t("common.managerAssignments"), to: "/manager-assignments", icon: Users },
+    { label: t("common.managerActions"), to: "/manager-actions", icon: ClipboardCheck },
+    { label: t("common.responses"), to: "/employee-responses", icon: MessageSquare },
+  ];
 
   const handleNavigate = (to: string) => {
     navigate(to);
@@ -56,7 +61,10 @@ export const MobileNavMenu = ({ dateRange, onDateRangeChange, showDatePicker = f
       </SheetTrigger>
       <SheetContent side="right" className="flex flex-col gap-6 pt-8">
         <SheetHeader>
-          <SheetTitle className="text-left">Navigation</SheetTitle>
+          <div className="flex items-center justify-between">
+            <SheetTitle className="text-left">{t("common.navigation")}</SheetTitle>
+            <LanguageToggle />
+          </div>
         </SheetHeader>
         <nav className="space-y-2 flex-1">
           {navItems.map((item) => {
