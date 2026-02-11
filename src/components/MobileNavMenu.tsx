@@ -11,13 +11,13 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 
 const navItems = [
-  { label: "Ana Səhifə", to: "/", icon: Home },
-  { label: "İdarəetmə Paneli", to: "/dashboard", icon: LayoutDashboard },
-  { label: "Proqnozlaşdırıcı Analitika", to: "/analytics", icon: Brain },
-  { label: "HR Paneli", to: "/hr-panel", icon: UserCog },
-  { label: "Menecer Təyinatları", to: "/manager-assignments", icon: Users },
-  { label: "Menecer Tapşırıqları", to: "/manager-actions", icon: ClipboardCheck },
-  { label: "İşçi Cavabları", to: "/employee-responses", icon: MessageSquare },
+  { label: "Home", to: "/", icon: Home },
+  { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
+  { label: "Predictive Analytics", to: "/analytics", icon: Brain },
+  { label: "HR Panel", to: "/hr-panel", icon: UserCog },
+  { label: "Manager Assignments", to: "/manager-assignments", icon: Users },
+  { label: "Manager Tasks", to: "/manager-actions", icon: ClipboardCheck },
+  { label: "Employee Responses", to: "/employee-responses", icon: MessageSquare },
 ];
 
 interface MobileNavMenuProps {
@@ -51,12 +51,12 @@ export const MobileNavMenu = ({ dateRange, onDateRangeChange, showDatePicker = f
           className="sm:hidden"
         >
           <Menu className="w-5 h-5" />
-          <span className="sr-only">Mobil menyu</span>
+          <span className="sr-only">Mobile menu</span>
         </Button>
       </SheetTrigger>
       <SheetContent side="right" className="flex flex-col gap-6 pt-8">
         <SheetHeader>
-          <SheetTitle className="text-left">Naviqasiya</SheetTitle>
+          <SheetTitle className="text-left">Navigation</SheetTitle>
         </SheetHeader>
         <nav className="space-y-2 flex-1">
           {navItems.map((item) => {
@@ -84,7 +84,7 @@ export const MobileNavMenu = ({ dateRange, onDateRangeChange, showDatePicker = f
           <div className="pt-4 border-t border-border">
             <p className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
               <CalendarIcon className="w-4 h-4" />
-              Tarix Aralığı
+              Date Range
             </p>
             <div className="text-sm text-muted-foreground mb-3">
               {format(dateRange.from, "dd MMM", { locale: az })} - {format(dateRange.to, "dd MMM yyyy", { locale: az })}
@@ -96,7 +96,7 @@ export const MobileNavMenu = ({ dateRange, onDateRangeChange, showDatePicker = f
                 onClick={() => onDateRangeChange({ from: subDays(new Date(), 7), to: new Date() })}
                 className="text-xs"
               >
-                Son 7 gün
+                Last 7 days
               </Button>
               <Button
                 variant="outline"
@@ -104,7 +104,7 @@ export const MobileNavMenu = ({ dateRange, onDateRangeChange, showDatePicker = f
                 onClick={() => onDateRangeChange({ from: subDays(new Date(), 30), to: new Date() })}
                 className="text-xs"
               >
-                Son 30 gün
+                Last 30 days
               </Button>
               <Button
                 variant="outline"
@@ -112,14 +112,14 @@ export const MobileNavMenu = ({ dateRange, onDateRangeChange, showDatePicker = f
                 onClick={() => onDateRangeChange({ from: subDays(new Date(), 90), to: new Date() })}
                 className="text-xs"
               >
-                Son 90 gün
+                Last 90 days
               </Button>
             </div>
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" size="sm" className="w-full justify-start">
                   <CalendarIcon className="w-4 h-4 mr-2" />
-                  Xüsusi tarix seç
+                  Select custom date
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -148,7 +148,7 @@ export const MobileNavMenu = ({ dateRange, onDateRangeChange, showDatePicker = f
             onClick={handleLogout}
           >
             <LogOut className="w-4 h-4" />
-            <span>Çıxış</span>
+            <span>Logout</span>
           </Button>
         </div>
       </SheetContent>

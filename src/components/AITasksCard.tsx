@@ -152,8 +152,8 @@ export const AITasksCard = ({ newTasks = [], isGenerating, onRefresh, branch }: 
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['ai-tasks'] }),
     onError: (error: any) => {
       toast({
-        title: "Xəta",
-        description: error.message || "Status yenilənə bilmədi",
+        title: "Error",
+        description: error.message || "Failed to update status",
         variant: "destructive",
       });
     },
@@ -174,6 +174,15 @@ export const AITasksCard = ({ newTasks = [], isGenerating, onRefresh, branch }: 
     }
   };
 
+  const getPriorityLabel = (priority: string) => {
+    switch (priority) {
+      case "kritik": return "Critical";
+      case "yüksək": return "High";
+      case "orta": return "Medium";
+      default: return priority;
+    }
+  };
+
   const isLoading = loadingTasks || isGenerating;
 
   return (
@@ -182,7 +191,7 @@ export const AITasksCard = ({ newTasks = [], isGenerating, onRefresh, branch }: 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            <CardTitle className="text-lg">Kritik Tapşırıqlar</CardTitle>
+            <CardTitle className="text-lg">Critical Tasks</CardTitle>
           </div>
           <Button
             variant="ghost"
@@ -197,18 +206,18 @@ export const AITasksCard = ({ newTasks = [], isGenerating, onRefresh, branch }: 
             )}
           </Button>
         </div>
-        <CardDescription>AI tərəfindən müəyyən edilən təcili addımlar</CardDescription>
+        <CardDescription>Urgent steps identified by AI</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading && dbTasks.length === 0 ? (
           <div className="flex items-center justify-center py-8 text-muted-foreground">
             <Loader2 className="h-6 w-6 animate-spin mr-2" />
-            Yüklənir...
+            Loading...
           </div>
         ) : dbTasks.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
             <CheckCircle2 className="h-10 w-10 mb-2 text-status-good" />
-            <p className="text-sm">Kritik tapşırıq yoxdur</p>
+            <p className="text-sm">No critical tasks</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -228,7 +237,7 @@ export const AITasksCard = ({ newTasks = [], isGenerating, onRefresh, branch }: 
                     <span className="font-medium text-sm truncate">{task.title}</span>
                     <Badge variant="outline" className={cn("shrink-0 text-xs", getPriorityColor(task.priority))}>
                       {task.priority === 'kritik' && <AlertTriangle className="w-3 h-3 mr-1" />}
-                      {task.priority}
+                      {getPriorityLabel(task.priority)}
                     </Badge>
                   </div>
                   <p className="text-xs text-muted-foreground line-clamp-2">{task.description}</p>

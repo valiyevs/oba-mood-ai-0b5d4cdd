@@ -159,8 +159,8 @@ export const PredictiveAnalytics = () => {
   const runPrediction = async () => {
     if (!selectedBranch) {
       toast({
-        title: "Filial seçin",
-        description: "Proqnoz üçün filial seçməlisiniz",
+        title: "Select branch",
+        description: "Please select a branch for prediction",
         variant: "destructive"
       });
       return;
@@ -210,7 +210,7 @@ export const PredictiveAnalytics = () => {
           ? data.stressScores.reduce((a, b) => a + b, 0) / data.stressScores.length 
           : 30;
         trends.push({
-          date: new Date(date).toLocaleDateString('az-AZ', { day: 'numeric', month: 'short' }),
+          date: new Date(date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
           sales: Math.round(data.sales / 1000), // in thousands
           complaints: data.complaints,
           stressIndex: Math.round(avgStress)
@@ -231,14 +231,14 @@ export const PredictiveAnalytics = () => {
       setSource(data.source);
 
       toast({
-        title: "Proqnoz hazırdır",
-        description: data.source === "ai" ? "AI analizi tamamlandı" : "Əsas hesablama ilə proqnoz hazırlandı"
+        title: "Prediction ready",
+        description: data.source === "ai" ? "AI analysis complete" : "Prediction calculated based on trends"
       });
     } catch (err) {
       console.error("Prediction error:", err);
       toast({
-        title: "Xəta",
-        description: "Proqnoz hesablana bilmədi",
+        title: "Error",
+        description: "Could not calculate prediction",
         variant: "destructive"
       });
     } finally {
@@ -254,10 +254,10 @@ export const PredictiveAnalytics = () => {
   };
 
   const getRiskBadge = (risk: number) => {
-    if (risk >= 80) return { variant: "destructive" as const, text: "Kritik" };
-    if (risk >= 60) return { variant: "default" as const, text: "Yüksək" };
-    if (risk >= 40) return { variant: "secondary" as const, text: "Orta" };
-    return { variant: "outline" as const, text: "Aşağı" };
+    if (risk >= 80) return { variant: "destructive" as const, text: "Critical" };
+    if (risk >= 60) return { variant: "default" as const, text: "High" };
+    if (risk >= 40) return { variant: "secondary" as const, text: "Medium" };
+    return { variant: "outline" as const, text: "Low" };
   };
 
   const getCorrelationColor = (corr: number) => {
@@ -277,9 +277,9 @@ export const PredictiveAnalytics = () => {
               <Brain className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <CardTitle className="text-xl">Proqnozlaşdırıcı Analitika</CardTitle>
+              <CardTitle className="text-xl">Predictive Analytics</CardTitle>
               <CardDescription>
-                Stress və satış məlumatlarının korrelyasiyası əsasında risk proqnozu
+                Risk forecast based on stress and sales data correlation
               </CardDescription>
             </div>
           </div>
@@ -288,7 +288,7 @@ export const PredictiveAnalytics = () => {
           <div className="flex flex-col sm:flex-row gap-4">
             <Select value={selectedBranch} onValueChange={setSelectedBranch}>
               <SelectTrigger className="w-full sm:w-[250px]">
-                <SelectValue placeholder="Filial seçin" />
+                <SelectValue placeholder="Select branch" />
               </SelectTrigger>
               <SelectContent>
                 {branches.map((branch) => (
@@ -300,12 +300,12 @@ export const PredictiveAnalytics = () => {
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Hesablanır...
+                  Calculating...
                 </>
               ) : (
                 <>
                   <RefreshCw className="mr-2 h-4 w-4" />
-                  Proqnoz al
+                  Get Prediction
                 </>
               )}
             </Button>
@@ -318,10 +318,10 @@ export const PredictiveAnalytics = () => {
         <CardHeader>
           <div className="flex items-center gap-2">
             <BarChart3 className="h-5 w-5 text-primary" />
-            <CardTitle className="text-lg">Filiallar arası müqayisə</CardTitle>
+            <CardTitle className="text-lg">Branch Comparison</CardTitle>
           </div>
           <CardDescription>
-            Stress-Satış korrelyasiyası (yüksək = daha çox risk)
+            Stress-Sales Correlation (higher = more risk)
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -355,7 +355,7 @@ export const PredictiveAnalytics = () => {
                     </div>
                   </div>
                   <div className="text-xs text-muted-foreground w-20 text-right hidden sm:block">
-                    ₼{(branch.avgSales / 1000).toFixed(0)}k/gün
+                    ₼{(branch.avgSales / 1000).toFixed(0)}k/day
                   </div>
                 </motion.div>
               ))}
@@ -370,10 +370,10 @@ export const PredictiveAnalytics = () => {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Zap className="h-5 w-5 text-orange-500" />
-              <CardTitle className="text-lg">Stressin Satışa Təsiri</CardTitle>
+              <CardTitle className="text-lg">Impact of Stress on Sales</CardTitle>
             </div>
             <CardDescription>
-              Hər filialda stress səviyyəsi vs gündəlik şikayət
+              Stress level vs daily complaints for each branch
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -387,20 +387,20 @@ export const PredictiveAnalytics = () => {
                     name="Stress" 
                     domain={[0, 100]}
                     tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
-                    label={{ value: 'Stress Səviyyəsi (%)', position: 'bottom', offset: 40, fill: 'hsl(var(--muted-foreground))' }}
+                    label={{ value: 'Stress Level (%)', position: 'bottom', offset: 40, fill: 'hsl(var(--muted-foreground))' }}
                   />
                   <YAxis 
                     type="number" 
                     dataKey="avgComplaints" 
-                    name="Şikayətlər"
+                    name="Complaints"
                     tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
-                    label={{ value: 'Ort. Şikayət/gün', angle: -90, position: 'insideLeft', fill: 'hsl(var(--muted-foreground))' }}
+                    label={{ value: 'Avg. Complaints/day', angle: -90, position: 'insideLeft', fill: 'hsl(var(--muted-foreground))' }}
                   />
                   <ZAxis 
                     type="number" 
                     dataKey="avgSales" 
                     range={[100, 500]} 
-                    name="Satış"
+                    name="Sales"
                   />
                   <Tooltip 
                     cursor={{ strokeDasharray: '3 3' }}
@@ -410,7 +410,7 @@ export const PredictiveAnalytics = () => {
                       borderRadius: "12px"
                     }}
                     formatter={(value: number, name: string) => {
-                      if (name === "Satış") return [`₼${(value / 1000).toFixed(0)}k`, name];
+                      if (name === "Sales") return [`₼${(value / 1000).toFixed(0)}k`, name];
                       if (name === "Stress") return [`${value.toFixed(0)}%`, name];
                       return [value.toFixed(1), name];
                     }}
@@ -422,7 +422,7 @@ export const PredictiveAnalytics = () => {
                     }}
                   />
                   <Scatter 
-                    name="Filiallar" 
+                    name="Branches" 
                     data={branchComparisons} 
                     fill="hsl(var(--primary))"
                   />
@@ -430,7 +430,7 @@ export const PredictiveAnalytics = () => {
               </ResponsiveContainer>
             </div>
             <p className="text-xs text-muted-foreground text-center mt-2">
-              Dairə ölçüsü = satış həcmi. Sağ üst = yüksək stress, çox şikayət (kritik)
+              Circle size = Sales volume. Top right = High stress, many complaints (Critical)
             </p>
           </CardContent>
         </Card>
@@ -450,9 +450,9 @@ export const PredictiveAnalytics = () => {
                 <CardHeader>
                   <div className="flex items-center gap-2">
                     <Activity className="h-5 w-5 text-primary" />
-                    <CardTitle className="text-lg">{selectedBranch} - Gündəlik Trend</CardTitle>
+                    <CardTitle className="text-lg">{selectedBranch} - Daily Trend</CardTitle>
                   </div>
-                  <CardDescription>Son 7 gün ərzində satış, şikayət və stress</CardDescription>
+                  <CardDescription>Sales, complaints and stress over last 7 days</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="h-[250px]">
@@ -468,41 +468,13 @@ export const PredictiveAnalytics = () => {
                             <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
                           </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
-                        <XAxis dataKey="date" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
-                        <YAxis tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
-                        <Tooltip 
-                          contentStyle={{ 
-                            backgroundColor: "hsl(var(--card))", 
-                            border: "1px solid hsl(var(--border))",
-                            borderRadius: "12px"
-                          }}
-                        />
+                        <XAxis dataKey="date" />
+                        <YAxis yAxisId="left" orientation="left" stroke="#22c55e" />
+                        <YAxis yAxisId="right" orientation="right" stroke="#ef4444" />
+                        <Tooltip />
                         <Legend />
-                        <Area 
-                          type="monotone" 
-                          dataKey="sales" 
-                          name="Satış (min ₼)" 
-                          stroke="#22c55e" 
-                          fillOpacity={1}
-                          fill="url(#colorSales)" 
-                        />
-                        <Area 
-                          type="monotone" 
-                          dataKey="stressIndex" 
-                          name="Stress İndeksi" 
-                          stroke="#ef4444" 
-                          fillOpacity={1}
-                          fill="url(#colorStress)" 
-                        />
-                        <Line 
-                          type="monotone" 
-                          dataKey="complaints" 
-                          name="Şikayətlər" 
-                          stroke="#f97316" 
-                          strokeWidth={2}
-                          dot={{ fill: "#f97316" }}
-                        />
+                        <Area yAxisId="left" type="monotone" dataKey="sales" name="Sales (k)" stroke="#22c55e" fillOpacity={1} fill="url(#colorSales)" />
+                        <Area yAxisId="right" type="monotone" dataKey="stressIndex" name="Stress Index" stroke="#ef4444" fillOpacity={1} fill="url(#colorStress)" />
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>
@@ -510,182 +482,93 @@ export const PredictiveAnalytics = () => {
               </Card>
             )}
 
-            {/* Main Prediction Card */}
-            <Card className="border-2 border-primary/30">
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <AlertTriangle className={getRiskColor(prediction.complaintRiskPercent)} />
-                    Risk Proqnozu
-                  </CardTitle>
-                  <Badge {...getRiskBadge(prediction.complaintRiskPercent)}>
-                    {getRiskBadge(prediction.complaintRiskPercent).text} Risk
-                  </Badge>
+            {/* Prediction Summary */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium">Predicted Stress Change</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-2xl font-bold ${prediction.stressChangePercent > 0 ? 'text-red-500' : 'text-green-500'}`}>
+                      {prediction.stressChangePercent > 0 ? '+' : ''}{prediction.stressChangePercent}%
+                    </span>
+                    <TrendIcon trend={prediction.stressChangePercent > 0 ? "artan" : "azalan"} />
+                  </div>
+                  <Progress value={50 + prediction.stressChangePercent} className="mt-2" />
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium">Complaint Risk</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-2xl font-bold ${getRiskColor(prediction.complaintRiskPercent)}`}>
+                      {prediction.complaintRiskPercent}%
+                    </span>
+                    <AlertTriangle className={`h-4 w-4 ${getRiskColor(prediction.complaintRiskPercent)}`} />
+                  </div>
+                  <Progress value={prediction.complaintRiskPercent} className="mt-2" />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium">Sales Impact</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl font-bold text-orange-500">
+                      -{prediction.salesImpactPercent}%
+                    </span>
+                    <TrendingDown className="h-4 w-4 text-orange-500" />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">Potential loss due to stress</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* AI Insight */}
+            <Card className="border-primary/50 bg-primary/5">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  <CardTitle className="text-lg">AI Insight</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
                 <p className="text-lg font-medium mb-4">{prediction.predictionText}</p>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                  {/* Complaint Risk */}
-                  <div className="p-4 rounded-lg bg-muted/50">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-muted-foreground">Şikayət Riski</span>
-                      <Users className="h-4 w-4 text-muted-foreground" />
+                {prediction.factors && (
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <h4 className="font-semibold mb-2 flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-orange-500" />
+                        Key Risks
+                      </h4>
+                      <ul className="space-y-1">
+                        {prediction.factors.keyRisks?.map((risk, i) => (
+                          <li key={i} className="text-sm text-muted-foreground">• {risk}</li>
+                        ))}
+                      </ul>
                     </div>
-                    <div className={`text-3xl font-bold ${getRiskColor(prediction.complaintRiskPercent)}`}>
-                      {prediction.complaintRiskPercent.toFixed(0)}%
+                    <div>
+                      <h4 className="font-semibold mb-2 flex items-center gap-2">
+                        <Target className="h-4 w-4 text-green-500" />
+                        Recommendations
+                      </h4>
+                      <ul className="space-y-1">
+                        {prediction.factors.recommendations?.map((rec, i) => (
+                          <li key={i} className="text-sm text-muted-foreground">• {rec}</li>
+                        ))}
+                      </ul>
                     </div>
-                    <Progress 
-                      value={prediction.complaintRiskPercent} 
-                      className="mt-2 h-2"
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">Növbəti 3 gün</p>
                   </div>
-
-                  {/* Stress Change */}
-                  <div className="p-4 rounded-lg bg-muted/50">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-muted-foreground">Stress Dəyişimi</span>
-                      <TrendIcon trend={prediction.factors?.stressTrend} />
-                    </div>
-                    <div className={`text-3xl font-bold ${prediction.stressChangePercent > 0 ? 'text-red-500' : 'text-green-500'}`}>
-                      {prediction.stressChangePercent > 0 ? '+' : ''}{prediction.stressChangePercent.toFixed(1)}%
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-2">Son 7 gün</p>
-                  </div>
-
-                  {/* Sales Impact */}
-                  <div className="p-4 rounded-lg bg-muted/50">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-muted-foreground">Satış Təsiri</span>
-                      <ShoppingCart className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                    <div className={`text-3xl font-bold ${prediction.salesImpactPercent > 0 ? 'text-green-500' : 'text-red-500'}`}>
-                      {prediction.salesImpactPercent > 0 ? '+' : ''}{prediction.salesImpactPercent.toFixed(1)}%
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-2">Gözlənilən</p>
-                  </div>
-                </div>
-
-                {/* Confidence Score */}
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Target className="h-4 w-4" />
-                  Etibarlılıq: {prediction.confidenceScore?.toFixed(0) || 50}%
-                  {source === "fallback" && (
-                    <Badge variant="outline" className="ml-2">Əsas hesablama</Badge>
-                  )}
-                </div>
+                )}
               </CardContent>
             </Card>
-
-            {/* Factors & Recommendations */}
-            {prediction.factors && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Trends */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Trendlər</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span>Stress</span>
-                      <div className="flex items-center gap-2">
-                        <TrendIcon trend={prediction.factors.stressTrend} />
-                        <span className="capitalize">{prediction.factors.stressTrend || "Sabit"}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>Satış</span>
-                      <div className="flex items-center gap-2">
-                        <TrendIcon trend={prediction.factors.salesTrend} />
-                        <span className="capitalize">{prediction.factors.salesTrend || "Sabit"}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>Şikayətlər</span>
-                      <div className="flex items-center gap-2">
-                        <TrendIcon trend={prediction.factors.complaintTrend} />
-                        <span className="capitalize">{prediction.factors.complaintTrend || "Sabit"}</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Risks & Recommendations */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Risklər və Tövsiyyələr</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {prediction.factors.keyRisks && prediction.factors.keyRisks.length > 0 && (
-                      <div>
-                        <p className="text-sm font-medium text-red-600 mb-2">Əsas Risklər:</p>
-                        <ul className="space-y-1">
-                          {prediction.factors.keyRisks.map((risk, i) => (
-                            <li key={i} className="text-sm flex items-start gap-2">
-                              <AlertTriangle className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
-                              {risk}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    {prediction.factors.recommendations && prediction.factors.recommendations.length > 0 && (
-                      <div>
-                        <p className="text-sm font-medium text-green-600 mb-2">Tövsiyyələr:</p>
-                        <ul className="space-y-1">
-                          {prediction.factors.recommendations.map((rec, i) => (
-                            <li key={i} className="text-sm flex items-start gap-2">
-                              <Target className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                              {rec}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-
-            {/* Raw Metrics */}
-            {metrics && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Əsas Metrikalar</CardTitle>
-                  <CardDescription>Son 7 günün xam məlumatları</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                    <div className="text-center p-3 bg-muted/30 rounded-lg">
-                      <div className="text-2xl font-bold">{metrics.totalResponses}</div>
-                      <div className="text-xs text-muted-foreground">Sorğu sayı</div>
-                    </div>
-                    <div className="text-center p-3 bg-muted/30 rounded-lg">
-                      <div className="text-2xl font-bold">{metrics.avgMoodScore.toFixed(0)}</div>
-                      <div className="text-xs text-muted-foreground">Əhval balı</div>
-                    </div>
-                    <div className="text-center p-3 bg-muted/30 rounded-lg">
-                      <div className={`text-2xl font-bold ${metrics.stressChange > 0 ? 'text-red-500' : 'text-green-500'}`}>
-                        {metrics.stressChange > 0 ? '+' : ''}{metrics.stressChange.toFixed(1)}%
-                      </div>
-                      <div className="text-xs text-muted-foreground">Stress dəyişimi</div>
-                    </div>
-                    <div className="text-center p-3 bg-muted/30 rounded-lg">
-                      <div className={`text-2xl font-bold ${metrics.salesTrend > 0 ? 'text-green-500' : 'text-red-500'}`}>
-                        {metrics.salesTrend > 0 ? '+' : ''}{metrics.salesTrend.toFixed(1)}%
-                      </div>
-                      <div className="text-xs text-muted-foreground">Satış trendi</div>
-                    </div>
-                    <div className="text-center p-3 bg-muted/30 rounded-lg">
-                      <div className="text-2xl font-bold">{metrics.avgComplaints.toFixed(1)}</div>
-                      <div className="text-xs text-muted-foreground">Ort. şikayət/gün</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
           </motion.div>
         )}
       </AnimatePresence>
