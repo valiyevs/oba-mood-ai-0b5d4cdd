@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Loader2, TrendingUp, TrendingDown, Minus, AlertTriangle, Brain, RefreshCw, Target, Users, ShoppingCart, Activity, BarChart3, Zap } from "lucide-react";
+import { Loader2, TrendingUp, TrendingDown, Minus, AlertTriangle, Brain, RefreshCw, Target, Users, ShoppingCart, Activity, BarChart3, Zap, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
