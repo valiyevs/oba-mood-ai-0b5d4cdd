@@ -252,7 +252,7 @@ Nəticə izlənir</div>
 
 <div class="footer">
   <p><strong>OBA Personal Məmnuniyyət İdarəetmə Sistemi</strong></p>
-  <p>Sifarişçi: Şahin | İcraçı: Kərbala Ayı Arzu xanım</p>
+  <p>Sifarişçi: Şahin | İcraçı: PATCO Group</p>
   <p>Fevral 2026 | Versiya 2.0</p>
 </div>
 

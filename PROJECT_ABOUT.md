@@ -7,7 +7,7 @@
 **Canlı URL:** https://oba-mood-ai.lovable.app
 
 **Sifarişçi:** Şahin  
-**İcraçı:** Kərbala Ayı Arzu xanım  
+**İcraçı:** PATCO Group  
 **Tarix:** Fevral 2026
 
 ---

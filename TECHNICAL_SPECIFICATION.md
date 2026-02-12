@@ -21,7 +21,7 @@
 
 ### 1.4 Layihənin Sahibi
 - **Sifarişçi**: Şahin
-- **İcraçı**: Kərbala Ayı Arzu xanım
+- **İcraçı**: PATCO Group
 - **Canlı URL**: https://oba-mood-ai.lovable.app
 
 ---

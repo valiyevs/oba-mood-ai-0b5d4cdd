@@ -126,7 +126,7 @@ npm run preview
 
 ## 👥 Əlaqə
 
-**Hazırlayan**: Kərbala Ayı Arzu xanım
+**Hazırlayan**: PATCO Group
 **Müştəri**: Şahin
 **Tarix**: 23/11/2025
 
