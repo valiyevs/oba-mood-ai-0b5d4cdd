@@ -5,6 +5,7 @@ import { TrendingUp, TrendingDown, Activity, Calendar } from "lucide-react";
 import { format, parseISO, eachDayOfInterval } from "date-fns";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface Response {
   response_date: string;
@@ -21,9 +22,12 @@ interface TrendLineChartProps {
 export const TrendLineChart = ({ 
   responses, 
   dateRange,
-  title = "Mood Trend", 
-  description = "Satisfaction score over time" 
+  title, 
+  description 
 }: TrendLineChartProps) => {
+  const { t } = useLanguage();
+  const displayTitle = title || t("charts.trend");
+  const displayDesc = description || t("charts.trendDesc");
   const [activePoint, setActivePoint] = useState<any>(null);
 
   // Generate all days in range
@@ -94,7 +98,7 @@ export const TrendLineChart = ({
           {data.satisfaction !== null ? (
             <>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-muted-foreground">Satisfaction</span>
+                <span className="text-sm text-muted-foreground">{t("charts.satisfaction")}</span>
                 <span className={cn(
                   "text-lg font-bold",
                   data.satisfaction >= 70 ? "text-emerald-500" : 
@@ -129,11 +133,11 @@ export const TrendLineChart = ({
               </div>
 
               <div className="mt-2 pt-2 border-t border-border text-xs text-muted-foreground">
-                Total responses: <span className="font-semibold text-foreground">{data.responses}</span>
+                {t("charts.totalResponses")}: <span className="font-semibold text-foreground">{data.responses}</span>
               </div>
             </>
           ) : (
-            <p className="text-sm text-muted-foreground">No data</p>
+            <p className="text-sm text-muted-foreground">{t("charts.noData")}</p>
           )}
         </motion.div>
       );
@@ -190,15 +194,15 @@ export const TrendLineChart = ({
                 <Activity className="h-5 w-5 text-emerald-500" />
               </div>
               <div>
-                <CardTitle className="text-foreground">{title}</CardTitle>
-                <CardDescription>{description}</CardDescription>
+                <CardTitle className="text-foreground">{displayTitle}</CardTitle>
+                <CardDescription>{displayDesc}</CardDescription>
               </div>
             </div>
             
             {/* Stats badges */}
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1 text-sm bg-muted/50 px-3 py-1.5 rounded-full">
-                <span className="text-muted-foreground">Avg:</span>
+                <span className="text-muted-foreground">{t("charts.average")}:</span>
                 <span className={cn(
                   "font-bold",
                   avgSatisfaction >= 70 ? "text-emerald-500" : 
@@ -290,11 +294,11 @@ export const TrendLineChart = ({
           <div className="flex justify-center gap-6 mt-4 text-xs text-muted-foreground">
             <div className="flex items-center gap-2">
               <div className="w-8 h-0.5 bg-gradient-to-r from-emerald-500 via-blue-500 to-emerald-500 rounded" />
-              <span>Satisfaction trend</span>
+              <span>{t("charts.satisfactionTrend")}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-8 h-0.5 border-t-2 border-dashed border-muted-foreground/50" />
-              <span>Average ({avgSatisfaction}%)</span>
+              <span>{t("charts.average")} ({avgSatisfaction}%)</span>
             </div>
           </div>
         </CardContent>

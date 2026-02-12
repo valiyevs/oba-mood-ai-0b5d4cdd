@@ -5,15 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { 
-  Sparkles, 
-  RefreshCw, 
-  AlertTriangle, 
-  CheckCircle2,
-  Loader2
-} from "lucide-react";
+import { Sparkles, RefreshCw, AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/hooks/useLanguage";
 
 export interface AITask {
   id: string;
@@ -48,6 +43,7 @@ interface AITasksCardProps {
 
 export const AITasksCard = ({ newTasks = [], isGenerating, onRefresh, branch }: AITasksCardProps) => {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const queryClient = useQueryClient();
 
   // Auto-save new tasks when they arrive
@@ -176,9 +172,9 @@ export const AITasksCard = ({ newTasks = [], isGenerating, onRefresh, branch }: 
 
   const getPriorityLabel = (priority: string) => {
     switch (priority) {
-      case "kritik": return "Critical";
-      case "yüksək": return "High";
-      case "orta": return "Medium";
+      case "kritik": return t("aiTasks.priority.critical");
+      case "yüksək": return t("aiTasks.priority.high");
+      case "orta": return t("aiTasks.priority.medium");
       default: return priority;
     }
   };
@@ -191,7 +187,7 @@ export const AITasksCard = ({ newTasks = [], isGenerating, onRefresh, branch }: 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            <CardTitle className="text-lg">Critical Tasks</CardTitle>
+            <CardTitle className="text-lg">{t("aiTasks.title")}</CardTitle>
           </div>
           <Button
             variant="ghost"
@@ -206,7 +202,7 @@ export const AITasksCard = ({ newTasks = [], isGenerating, onRefresh, branch }: 
             )}
           </Button>
         </div>
-        <CardDescription>Urgent steps identified by AI</CardDescription>
+        <CardDescription>{t("aiTasks.description")}</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading && dbTasks.length === 0 ? (
@@ -217,7 +213,7 @@ export const AITasksCard = ({ newTasks = [], isGenerating, onRefresh, branch }: 
         ) : dbTasks.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
             <CheckCircle2 className="h-10 w-10 mb-2 text-status-good" />
-            <p className="text-sm">No critical tasks</p>
+            <p className="text-sm">{t("aiTasks.noCriticalTasks")}</p>
           </div>
         ) : (
           <div className="space-y-2">

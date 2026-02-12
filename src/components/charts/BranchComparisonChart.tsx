@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, Users, MessageSquare, AlertTriangle, MapPin, Smile, Meh, Frown } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface Response {
   branch: string;
@@ -29,17 +30,21 @@ const regionNames: Record<string, string> = {
   'lankaran': 'Lankaran', 'shaki': 'Shaki', 'quba': 'Guba'
 };
 
-const MOOD_COLORS = {
-  good: { gradient: ["#22c55e", "#16a34a"], label: "Good" },
-  normal: { gradient: ["#eab308", "#ca8a04"], label: "Normal" },
-  bad: { gradient: ["#ef4444", "#dc2626"], label: "Bad" },
-};
+const getMoodLabels = (t: (key: string) => string) => ({
+  good: { gradient: ["#22c55e", "#16a34a"], label: t("charts.good") },
+  normal: { gradient: ["#eab308", "#ca8a04"], label: t("charts.normal") },
+  bad: { gradient: ["#ef4444", "#dc2626"], label: t("charts.bad") },
+});
 
 export const BranchComparisonChart = ({ 
   responses, 
-  title = "Regional Comparison", 
-  description = "Mood distribution by region (click for details)" 
+  title, 
+  description 
 }: BranchComparisonChartProps) => {
+  const { t } = useLanguage();
+  const displayTitle = title || t("charts.branchComparison");
+  const displayDesc = description || t("charts.branchCompDesc");
+  const MOOD_COLORS = getMoodLabels(t);
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [activeBar, setActiveBar] = useState<number | null>(null);
@@ -143,7 +148,7 @@ export const BranchComparisonChart = ({
           
           <div className="mt-3 pt-2 border-t border-border">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Satisfaction</span>
+              <span className="text-muted-foreground">{t("charts.satisfaction")}</span>
               <span className={cn(
                 "font-bold",
                 data?.satisfaction >= 70 ? "text-emerald-500" : 
@@ -154,7 +159,7 @@ export const BranchComparisonChart = ({
             </div>
           </div>
           
-          <p className="text-xs text-primary mt-2 text-center">Click for details</p>
+          <p className="text-xs text-primary mt-2 text-center">{t("charts.clickForDetails")}</p>
         </motion.div>
       );
     }
@@ -183,14 +188,14 @@ export const BranchComparisonChart = ({
     return (
       <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-foreground">{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
+          <CardTitle className="text-foreground">{displayTitle}</CardTitle>
+          <CardDescription>{displayDesc}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="h-[280px] flex items-center justify-center text-muted-foreground">
             <div className="text-center">
               <MapPin className="w-12 h-12 mx-auto mb-2 opacity-50" />
-              <p>No data</p>
+              <p>{t("charts.noDataAvailable")}</p>
             </div>
           </div>
         </CardContent>
@@ -215,8 +220,8 @@ export const BranchComparisonChart = ({
                 <MapPin className="h-5 w-5 text-blue-500" />
               </div>
               <div>
-                <CardTitle className="text-foreground">{title}</CardTitle>
-                <CardDescription>{description}</CardDescription>
+                <CardTitle className="text-foreground">{displayTitle}</CardTitle>
+                <CardDescription>{displayDesc}</CardDescription>
               </div>
             </div>
           </CardHeader>
@@ -326,10 +331,10 @@ export const BranchComparisonChart = ({
               <div className="p-2 rounded-lg bg-primary/10">
                 <MapPin className="w-5 h-5 text-primary" />
               </div>
-              {selectedRegionName} Region
+              {selectedRegionName} {t("charts.region")}
             </DialogTitle>
             <DialogDescription>
-              Detailed statistics and mood metrics
+              {t("charts.detailedStats")}
             </DialogDescription>
           </DialogHeader>
 
@@ -345,7 +350,7 @@ export const BranchComparisonChart = ({
                 >
                   <Smile className="w-6 h-6 mx-auto mb-2 text-emerald-500" />
                   <div className="text-2xl font-bold text-emerald-500">{selectedData.good}</div>
-                  <div className="text-xs text-muted-foreground">Good</div>
+                  <div className="text-xs text-muted-foreground">{t("charts.good")}</div>
                 </motion.div>
                 <motion.div 
                   initial={{ opacity: 0, y: 10 }}
@@ -355,7 +360,7 @@ export const BranchComparisonChart = ({
                 >
                   <Meh className="w-6 h-6 mx-auto mb-2 text-amber-500" />
                   <div className="text-2xl font-bold text-amber-500">{selectedData.normal}</div>
-                  <div className="text-xs text-muted-foreground">Normal</div>
+                  <div className="text-xs text-muted-foreground">{t("charts.normal")}</div>
                 </motion.div>
                 <motion.div 
                   initial={{ opacity: 0, y: 10 }}
@@ -365,7 +370,7 @@ export const BranchComparisonChart = ({
                 >
                   <Frown className="w-6 h-6 mx-auto mb-2 text-rose-500" />
                   <div className="text-2xl font-bold text-rose-500">{selectedData.bad}</div>
-                  <div className="text-xs text-muted-foreground">Bad</div>
+                  <div className="text-xs text-muted-foreground">{t("charts.bad")}</div>
                 </motion.div>
               </div>
 
@@ -377,7 +382,7 @@ export const BranchComparisonChart = ({
                 className="p-4 rounded-xl border bg-card"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium">Satisfaction Index</span>
+                  <span className="text-sm font-medium">{t("charts.satisfactionIndex")}</span>
                   <Badge variant={Number(stats.satisfaction) >= 7 ? "default" : Number(stats.satisfaction) >= 4 ? "secondary" : "destructive"}>
                     {stats.satisfaction}/10
                   </Badge>
@@ -385,9 +390,9 @@ export const BranchComparisonChart = ({
                 <Progress value={Number(stats.satisfaction) * 10} className="h-2" />
                 <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
                   {Number(stats.satisfaction) >= 5 ? (
-                    <><TrendingUp className="w-3 h-3 text-emerald-500" /> Good performance</>
+                    <><TrendingUp className="w-3 h-3 text-emerald-500" /> {t("charts.goodPerformance")}</>
                   ) : (
-                    <><TrendingDown className="w-3 h-3 text-rose-500" /> Needs attention</>
+                    <><TrendingDown className="w-3 h-3 text-rose-500" /> {t("charts.needsAttention")}</>
                   )}
                 </div>
               </motion.div>
@@ -402,7 +407,7 @@ export const BranchComparisonChart = ({
                 >
                   <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
                     <MessageSquare className="w-4 h-4 text-primary" />
-                    Top Complaints
+                    {t("charts.topComplaints")}
                   </h4>
                   <div className="space-y-2">
                     {stats.topReasons.map(([reason, count], idx) => (
