@@ -58,6 +58,7 @@ export const SuccessScreen = ({ onComplete }: SuccessScreenProps) => {
         transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
         className="relative mx-auto"
       >
+        {/* Multiple Pulsing Rings */}
         <motion.div
           animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0, 0.3] }}
           transition={{ duration: 2, repeat: Infinity }}
@@ -69,6 +70,7 @@ export const SuccessScreen = ({ onComplete }: SuccessScreenProps) => {
           className="absolute inset-0 w-36 h-36 mx-auto rounded-full bg-gradient-to-r from-cyan-400 to-emerald-500 blur-3xl translate-x-2"
         />
         
+        {/* Icon Container */}
         <motion.div
           initial={{ rotate: -180, opacity: 0 }}
           animate={{ rotate: 0, opacity: 1 }}
@@ -82,9 +84,12 @@ export const SuccessScreen = ({ onComplete }: SuccessScreenProps) => {
           >
             <CheckCircle2 className="w-18 h-18 text-white" strokeWidth={2.5} />
           </motion.div>
+          
+          {/* Inner Glow */}
           <div className="absolute inset-4 rounded-full bg-gradient-to-t from-white/0 to-white/20" />
         </motion.div>
 
+        {/* Sparkles */}
         <motion.div
           initial={{ opacity: 0, scale: 0, rotate: -45 }}
           animate={{ opacity: 1, scale: 1, rotate: 0 }}
@@ -119,7 +124,7 @@ export const SuccessScreen = ({ onComplete }: SuccessScreenProps) => {
         className="space-y-4"
       >
         <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 bg-clip-text text-transparent">
-          Thank you!
+          Təşəkkürlər!
         </h2>
         <motion.p 
           initial={{ opacity: 0 }}
@@ -127,7 +132,7 @@ export const SuccessScreen = ({ onComplete }: SuccessScreenProps) => {
           transition={{ delay: 0.5 }}
           className="text-xl text-muted-foreground flex items-center justify-center gap-2"
         >
-          Your feedback has been recorded
+          Rəyiniz uğurla qeydə alındı
           <motion.span
             animate={{ scale: [1, 1.2, 1] }}
             transition={{ duration: 1, repeat: Infinity, repeatDelay: 2 }}
@@ -144,13 +149,17 @@ export const SuccessScreen = ({ onComplete }: SuccessScreenProps) => {
         transition={{ delay: 0.5, type: "spring" }}
         className="relative overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-br from-card via-card to-card/80 backdrop-blur-sm p-6 shadow-xl"
       >
+        {/* Background Pattern */}
         <div className="absolute inset-0 opacity-[0.03]">
           <div className="absolute inset-0" style={{
             backgroundImage: "radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)",
             backgroundSize: "20px 20px"
           }} />
         </div>
+        
+        {/* Gradient Border Effect */}
         <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/10 via-transparent to-emerald-500/10" />
+
         <div className="relative space-y-3">
           <div className="flex items-center justify-center gap-2 text-primary">
             <motion.div
@@ -159,10 +168,10 @@ export const SuccessScreen = ({ onComplete }: SuccessScreenProps) => {
             >
               <Shield className="w-6 h-6" />
             </motion.div>
-            <span className="font-bold text-lg">Full Privacy</span>
+            <span className="font-bold text-lg">Tam Məxfilik</span>
           </div>
           <p className="text-muted-foreground text-sm md:text-base">
-            Your response is completely anonymous and is only used in overall statistics.
+            Cavabınız tamamilə anonimdir və yalnız ümumi statistikada istifadə olunur.
           </p>
         </div>
       </motion.div>
@@ -179,7 +188,7 @@ export const SuccessScreen = ({ onComplete }: SuccessScreenProps) => {
             size="lg"
             className="w-full h-14 text-lg font-semibold rounded-xl bg-gradient-to-r from-primary via-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-xl shadow-primary/30 transition-all duration-300 hover:shadow-2xl hover:shadow-primary/40"
           >
-            Close
+            Bağla
           </Button>
         </motion.div>
       </motion.div>
@@ -191,7 +200,7 @@ export const SuccessScreen = ({ onComplete }: SuccessScreenProps) => {
         transition={{ delay: 0.8 }}
         className="text-sm text-muted-foreground flex items-center justify-center gap-2"
       >
-        <span>See you tomorrow!</span>
+        <span>Görüşənədək! Sabah yenə qarşınızda olacağıq</span>
         <motion.span
           animate={{ rotate: [0, 20, 0] }}
           transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}

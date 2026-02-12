@@ -10,14 +10,14 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 const branches = [
-  { id: "baku", name: "Baku", icon: "🏙️" },
-  { id: "ganja", name: "Ganja", icon: "🌆" },
-  { id: "sumgait", name: "Sumgait", icon: "🏭" },
-  { id: "mingachevir", name: "Mingachevir", icon: "⚡" },
-  { id: "shirvan", name: "Shirvan", icon: "🌾" },
-  { id: "lankaran", name: "Lankaran", icon: "🌊" },
-  { id: "shaki", name: "Shaki", icon: "🏔️" },
-  { id: "quba", name: "Guba", icon: "🍎" },
+  { id: "baku", name: "Bakı", icon: "🏙️" },
+  { id: "ganja", name: "Gəncə", icon: "🌆" },
+  { id: "sumgait", name: "Sumqayıt", icon: "🏭" },
+  { id: "mingachevir", name: "Mingəçevir", icon: "⚡" },
+  { id: "shirvan", name: "Şirvan", icon: "🌾" },
+  { id: "lankaran", name: "Lənkəran", icon: "🌊" },
+  { id: "shaki", name: "Şəki", icon: "🏔️" },
+  { id: "quba", name: "Quba", icon: "🍎" },
 ];
 
 interface ManagerWithBranch {
@@ -102,14 +102,14 @@ export const ManagerBranchAssignment = () => {
       queryClient.invalidateQueries({ queryKey: ['manager-branch-assignments'] });
       setSelectedBranch("");
       toast({
-        title: "Assignment successful",
-        description: "Manager has been assigned to the branch",
+        title: "Təyinat uğurlu",
+        description: "Menecer bölgəyə təyin edildi",
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Error occurred during assignment",
+        title: "Xəta",
+        description: error.message || "Təyinat zamanı xəta baş verdi",
         variant: "destructive",
       });
     },
@@ -128,14 +128,14 @@ export const ManagerBranchAssignment = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['manager-branch-assignments'] });
       toast({
-        title: "Assignment removed",
-        description: "Manager removed from branch",
+        title: "Təyinat silindi",
+        description: "Menecer bölgədən çıxarıldı",
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Error occurred during removal",
+        title: "Xəta",
+        description: error.message || "Silmə zamanı xəta baş verdi",
         variant: "destructive",
       });
     },
@@ -144,8 +144,8 @@ export const ManagerBranchAssignment = () => {
   const handleAssign = () => {
     if (!selectedManager || !selectedBranch) {
       toast({
-        title: "Error",
-        description: "Please select both a manager and a branch",
+        title: "Xəta",
+        description: "Menecer və bölgə seçin",
         variant: "destructive",
       });
       return;
@@ -158,8 +158,8 @@ export const ManagerBranchAssignment = () => {
     
     if (alreadyAssigned) {
       toast({
-        title: "Error",
-        description: "This manager is already assigned to this branch",
+        title: "Xəta",
+        description: "Bu menecer artıq bu bölgəyə təyin olunub",
         variant: "destructive",
       });
       return;
@@ -187,10 +187,10 @@ export const ManagerBranchAssignment = () => {
       <CardHeader className="bg-primary/5">
         <CardTitle className="flex items-center gap-2">
           <UserCog className="w-5 h-5 text-primary" />
-          Manager-Branch Assignments
+          Menecer-Bölgə Təyinatları
         </CardTitle>
         <CardDescription>
-          Assign one or more branches to each manager
+          Hər menecerə bir və ya bir neçə bölgə təyin edin
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6 pt-6">
@@ -198,7 +198,7 @@ export const ManagerBranchAssignment = () => {
         <div className="p-4 rounded-lg border border-border bg-muted/30">
           <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
             <Plus className="w-4 h-4" />
-            Add New Assignment
+            Yeni Təyinat Əlavə Et
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <Select value={selectedManager} onValueChange={(val) => {
@@ -206,11 +206,11 @@ export const ManagerBranchAssignment = () => {
               setSelectedBranch(""); // Reset branch when manager changes
             }}>
               <SelectTrigger>
-                <SelectValue placeholder="Select Manager" />
+                <SelectValue placeholder="Menecer seçin" />
               </SelectTrigger>
               <SelectContent>
                 {managers.length === 0 ? (
-                  <SelectItem value="none" disabled>No managers found</SelectItem>
+                  <SelectItem value="none" disabled>Menecer yoxdur</SelectItem>
                 ) : (
                   managers.map(manager => {
                     const assignedCount = (managerBranchMap[manager.user_id] || []).length;
@@ -220,7 +220,7 @@ export const ManagerBranchAssignment = () => {
                           <span>{manager.user_id.slice(0, 8)}...</span>
                           {assignedCount > 0 && (
                             <Badge variant="secondary" className="text-xs">
-                              {assignedCount} branch{assignedCount !== 1 ? 'es' : ''}
+                              {assignedCount} bölgə
                             </Badge>
                           )}
                         </div>
@@ -237,7 +237,7 @@ export const ManagerBranchAssignment = () => {
               disabled={!selectedManager}
             >
               <SelectTrigger>
-                <SelectValue placeholder={selectedManager ? "Select Branch" : "Select manager first"} />
+                <SelectValue placeholder={selectedManager ? "Bölgə seçin" : "Əvvəl menecer seçin"} />
               </SelectTrigger>
               <SelectContent>
                 {branches.map(branch => {
@@ -250,7 +250,7 @@ export const ManagerBranchAssignment = () => {
                       disabled={isAssignedToSelectedManager}
                     >
                       {branch.icon} {branch.name}
-                      {isAssignedToSelectedManager && " (already assigned)"}
+                      {isAssignedToSelectedManager && " (artıq təyin olunub)"}
                     </SelectItem>
                   );
                 })}
@@ -263,7 +263,7 @@ export const ManagerBranchAssignment = () => {
               className="gap-2"
             >
               <Check className="w-4 h-4" />
-              Assign
+              Təyin Et
             </Button>
           </div>
         </div>
@@ -272,15 +272,15 @@ export const ManagerBranchAssignment = () => {
         <div className="space-y-4">
           <h4 className="text-sm font-medium flex items-center gap-2">
             <Users className="w-4 h-4" />
-            Managers & Their Branches
+            Menecerlər və Bölgələri
           </h4>
           
           {loadingAssignments || loadingManagers ? (
-            <div className="text-center py-4 text-muted-foreground">Loading...</div>
+            <div className="text-center py-4 text-muted-foreground">Yüklənir...</div>
           ) : managersWithBranches.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground border border-dashed border-border rounded-lg">
               <UserCog className="w-8 h-8 mx-auto mb-2 opacity-50" />
-              <p>No managers found</p>
+              <p>Heç bir menecer yoxdur</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -295,20 +295,20 @@ export const ManagerBranchAssignment = () => {
                         <UserCog className="w-5 h-5 text-primary" />
                       </div>
                       <div>
-                        <div className="font-medium">Manager</div>
+                        <div className="font-medium">Menecer</div>
                         <div className="text-xs text-muted-foreground">
                           ID: {manager.user_id.slice(0, 12)}...
                         </div>
                       </div>
                     </div>
                     <Badge variant="outline">
-                      {manager.branches.length} branch{manager.branches.length !== 1 ? 'es' : ''}
+                      {manager.branches.length} bölgə
                     </Badge>
                   </div>
                   
                   {manager.branches.length === 0 ? (
                     <div className="text-sm text-muted-foreground italic py-2">
-                      No branches assigned
+                      Heç bir bölgə təyin olunmayıb
                     </div>
                   ) : (
                     <div className="flex flex-wrap gap-2">
@@ -341,7 +341,7 @@ export const ManagerBranchAssignment = () => {
         <div className="pt-4 border-t border-border">
           <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
             <MapPin className="w-4 h-4" />
-            Branch Coverage
+            Bölgə Əhatəsi
           </h4>
           <div className="flex flex-wrap gap-2">
             {branches.map(branch => {
@@ -367,7 +367,7 @@ export const ManagerBranchAssignment = () => {
             })}
           </div>
           <p className="text-xs text-muted-foreground mt-2">
-            {new Set(managerBranches.map(mb => mb.branch)).size}/{branches.length} branches have assigned managers
+            {new Set(managerBranches.map(mb => mb.branch)).size}/{branches.length} bölgə menecerlə təmin edilib
           </p>
         </div>
       </CardContent>

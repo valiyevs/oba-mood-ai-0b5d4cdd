@@ -24,21 +24,21 @@ interface BranchComparisonChartProps {
 }
 
 const regionNames: Record<string, string> = {
-  'baku': 'Baku', 'ganja': 'Ganja', 'sumgait': 'Sumgait',
-  'mingachevir': 'Mingachevir', 'shirvan': 'Shirvan',
-  'lankaran': 'Lankaran', 'shaki': 'Shaki', 'quba': 'Guba'
+  'baku': 'Bakı', 'ganja': 'Gəncə', 'sumgait': 'Sumqayıt',
+  'mingachevir': 'Mingəçevir', 'shirvan': 'Şirvan',
+  'lankaran': 'Lənkəran', 'shaki': 'Şəki', 'quba': 'Quba'
 };
 
 const MOOD_COLORS = {
-  good: { gradient: ["#22c55e", "#16a34a"], label: "Good" },
+  good: { gradient: ["#22c55e", "#16a34a"], label: "Yaxşı" },
   normal: { gradient: ["#eab308", "#ca8a04"], label: "Normal" },
-  bad: { gradient: ["#ef4444", "#dc2626"], label: "Bad" },
+  bad: { gradient: ["#ef4444", "#dc2626"], label: "Pis" },
 };
 
 export const BranchComparisonChart = ({ 
   responses, 
-  title = "Regional Comparison", 
-  description = "Mood distribution by region (click for details)" 
+  title = "Bölgə Müqayisəsi", 
+  description = "Bölgələr üzrə əhval bölgüsü (klikləyin)" 
 }: BranchComparisonChartProps) => {
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -52,18 +52,18 @@ export const BranchComparisonChart = ({
       branchData[r.branch] = { good: 0, normal: 0, bad: 0, responses: [] };
     }
     branchData[r.branch].responses.push(r);
-    if (r.mood === "Yaxşı" || r.mood === "Good") branchData[r.branch].good++;
+    if (r.mood === "Yaxşı") branchData[r.branch].good++;
     else if (r.mood === "Normal") branchData[r.branch].normal++;
-    else if (r.mood === "Pis" || r.mood === "Bad") branchData[r.branch].bad++;
+    else if (r.mood === "Pis") branchData[r.branch].bad++;
   });
 
   const chartData = Object.entries(branchData)
     .map(([branch, counts]) => ({
       branch,
       branchName: regionNames[branch] || branch.charAt(0).toUpperCase() + branch.slice(1),
-      Good: counts.good,
+      Yaxşı: counts.good,
       Normal: counts.normal,
-      Bad: counts.bad,
+      Pis: counts.bad,
       total: counts.good + counts.normal + counts.bad,
       responses: counts.responses,
       satisfaction: counts.good + counts.normal + counts.bad > 0 
@@ -104,7 +104,7 @@ export const BranchComparisonChart = ({
 
     // Recent responses
     const recentBadResponses = selectedData.responses
-      .filter(r => (r.mood === 'Pis' || r.mood === 'Bad') && r.reason)
+      .filter(r => r.mood === 'Pis' && r.reason)
       .slice(0, 3);
 
     return { total, satisfaction, topReasons, recentBadResponses };
@@ -143,7 +143,7 @@ export const BranchComparisonChart = ({
           
           <div className="mt-3 pt-2 border-t border-border">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Satisfaction</span>
+              <span className="text-muted-foreground">Məmnuniyyət</span>
               <span className={cn(
                 "font-bold",
                 data?.satisfaction >= 70 ? "text-emerald-500" : 
@@ -154,7 +154,7 @@ export const BranchComparisonChart = ({
             </div>
           </div>
           
-          <p className="text-xs text-primary mt-2 text-center">Click for details</p>
+          <p className="text-xs text-primary mt-2 text-center">Detallara baxmaq üçün klikləyin</p>
         </motion.div>
       );
     }
@@ -190,7 +190,7 @@ export const BranchComparisonChart = ({
           <div className="h-[280px] flex items-center justify-center text-muted-foreground">
             <div className="text-center">
               <MapPin className="w-12 h-12 mx-auto mb-2 opacity-50" />
-              <p>No data</p>
+              <p>Məlumat yoxdur</p>
             </div>
           </div>
         </CardContent>
@@ -289,7 +289,7 @@ export const BranchComparisonChart = ({
                   />
                   <Tooltip content={<CustomTooltip />} cursor={{ fill: "hsl(var(--muted) / 0.3)", radius: 4 }} />
                   <Bar 
-                    dataKey="Good" 
+                    dataKey="Yaxşı" 
                     stackId="a" 
                     fill="url(#goodGradient)" 
                     radius={[0, 0, 0, 0]}
@@ -303,7 +303,7 @@ export const BranchComparisonChart = ({
                     className="cursor-pointer transition-opacity"
                   />
                   <Bar 
-                    dataKey="Bad" 
+                    dataKey="Pis" 
                     stackId="a" 
                     fill="url(#badGradient)" 
                     radius={[4, 4, 0, 0]}
@@ -326,10 +326,10 @@ export const BranchComparisonChart = ({
               <div className="p-2 rounded-lg bg-primary/10">
                 <MapPin className="w-5 h-5 text-primary" />
               </div>
-              {selectedRegionName} Region
+              {selectedRegionName} Bölgəsi
             </DialogTitle>
             <DialogDescription>
-              Detailed statistics and mood metrics
+              Detallı statistika və əhval göstəriciləri
             </DialogDescription>
           </DialogHeader>
 
@@ -345,7 +345,7 @@ export const BranchComparisonChart = ({
                 >
                   <Smile className="w-6 h-6 mx-auto mb-2 text-emerald-500" />
                   <div className="text-2xl font-bold text-emerald-500">{selectedData.good}</div>
-                  <div className="text-xs text-muted-foreground">Good</div>
+                  <div className="text-xs text-muted-foreground">Yaxşı</div>
                 </motion.div>
                 <motion.div 
                   initial={{ opacity: 0, y: 10 }}
@@ -365,7 +365,7 @@ export const BranchComparisonChart = ({
                 >
                   <Frown className="w-6 h-6 mx-auto mb-2 text-rose-500" />
                   <div className="text-2xl font-bold text-rose-500">{selectedData.bad}</div>
-                  <div className="text-xs text-muted-foreground">Bad</div>
+                  <div className="text-xs text-muted-foreground">Pis</div>
                 </motion.div>
               </div>
 
@@ -377,7 +377,7 @@ export const BranchComparisonChart = ({
                 className="p-4 rounded-xl border bg-card"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium">Satisfaction Index</span>
+                  <span className="text-sm font-medium">Məmnuniyyət İndeksi</span>
                   <Badge variant={Number(stats.satisfaction) >= 7 ? "default" : Number(stats.satisfaction) >= 4 ? "secondary" : "destructive"}>
                     {stats.satisfaction}/10
                   </Badge>
@@ -385,9 +385,9 @@ export const BranchComparisonChart = ({
                 <Progress value={Number(stats.satisfaction) * 10} className="h-2" />
                 <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
                   {Number(stats.satisfaction) >= 5 ? (
-                    <><TrendingUp className="w-3 h-3 text-emerald-500" /> Good performance</>
+                    <><TrendingUp className="w-3 h-3 text-emerald-500" /> Yaxşı göstərici</>
                   ) : (
-                    <><TrendingDown className="w-3 h-3 text-rose-500" /> Needs attention</>
+                    <><TrendingDown className="w-3 h-3 text-rose-500" /> Diqqət tələb edir</>
                   )}
                 </div>
               </motion.div>
@@ -402,7 +402,7 @@ export const BranchComparisonChart = ({
                 >
                   <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
                     <MessageSquare className="w-4 h-4 text-primary" />
-                    Top Complaints
+                    Əsas Şikayət Səbəbləri
                   </h4>
                   <div className="space-y-2">
                     {stats.topReasons.map(([reason, count], idx) => (
@@ -414,6 +414,36 @@ export const BranchComparisonChart = ({
                   </div>
                 </motion.div>
               )}
+
+              {/* Recent Bad Responses */}
+              {stats.recentBadResponses.length > 0 && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                  className="p-4 rounded-xl border border-destructive/30 bg-destructive/5"
+                >
+                  <h4 className="text-sm font-medium mb-3 flex items-center gap-2 text-destructive">
+                    <AlertTriangle className="w-4 h-4" />
+                    Son Pis Əhval Qeydləri
+                  </h4>
+                  <div className="space-y-2">
+                    {stats.recentBadResponses.map((r, idx) => (
+                      <div key={idx} className="text-sm p-2 rounded-lg bg-background border">
+                        <p className="text-muted-foreground line-clamp-2">"{r.reason}"</p>
+                        {r.reason_category && (
+                          <Badge variant="outline" className="mt-1 text-xs">{r.reason_category}</Badge>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Total Responses */}
+              <div className="text-center text-sm text-muted-foreground pt-2 border-t">
+                Ümumi cavab sayı: <strong className="text-foreground">{stats.total}</strong>
+              </div>
             </div>
           )}
         </DialogContent>
