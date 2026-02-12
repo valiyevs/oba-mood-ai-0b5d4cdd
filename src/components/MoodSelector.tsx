@@ -1,7 +1,6 @@
 import { Smile, Meh, Frown } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useLanguage } from "@/hooks/useLanguage";
 
 export type MoodType = "good" | "normal" | "bad" | null;
 
@@ -10,39 +9,42 @@ interface MoodSelectorProps {
   selectedMood: MoodType;
 }
 
-const moodMeta = [
+const moods = [
   {
     type: "good" as const,
     icon: Smile,
-    labelKey: "mood.good",
-    descKey: "mood.goodDesc",
+    label: "Yaxşı",
+    description: "Hər şey qaydasında",
     emoji: "😊",
     gradient: "from-emerald-400 to-green-500",
     bgGradient: "from-emerald-500/20 to-green-500/20",
     shadowColor: "shadow-emerald-500/25",
     ringColor: "ring-emerald-500",
+    accentColor: "emerald",
   },
   {
     type: "normal" as const,
     icon: Meh,
-    labelKey: "mood.normal",
-    descKey: "mood.normalDesc",
+    label: "Normal",
+    description: "Adi gün keçir",
     emoji: "😐",
     gradient: "from-amber-400 to-yellow-500",
     bgGradient: "from-amber-500/20 to-yellow-500/20",
     shadowColor: "shadow-amber-500/25",
     ringColor: "ring-amber-500",
+    accentColor: "amber",
   },
   {
     type: "bad" as const,
     icon: Frown,
-    labelKey: "mood.bad",
-    descKey: "mood.badDesc",
+    label: "Pis",
+    description: "Çətinliklər var",
     emoji: "😔",
     gradient: "from-rose-400 to-red-500",
     bgGradient: "from-rose-500/20 to-red-500/20",
     shadowColor: "shadow-rose-500/25",
     ringColor: "ring-rose-500",
+    accentColor: "rose",
   },
 ];
 
@@ -50,7 +52,10 @@ const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.12, delayChildren: 0.1 },
+    transition: {
+      staggerChildren: 0.12,
+      delayChildren: 0.1,
+    },
   },
 } as const;
 
@@ -60,13 +65,15 @@ const cardVariants = {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { type: "spring" as const, stiffness: 250, damping: 20 },
+    transition: {
+      type: "spring" as const,
+      stiffness: 250,
+      damping: 20,
+    },
   },
 };
 
 export const MoodSelector = ({ onMoodSelect, selectedMood }: MoodSelectorProps) => {
-  const { t } = useLanguage();
-
   return (
     <motion.div
       variants={containerVariants}
@@ -74,7 +81,7 @@ export const MoodSelector = ({ onMoodSelect, selectedMood }: MoodSelectorProps) 
       animate="visible"
       className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 w-full max-w-4xl"
     >
-      {moodMeta.map((mood) => {
+      {moods.map((mood, index) => {
         const Icon = mood.icon;
         const isSelected = selectedMood === mood.type;
 
@@ -95,59 +102,99 @@ export const MoodSelector = ({ onMoodSelect, selectedMood }: MoodSelectorProps) 
                 : "border-border/50 bg-gradient-to-br from-card/90 to-card/70 hover:shadow-xl hover:border-transparent"
             )}
           >
+            {/* Animated Background Gradient */}
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: isSelected ? 1 : 0 }}
-              className={cn("absolute inset-0 bg-gradient-to-br transition-opacity duration-500", mood.bgGradient)} 
+              className={cn(
+                "absolute inset-0 bg-gradient-to-br transition-opacity duration-500",
+                mood.bgGradient
+              )} 
             />
-            <div className={cn("absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-50 transition-opacity duration-500", mood.bgGradient)} />
             
+            {/* Hover Background */}
+            <div className={cn(
+              "absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-50 transition-opacity duration-500",
+              mood.bgGradient
+            )} />
+            
+            {/* Animated Circles Background */}
             <div className="absolute inset-0 overflow-hidden">
               <motion.div 
-                animate={isSelected ? { scale: [1, 1.2, 1], opacity: [0.3, 0.15, 0.3] } : {}}
+                animate={isSelected ? { 
+                  scale: [1, 1.2, 1],
+                  opacity: [0.3, 0.15, 0.3]
+                } : {}}
                 transition={{ duration: 3, repeat: Infinity }}
-                className={cn("absolute -top-24 -right-24 w-48 h-48 rounded-full blur-3xl transition-opacity duration-500", `bg-gradient-to-br ${mood.gradient}`, isSelected ? "opacity-40" : "opacity-0 group-hover:opacity-20")} 
+                className={cn(
+                  "absolute -top-24 -right-24 w-48 h-48 rounded-full blur-3xl transition-opacity duration-500",
+                  `bg-gradient-to-br ${mood.gradient}`,
+                  isSelected ? "opacity-40" : "opacity-0 group-hover:opacity-20"
+                )} 
               />
               <motion.div 
-                animate={isSelected ? { scale: [1, 1.3, 1], opacity: [0.2, 0.1, 0.2] } : {}}
+                animate={isSelected ? { 
+                  scale: [1, 1.3, 1],
+                  opacity: [0.2, 0.1, 0.2]
+                } : {}}
                 transition={{ duration: 4, repeat: Infinity, delay: 0.5 }}
-                className={cn("absolute -bottom-24 -left-24 w-48 h-48 rounded-full blur-3xl transition-opacity duration-500", `bg-gradient-to-br ${mood.gradient}`, isSelected ? "opacity-30" : "opacity-0 group-hover:opacity-10")} 
+                className={cn(
+                  "absolute -bottom-24 -left-24 w-48 h-48 rounded-full blur-3xl transition-opacity duration-500",
+                  `bg-gradient-to-br ${mood.gradient}`,
+                  isSelected ? "opacity-30" : "opacity-0 group-hover:opacity-10"
+                )} 
               />
             </div>
 
+            {/* Content */}
             <div className="relative z-10 flex flex-col items-center gap-5">
+              {/* Emoji with Glow */}
               <motion.div
-                animate={isSelected ? { scale: [1, 1.08, 1], rotate: [0, -3, 3, 0] } : {}}
+                animate={isSelected ? { 
+                  scale: [1, 1.08, 1],
+                  rotate: [0, -3, 3, 0]
+                } : {}}
                 transition={{ duration: 1.5, repeat: isSelected ? Infinity : 0, repeatDelay: 2 }}
                 className="relative"
               >
+                {/* Glow Ring */}
                 {isSelected && (
                   <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0, 0.5] }}
                     transition={{ duration: 2, repeat: Infinity }}
-                    className={cn("absolute inset-0 rounded-full blur-2xl", `bg-gradient-to-br ${mood.gradient}`)}
+                    className={cn(
+                      "absolute inset-0 rounded-full blur-2xl",
+                      `bg-gradient-to-br ${mood.gradient}`
+                    )}
                   />
                 )}
                 <span className="relative text-7xl md:text-8xl drop-shadow-lg filter">{mood.emoji}</span>
               </motion.div>
 
+              {/* Label */}
               <div className="text-center space-y-2">
                 <motion.h3
                   layout
                   className={cn(
                     "text-2xl md:text-3xl font-bold transition-all duration-300",
-                    isSelected ? `bg-gradient-to-r ${mood.gradient} bg-clip-text text-transparent` : "text-foreground"
+                    isSelected 
+                      ? `bg-gradient-to-r ${mood.gradient} bg-clip-text text-transparent` 
+                      : "text-foreground"
                   )}
                 >
-                  {t(mood.labelKey)}
+                  {mood.label}
                 </motion.h3>
-                <p className={cn("text-sm md:text-base transition-colors duration-300", isSelected ? "text-foreground/80" : "text-muted-foreground")}>
-                  {t(mood.descKey)}
+                <p className={cn(
+                  "text-sm md:text-base transition-colors duration-300",
+                  isSelected ? "text-foreground/80" : "text-muted-foreground"
+                )}>
+                  {mood.description}
                 </p>
               </div>
             </div>
 
+            {/* Selection Ring Animation */}
             {isSelected && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -161,6 +208,7 @@ export const MoodSelector = ({ onMoodSelect, selectedMood }: MoodSelectorProps) 
               />
             )}
 
+            {/* Pulse Ring on Hover */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               whileHover={{ opacity: 0.5, scale: 1 }}

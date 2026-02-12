@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
-import { useLanguage } from "@/hooks/useLanguage";
 
 interface AIAnalysis {
   score: number;
@@ -21,34 +20,30 @@ interface AIAnalysisCardProps {
 }
 
 export const AIAnalysisCard = ({ analysis, isLoading, onRefresh }: AIAnalysisCardProps) => {
-  const { t } = useLanguage();
   const getRiskLevelConfig = (level: string) => {
     const normalizedLevel = level?.toLowerCase();
     switch (normalizedLevel) {
-      case 'critical':
       case 'kritik':
         return {
-          label: t("aiAnalysis.critical"),
+          label: 'Kritik',
           bgColor: 'bg-destructive/10',
           textColor: 'text-destructive',
           borderColor: 'border-destructive',
           progressColor: 'bg-destructive',
           icon: AlertCircle,
         };
-      case 'high':
       case 'yüksək':
         return {
-          label: t("aiAnalysis.high"),
+          label: 'Yüksək',
           bgColor: 'bg-orange-500/10',
           textColor: 'text-orange-600',
           borderColor: 'border-orange-500',
           progressColor: 'bg-orange-500',
           icon: AlertTriangle,
         };
-      case 'medium':
       case 'orta':
         return {
-          label: t("aiAnalysis.medium"),
+          label: 'Orta',
           bgColor: 'bg-yellow-500/10',
           textColor: 'text-yellow-600',
           borderColor: 'border-yellow-500',
@@ -57,7 +52,7 @@ export const AIAnalysisCard = ({ analysis, isLoading, onRefresh }: AIAnalysisCar
         };
       default:
         return {
-          label: t("aiAnalysis.low"),
+          label: 'Aşağı',
           bgColor: 'bg-primary/10',
           textColor: 'text-primary',
           borderColor: 'border-primary',
@@ -76,7 +71,7 @@ export const AIAnalysisCard = ({ analysis, isLoading, onRefresh }: AIAnalysisCar
   return (
     <Card className={cn(
       "overflow-hidden transition-all duration-300",
-      analysis?.riskLevel?.toLowerCase() === 'critical' || analysis?.riskLevel?.toLowerCase() === 'kritik'
+      analysis?.riskLevel?.toLowerCase() === 'kritik' 
         ? "border-destructive/50 bg-gradient-to-br from-destructive/5 via-background to-destructive/10" 
         : "border-border/50 bg-card"
     )}>
@@ -90,8 +85,8 @@ export const AIAnalysisCard = ({ analysis, isLoading, onRefresh }: AIAnalysisCar
               <RiskIcon className={cn("h-6 w-6", riskConfig?.textColor || "text-muted-foreground")} />
             </div>
             <div>
-              <CardTitle className="text-foreground text-xl">{t("aiAnalysis.title")}</CardTitle>
-              <CardDescription>{t("aiAnalysis.description")}</CardDescription>
+              <CardTitle className="text-foreground text-xl">AI Analizi</CardTitle>
+              <CardDescription>Tükənmişlik risk qiymətləndirməsi</CardDescription>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -122,6 +117,7 @@ export const AIAnalysisCard = ({ analysis, isLoading, onRefresh }: AIAnalysisCar
           </div>
         </div>
       </CardHeader>
+
       <CardContent className="space-y-6">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-12">
@@ -129,15 +125,15 @@ export const AIAnalysisCard = ({ analysis, isLoading, onRefresh }: AIAnalysisCar
               <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
               <AlertCircle className="h-16 w-16 text-primary relative animate-pulse" />
             </div>
-            <p className="mt-6 text-lg font-medium text-foreground">{t("aiAnalysis.analyzing")}</p>
-            <p className="text-sm text-muted-foreground mt-2">{t("aiAnalysis.processingData")}</p>
+            <p className="mt-6 text-lg font-medium text-foreground">Analiz aparılır...</p>
+            <p className="text-sm text-muted-foreground mt-2">AI məlumatları araşdırır</p>
           </div>
         ) : analysis ? (
           <>
             {/* Risk Score with Progress Bar */}
             <div className="bg-muted/30 rounded-xl p-4">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-medium text-muted-foreground">{t("aiAnalysis.riskScore")}</span>
+                <span className="text-sm font-medium text-muted-foreground">Risk Skoru</span>
                 <span className={cn(
                   "text-3xl font-bold",
                   riskConfig?.textColor || "text-foreground"
@@ -161,7 +157,7 @@ export const AIAnalysisCard = ({ analysis, isLoading, onRefresh }: AIAnalysisCar
               <div className="bg-destructive/10 border border-destructive/30 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <AlertCircle className="h-5 w-5 text-destructive" />
-                  <h3 className="font-semibold text-destructive">{t("aiAnalysis.criticalAlerts")}</h3>
+                  <h3 className="font-semibold text-destructive">Kritik Xəbərdarlıqlar</h3>
                 </div>
                 <ul className="space-y-2">
                   {analysis.criticalAlerts.map((alert, index) => (
@@ -179,7 +175,7 @@ export const AIAnalysisCard = ({ analysis, isLoading, onRefresh }: AIAnalysisCar
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <TrendingUp className="h-5 w-5 text-primary" />
-                  <h3 className="font-semibold text-foreground">{t("aiAnalysis.observations")}</h3>
+                  <h3 className="font-semibold text-foreground">Əsas Müşahidələr</h3>
                 </div>
                 <ul className="space-y-2">
                   {analysis.observations.map((observation, index) => (
@@ -197,7 +193,7 @@ export const AIAnalysisCard = ({ analysis, isLoading, onRefresh }: AIAnalysisCar
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <Lightbulb className="h-5 w-5 text-status-good" />
-                  <h3 className="font-semibold text-foreground">{t("aiAnalysis.recommendations")}</h3>
+                  <h3 className="font-semibold text-foreground">Tövsiyələr</h3>
                 </div>
                 <ul className="space-y-2">
                   {analysis.recommendations.map((rec, index) => (
@@ -213,9 +209,9 @@ export const AIAnalysisCard = ({ analysis, isLoading, onRefresh }: AIAnalysisCar
         ) : (
           <div className="text-center py-8 text-muted-foreground">
             <AlertCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>{t("aiAnalysis.noAnalysis")}</p>
+            <p>Analiz məlumatı yoxdur</p>
             <Button variant="outline" size="sm" onClick={onRefresh} className="mt-4">
-              {t("aiAnalysis.analyze")}
+              Analiz Et
             </Button>
           </div>
         )}

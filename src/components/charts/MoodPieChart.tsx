@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { PieChart as PieChartIcon, Smile, Meh, Frown } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useLanguage } from "@/hooks/useLanguage";
 
 interface MoodData {
   mood: string;
@@ -33,10 +32,8 @@ const GRADIENTS = {
 
 const getMoodIcon = (mood: string) => {
   switch (mood) {
-    case "Good": 
     case "Yaxşı": return Smile;
     case "Normal": return Meh;
-    case "Bad":
     case "Pis": return Frown;
     default: return Meh;
   }
@@ -80,29 +77,19 @@ const renderActiveShape = (props: any) => {
 
 export const MoodPieChart = ({ 
   data, 
-  title, 
-  description 
+  title = "Əhval Bölgüsü", 
+  description = "İşçilərin əhval paylanması" 
 }: MoodPieChartProps) => {
-  const { t } = useLanguage();
-  const displayTitle = title || t("charts.moodDistribution");
-  const displayDesc = description || t("charts.moodPieDesc");
   const [activeIndex, setActiveIndex] = useState<number | undefined>(undefined);
 
-  const chartData = data.map(item => {
-    let moodName = item.mood;
-    if (moodName === "Yaxşı") moodName = t("charts.good");
-    else if (moodName === "Normal") moodName = t("charts.normal");
-    else if (moodName === "Pis") moodName = t("charts.bad");
-    
-    return {
-      name: moodName,
-      value: item.count,
-      percentage: item.percentage,
-      fill: COLORS[item.color as keyof typeof COLORS] || "hsl(var(--primary))",
-      gradient: GRADIENTS[item.color as keyof typeof GRADIENTS] || ["#6366f1", "#4f46e5"],
-      color: item.color,
-    };
-  });
+  const chartData = data.map(item => ({
+    name: item.mood,
+    value: item.count,
+    percentage: item.percentage,
+    fill: COLORS[item.color as keyof typeof COLORS] || "hsl(var(--primary))",
+    gradient: GRADIENTS[item.color as keyof typeof GRADIENTS] || ["#6366f1", "#4f46e5"],
+    color: item.color,
+  }));
 
   const total = chartData.reduce((sum, item) => sum + item.value, 0);
 
@@ -123,10 +110,10 @@ export const MoodPieChart = ({
             <p className="font-bold text-foreground">{data.name}</p>
           </div>
           <p className="text-sm text-muted-foreground">
-            <span className="text-foreground font-semibold">{data.value}</span> {t("charts.people")}
+            <span className="text-foreground font-semibold">{data.value}</span> nəfər
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            <span className="font-semibold" style={{ color: data.fill }}>{data.percentage}%</span> {t("charts.ofTotalResponses")}
+            Ümumi cavabların <span className="font-semibold" style={{ color: data.fill }}>{data.percentage}%</span>-i
           </p>
         </motion.div>
       );
@@ -200,8 +187,8 @@ export const MoodPieChart = ({
               <PieChartIcon className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <CardTitle className="text-foreground">{displayTitle}</CardTitle>
-              <CardDescription>{displayDesc}</CardDescription>
+              <CardTitle className="text-foreground">{title}</CardTitle>
+              <CardDescription>{description}</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -273,7 +260,7 @@ export const MoodPieChart = ({
 
           {/* Total indicator */}
           <div className="text-center mt-2 text-sm text-muted-foreground">
-            {t("charts.total")}: <span className="font-semibold text-foreground">{total}</span> {t("charts.responses")}
+            Ümumi: <span className="font-semibold text-foreground">{total}</span> cavab
           </div>
         </CardContent>
       </Card>

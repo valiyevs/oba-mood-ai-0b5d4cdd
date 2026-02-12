@@ -48,7 +48,7 @@ export const ThemeToggle = () => {
         </motion.div>
       </TooltipTrigger>
       <TooltipContent>
-        <p>{theme === "dark" ? "Light mode" : "Dark mode"}</p>
+        <p>{theme === "dark" ? "İşıqlı rejim" : "Qaranlıq rejim"}</p>
       </TooltipContent>
     </Tooltip>
   );

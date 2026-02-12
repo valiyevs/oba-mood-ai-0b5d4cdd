@@ -21,7 +21,7 @@ import {
   Lightbulb
 } from "lucide-react";
 import { format, subDays } from "date-fns";
-import { az, enUS } from "date-fns/locale";
+import { az } from "date-fns/locale";
 import { motion } from "framer-motion";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -40,8 +40,6 @@ import { MoodPieChart } from "@/components/charts/MoodPieChart";
 import { TrendLineChart } from "@/components/charts/TrendLineChart";
 import { ReasonsBarChart } from "@/components/charts/ReasonsBarChart";
 import { BranchComparisonChart } from "@/components/charts/BranchComparisonChart";
-import { LanguageToggle } from "@/components/LanguageToggle";
-import { useLanguage } from "@/hooks/useLanguage";
 
 interface FilterState {
   region: string;
@@ -111,8 +109,6 @@ const StatCard = ({ title, value, subtitle, icon: Icon, gradient, trend, trendUp
 
 const HRPanel = () => {
   const navigate = useNavigate();
-  const { t, language } = useLanguage();
-  const dateLocale = language === "az" ? az : enUS;
   const [filters, setFilters] = useState<FilterState>({
     region: "all",
     district: "all"
@@ -124,7 +120,7 @@ const HRPanel = () => {
 
   // Region-District hierarchy for Azerbaijan
   const regionHierarchy = [
-    { id: "all", name: t("hr.allRegions"), districts: [] },
+    { id: "all", name: "Bütün regionlar", districts: [] },
     {
       id: "baku",
       name: "Bakı",
@@ -382,7 +378,7 @@ const HRPanel = () => {
         }));
 
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) throw new Error('Authentication required');
+      if (!session?.access_token) throw new Error('Autentifikasiya tələb olunur');
       
       const response = await supabase.functions.invoke('analyze-responses', {
         body: {
@@ -444,37 +440,36 @@ const HRPanel = () => {
               <div className="min-w-0">
                 <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate flex items-center gap-2">
                   <Shield className="w-6 h-6 text-primary" />
-                  {t("hr.title")}
+                  İnsan Resursları Paneli
                 </h1>
                 <p className="text-sm text-muted-foreground truncate flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  {t("hr.subtitle")}
+                  Əməkdaş məmnuniyyəti və risk idarəetməsi
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               {/* Desktop navigation */}
               <div className="hidden sm:flex items-center gap-2">
-                <LanguageToggle />
                 <Button variant="ghost" size="sm" onClick={() => navigate("/manager-assignments")} className="gap-2 rounded-xl hover:bg-primary/10">
                   <Users className="w-4 h-4" />
-                  <span className="hidden md:inline">{t("nav.assignments")}</span>
+                  <span className="hidden md:inline">Təyinatlar</span>
                 </Button>
                 <Button variant="ghost" size="sm" onClick={() => navigate("/manager-actions")} className="gap-2 rounded-xl hover:bg-primary/10">
                   <ClipboardCheck className="w-4 h-4" />
-                  <span className="hidden md:inline">{t("nav.tasks")}</span>
+                  <span className="hidden md:inline">Tapşırıqlar</span>
                 </Button>
                 <Button variant="ghost" size="sm" onClick={() => navigate("/employee-responses")} className="gap-2 rounded-xl hover:bg-primary/10">
                   <MessageSquare className="w-4 h-4" />
-                  <span className="hidden md:inline">{t("nav.responses")}</span>
+                  <span className="hidden md:inline">Cavablar</span>
                 </Button>
                 <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="gap-2 rounded-xl hover:bg-primary/10">
                   <Home className="w-4 h-4" />
-                  <span className="hidden md:inline">{t("nav.management")}</span>
+                  <span className="hidden md:inline">İdarəetmə</span>
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => navigate("/reports")} className="gap-2 rounded-xl border-border/50 hover:bg-primary/5">
                   <Download className="w-4 h-4" />
-                  <span className="hidden md:inline">{t("nav.report")}</span>
+                  <span className="hidden md:inline">Hesabat</span>
                 </Button>
                 <Button
                   variant="ghost"
@@ -486,7 +481,7 @@ const HRPanel = () => {
                   className="gap-2 rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10"
                 >
                   <LogOut className="w-4 h-4" />
-                  <span className="hidden md:inline">{t("common.logout")}</span>
+                  <span className="hidden md:inline">Çıxış</span>
                 </Button>
               </div>
               {/* Desktop date picker */}
@@ -494,15 +489,15 @@ const HRPanel = () => {
                 <PopoverTrigger asChild className="hidden sm:flex">
                   <Button variant="outline" size="sm" className="gap-2 min-w-[180px] justify-start text-left font-normal rounded-xl border-border/50 hover:bg-primary/5">
                     <CalendarIcon className="h-4 w-4 text-primary" />
-                    {format(dateRange.from, "dd MMM", { locale: dateLocale })} - {format(dateRange.to, "dd MMM yyyy", { locale: dateLocale })}
+                    {format(dateRange.from, "dd MMM", { locale: az })} - {format(dateRange.to, "dd MMM yyyy", { locale: az })}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0 bg-card border-border/50 shadow-xl rounded-xl" align="end">
                   <div className="p-3 border-b border-border/50 bg-muted/30">
                     <div className="flex gap-2 flex-wrap">
-                      <Button variant="ghost" size="sm" onClick={() => setDateRange({ from: subDays(new Date(), 7), to: new Date() })} className="text-xs rounded-lg hover:bg-primary/10">{t("common.last7days")}</Button>
-                      <Button variant="ghost" size="sm" onClick={() => setDateRange({ from: subDays(new Date(), 30), to: new Date() })} className="text-xs rounded-lg hover:bg-primary/10">{t("common.last30days")}</Button>
-                      <Button variant="ghost" size="sm" onClick={() => setDateRange({ from: subDays(new Date(), 90), to: new Date() })} className="text-xs rounded-lg hover:bg-primary/10">{t("common.last90days")}</Button>
+                      <Button variant="ghost" size="sm" onClick={() => setDateRange({ from: subDays(new Date(), 7), to: new Date() })} className="text-xs rounded-lg hover:bg-primary/10">Son 7 gün</Button>
+                      <Button variant="ghost" size="sm" onClick={() => setDateRange({ from: subDays(new Date(), 30), to: new Date() })} className="text-xs rounded-lg hover:bg-primary/10">Son 30 gün</Button>
+                      <Button variant="ghost" size="sm" onClick={() => setDateRange({ from: subDays(new Date(), 90), to: new Date() })} className="text-xs rounded-lg hover:bg-primary/10">Son 90 gün</Button>
                     </div>
                   </div>
                   <Calendar
@@ -533,10 +528,10 @@ const HRPanel = () => {
             <div className="p-2 rounded-xl bg-gradient-to-br from-violet-500/20 to-purple-500/5">
               <BarChart3 className="w-6 h-6 text-violet-500" />
             </div>
-            <h2 className="text-2xl font-bold text-foreground">{t("hr.analytics")}</h2>
+            <h2 className="text-2xl font-bold text-foreground">HR Analitikası</h2>
           </div>
           <p className="text-muted-foreground">
-            {format(dateRange.from, "dd MMMM", { locale: dateLocale })} - {format(dateRange.to, "dd MMMM yyyy", { locale: dateLocale })} {t("hr.statsFor")}
+            {format(dateRange.from, "dd MMMM", { locale: az })} - {format(dateRange.to, "dd MMMM yyyy", { locale: az })} tarixləri üçün əməkdaş statistikası
           </p>
         </motion.div>
 
@@ -546,7 +541,7 @@ const HRPanel = () => {
             <Alert className="border-destructive/50 bg-destructive/10 backdrop-blur-sm rounded-xl">
               <AlertTriangle className="h-5 w-5 text-destructive" />
               <AlertDescription className="text-destructive ml-2">
-                <strong>{t("hr.attention")}</strong> {stats.criticalCases} {t("hr.criticalBurnoutDetected")}
+                <strong>Diqqət!</strong> {stats.criticalCases} kritik tükənmişlik halı müəyyən edilib. Dərhal müdaxilə tələb olunur.
               </AlertDescription>
             </Alert>
           </motion.div>
@@ -558,7 +553,7 @@ const HRPanel = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Filter className="w-5 h-5 text-primary" />
-                {t("hr.filters")}
+                Filtrlər
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -566,7 +561,7 @@ const HRPanel = () => {
                 <div>
                   <label className="block text-sm font-medium mb-2 text-foreground flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-muted-foreground" />
-                    {t("hr.region")}
+                    Region
                   </label>
                   <select
                     value={filters.region}
@@ -581,7 +576,7 @@ const HRPanel = () => {
                 <div>
                   <label className="block text-sm font-medium mb-2 text-foreground flex items-center gap-2">
                     <Building2 className="w-4 h-4 text-muted-foreground" />
-                    {t("hr.district")}
+                    Rayon / Bölgə
                   </label>
                   <select
                     value={filters.district}
@@ -592,13 +587,13 @@ const HRPanel = () => {
                       filters.region === "all" && "opacity-50 cursor-not-allowed"
                     )}
                   >
-                    <option value="all">{t("hr.allDistricts")}</option>
+                    <option value="all">Bütün rayonlar</option>
                     {getAvailableDistricts().map(district => (
                       <option key={district.id} value={district.id}>{district.name}</option>
                     ))}
                   </select>
                   {filters.region === "all" && (
-                    <p className="text-xs text-muted-foreground mt-1">{t("hr.selectRegionFirst")}</p>
+                    <p className="text-xs text-muted-foreground mt-1">Əvvəlcə region seçin</p>
                   )}
                 </div>
               </div>
@@ -608,21 +603,21 @@ const HRPanel = () => {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-          <StatCard title={t("hr.totalEmployees")} value={stats.totalEmployees.toString()} subtitle={t("hr.activeWorkers")} icon={Users} gradient="from-blue-500 to-cyan-500" delay={0.15} />
-          <StatCard title={t("hr.responseRatio")} value={`${stats.responseRate}%`} subtitle="" icon={TrendingUp} gradient="from-emerald-500 to-green-500" trend={`${stats.trend}% ${t("hr.thisWeek")}`} trendUp delay={0.2} />
-          <StatCard title={t("hr.avgSatisfaction")} value={`${stats.avgSatisfaction}/10`} subtitle={t("hr.last30days")} icon={Sparkles} gradient="from-violet-500 to-purple-500" delay={0.25} />
-          <StatCard title={t("hr.riskCases")} value={stats.burnoutCases.toString()} subtitle={`${stats.criticalCases} ${t("hr.criticalCases")}`} icon={AlertTriangle} gradient="from-rose-500 to-red-500" delay={0.3} />
+          <StatCard title="Ümumi Əməkdaş" value={stats.totalEmployees.toString()} subtitle="Aktiv işçilər" icon={Users} gradient="from-blue-500 to-cyan-500" delay={0.15} />
+          <StatCard title="Cavab Nisbəti" value={`${stats.responseRate}%`} subtitle="" icon={TrendingUp} gradient="from-emerald-500 to-green-500" trend={`${stats.trend}% bu həftə`} trendUp delay={0.2} />
+          <StatCard title="Orta Məmnuniyyət" value={`${stats.avgSatisfaction}/10`} subtitle="Son 30 gün" icon={Sparkles} gradient="from-violet-500 to-purple-500" delay={0.25} />
+          <StatCard title="Risk Halları" value={stats.burnoutCases.toString()} subtitle={`${stats.criticalCases} kritik hal`} icon={AlertTriangle} gradient="from-rose-500 to-red-500" delay={0.3} />
         </div>
 
         {/* Charts */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <MoodPieChart data={moodDistribution} title={t("hr.moodDistribution")} description={t("charts.moodPieDesc")} />
-          <TrendLineChart responses={responses} dateRange={dateRange} title={t("hr.moodTrend")} description={t("hr.dailySatisfaction")} />
+          <MoodPieChart data={moodDistribution} title="Əhval Bölgüsü" description="İşçilərin əhval paylanması" />
+          <TrendLineChart responses={responses} dateRange={dateRange} title="Əhval Trendi" description="Günlər üzrə məmnuniyyət göstəricisi" />
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <ReasonsBarChart data={topReasons} title={t("hr.complaintReasons")} description={t("hr.topProblems")} />
-          <BranchComparisonChart responses={responses} title={t("hr.branchComparison")} description={t("hr.branchMoodDistribution")} />
+          <ReasonsBarChart data={topReasons} title="Şikayət Səbəbləri" description="Ən çox qeyd olunan problemlər" />
+          <BranchComparisonChart responses={responses} title="Bölgə Müqayisəsi" description="Bölgələr üzrə əhval bölgüsü" />
         </motion.div>
 
         {/* AI Analysis */}
@@ -636,9 +631,9 @@ const HRPanel = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Building2 className="w-5 h-5 text-primary" />
-                {t("hr.regionStats")}
+                Bölgələr üzrə Ümumi Statistika
               </CardTitle>
-              <CardDescription>{t("hr.regionStatsDesc")}</CardDescription>
+              <CardDescription>Real sorğu cavablarına əsasən bölgə göstəriciləri</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -664,7 +659,7 @@ const HRPanel = () => {
                   })).sort((a, b) => b.responses - a.responses);
 
                   return regionStats.length === 0 ? (
-                    <p className="col-span-full text-center text-muted-foreground py-8">{t("common.noData")}</p>
+                    <p className="col-span-full text-center text-muted-foreground py-8">Məlumat yoxdur</p>
                   ) : (
                     regionStats.map((region, index) => (
                       <motion.div
@@ -687,17 +682,17 @@ const HRPanel = () => {
                         </div>
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between items-center">
-                            <span className="text-muted-foreground">{t("hr.responseCount")}:</span>
+                            <span className="text-muted-foreground">Cavab sayı:</span>
                             <span className="font-semibold">{region.responses}</span>
                           </div>
                           <div className="flex justify-between items-center">
-                            <span className="text-muted-foreground">{t("hr.goodMood")}:</span>
+                            <span className="text-muted-foreground">Yaxşı əhval:</span>
                             <span className="text-emerald-600 font-semibold">{region.goodPercent}%</span>
                           </div>
                           {region.badCount > 0 && (
                             <div className="flex justify-between items-center">
-                              <span className="text-muted-foreground">{t("hr.badMood")}:</span>
-                              <span className="text-rose-600 font-semibold">{region.badCount} {t("hr.people")}</span>
+                              <span className="text-muted-foreground">Pis əhval:</span>
+                              <span className="text-rose-600 font-semibold">{region.badCount} nəfər</span>
                             </div>
                           )}
                         </div>
@@ -714,7 +709,7 @@ const HRPanel = () => {
 
       {/* Footer */}
       <footer className="py-6 text-center text-sm text-muted-foreground border-t border-border/50 bg-card/30 backdrop-blur-sm mt-8">
-        <p>{t("hr.footer")}</p>
+        <p>© 2025 OBA İnsan Resursları Paneli. Bütün hüquqlar qorunur.</p>
       </footer>
     </div>
   );

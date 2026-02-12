@@ -1,8 +1,18 @@
 import { MapPin, Sparkles, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
-import { useLanguage } from "@/hooks/useLanguage";
 
 export type BranchType = string | null;
+
+const branches = [
+  { id: "baku", name: "Bakı", icon: "🏙️", gradient: "from-blue-500 to-cyan-400", color: "blue" },
+  { id: "ganja", name: "Gəncə", icon: "🌆", gradient: "from-purple-500 to-pink-400", color: "purple" },
+  { id: "sumgait", name: "Sumqayıt", icon: "🏭", gradient: "from-slate-500 to-zinc-400", color: "slate" },
+  { id: "mingachevir", name: "Mingəçevir", icon: "⚡", gradient: "from-yellow-500 to-orange-400", color: "yellow" },
+  { id: "shirvan", name: "Şirvan", icon: "🌾", gradient: "from-green-500 to-emerald-400", color: "green" },
+  { id: "lankaran", name: "Lənkəran", icon: "🌊", gradient: "from-teal-500 to-cyan-400", color: "teal" },
+  { id: "shaki", name: "Şəki", icon: "🏔️", gradient: "from-indigo-500 to-blue-400", color: "indigo" },
+  { id: "quba", name: "Quba", icon: "🍎", gradient: "from-red-500 to-rose-400", color: "red" },
+];
 
 interface BranchSelectorProps {
   onBranchSelect: (branch: BranchType) => void;
@@ -34,20 +44,7 @@ const itemVariants = {
   },
 };
 
-const branchMeta = [
-  { id: "baku", key: "baku", icon: "🏙️", gradient: "from-blue-500 to-cyan-400" },
-  { id: "ganja", key: "ganja", icon: "🌆", gradient: "from-purple-500 to-pink-400" },
-  { id: "sumgait", key: "sumgait", icon: "🏭", gradient: "from-slate-500 to-zinc-400" },
-  { id: "mingachevir", key: "mingachevir", icon: "⚡", gradient: "from-yellow-500 to-orange-400" },
-  { id: "shirvan", key: "shirvan", icon: "🌾", gradient: "from-green-500 to-emerald-400" },
-  { id: "lankaran", key: "lankaran", icon: "🌊", gradient: "from-teal-500 to-cyan-400" },
-  { id: "shaki", key: "shaki", icon: "🏔️", gradient: "from-indigo-500 to-blue-400" },
-  { id: "quba", key: "quba", icon: "🍎", gradient: "from-red-500 to-rose-400" },
-];
-
 export const BranchSelector = ({ onBranchSelect, selectedBranch }: BranchSelectorProps) => {
-  const { t } = useLanguage();
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -63,7 +60,9 @@ export const BranchSelector = ({ onBranchSelect, selectedBranch }: BranchSelecto
           transition={{ type: "spring", stiffness: 200, delay: 0.1 }}
           className="relative inline-flex items-center justify-center"
         >
+          {/* Glow Effect */}
           <div className="absolute inset-0 w-24 h-24 bg-gradient-to-r from-primary/30 to-purple-500/30 rounded-3xl blur-2xl" />
+          
           <div className="relative w-24 h-24 rounded-3xl bg-gradient-to-br from-primary/20 via-purple-500/15 to-primary/10 backdrop-blur-sm border border-primary/20 shadow-xl flex items-center justify-center">
             <MapPin className="w-12 h-12 text-primary" />
           </div>
@@ -76,11 +75,11 @@ export const BranchSelector = ({ onBranchSelect, selectedBranch }: BranchSelecto
           className="space-y-3"
         >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent">
-            {t("branch.title")}
+            Hansı bölgədənsən?
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto flex items-center justify-center gap-2">
             <Sparkles className="w-5 h-5 text-primary animate-pulse" />
-            {t("branch.subtitle")}
+            Sorğunu göndərmək üçün bölgəni seç
             <Sparkles className="w-5 h-5 text-primary animate-pulse" />
           </p>
         </motion.div>
@@ -93,7 +92,7 @@ export const BranchSelector = ({ onBranchSelect, selectedBranch }: BranchSelecto
         animate="visible"
         className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4"
       >
-        {branchMeta.map((branch) => {
+        {branches.map((branch, index) => {
           const isSelected = selectedBranch === branch.id;
           
           return (
@@ -111,6 +110,7 @@ export const BranchSelector = ({ onBranchSelect, selectedBranch }: BranchSelecto
                 }
               `}
             >
+              {/* Background Gradient Overlay */}
               <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: isSelected ? 0.2 : 0 }}
@@ -118,6 +118,7 @@ export const BranchSelector = ({ onBranchSelect, selectedBranch }: BranchSelecto
                 className={`absolute inset-0 bg-gradient-to-br ${branch.gradient}`} 
               />
               
+              {/* Animated Border Glow */}
               {isSelected && (
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -128,6 +129,7 @@ export const BranchSelector = ({ onBranchSelect, selectedBranch }: BranchSelecto
                 </motion.div>
               )}
               
+              {/* Shine Effect */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
                 <motion.div 
                   initial={{ x: "-100%" }}
@@ -138,6 +140,7 @@ export const BranchSelector = ({ onBranchSelect, selectedBranch }: BranchSelecto
               </div>
 
               <div className="relative flex flex-col items-center gap-3">
+                {/* Emoji Container */}
                 <motion.div
                   animate={isSelected ? { scale: [1, 1.15, 1], rotate: [0, 5, -5, 0] } : {}}
                   transition={{ duration: 0.5 }}
@@ -156,6 +159,7 @@ export const BranchSelector = ({ onBranchSelect, selectedBranch }: BranchSelecto
                   )}
                 </motion.div>
                 
+                {/* Name */}
                 <div className="flex items-center gap-1">
                   <span className={`
                     font-bold text-base md:text-lg transition-all duration-300
@@ -164,7 +168,7 @@ export const BranchSelector = ({ onBranchSelect, selectedBranch }: BranchSelecto
                       : "text-foreground group-hover:text-primary"
                     }
                   `}>
-                    {t(`branch.${branch.key}`)}
+                    {branch.name}
                   </span>
                   <ChevronRight className={`
                     w-4 h-4 transition-all duration-300
@@ -176,6 +180,7 @@ export const BranchSelector = ({ onBranchSelect, selectedBranch }: BranchSelecto
                 </div>
               </div>
 
+              {/* Selection Indicator */}
               {isSelected && (
                 <motion.div
                   initial={{ scale: 0, rotate: -180 }}
@@ -193,6 +198,7 @@ export const BranchSelector = ({ onBranchSelect, selectedBranch }: BranchSelecto
         })}
       </motion.div>
 
+      {/* Footer Hint */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -203,7 +209,7 @@ export const BranchSelector = ({ onBranchSelect, selectedBranch }: BranchSelecto
           <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          {t("branch.regionInfoHint")}
+          Seçdiyiniz bölgə yalnız statistika üçün istifadə olunur
         </span>
       </motion.div>
     </motion.div>

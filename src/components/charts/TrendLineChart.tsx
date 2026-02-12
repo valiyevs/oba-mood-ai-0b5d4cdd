@@ -3,9 +3,9 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Activity, Calendar } from "lucide-react";
 import { format, parseISO, eachDayOfInterval } from "date-fns";
+import { az } from "date-fns/locale";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useLanguage } from "@/hooks/useLanguage";
 
 interface Response {
   response_date: string;
@@ -22,12 +22,9 @@ interface TrendLineChartProps {
 export const TrendLineChart = ({ 
   responses, 
   dateRange,
-  title, 
-  description 
+  title = "Əhval Trendi", 
+  description = "Günlər üzrə məmnuniyyət göstəricisi" 
 }: TrendLineChartProps) => {
-  const { t } = useLanguage();
-  const displayTitle = title || t("charts.trend");
-  const displayDesc = description || t("charts.trendDesc");
   const [activePoint, setActivePoint] = useState<any>(null);
 
   // Generate all days in range
@@ -45,15 +42,15 @@ export const TrendLineChart = ({
     const dateStr = r.response_date;
     if (responsesByDate[dateStr]) {
       responsesByDate[dateStr].total++;
-      if (r.mood === "Yaxşı" || r.mood === "Good") responsesByDate[dateStr].good++;
+      if (r.mood === "Yaxşı") responsesByDate[dateStr].good++;
       else if (r.mood === "Normal") responsesByDate[dateStr].normal++;
-      else if (r.mood === "Pis" || r.mood === "Bad") responsesByDate[dateStr].bad++;
+      else if (r.mood === "Pis") responsesByDate[dateStr].bad++;
     }
   });
 
   const chartData = Object.entries(responsesByDate).map(([date, counts]) => ({
     date,
-    displayDate: format(parseISO(date), "dd MMM"),
+    displayDate: format(parseISO(date), "dd MMM", { locale: az }),
     satisfaction: counts.total > 0 
       ? Math.round(((counts.good * 100 + counts.normal * 50) / counts.total))
       : null,
@@ -98,7 +95,7 @@ export const TrendLineChart = ({
           {data.satisfaction !== null ? (
             <>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-muted-foreground">{t("charts.satisfaction")}</span>
+                <span className="text-sm text-muted-foreground">Məmnuniyyət</span>
                 <span className={cn(
                   "text-lg font-bold",
                   data.satisfaction >= 70 ? "text-emerald-500" : 
@@ -112,7 +109,7 @@ export const TrendLineChart = ({
                 <div className="flex items-center justify-between text-xs">
                   <span className="flex items-center gap-1">
                     <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                    Good
+                    Yaxşı
                   </span>
                   <span className="font-medium">{data.good}</span>
                 </div>
@@ -126,18 +123,18 @@ export const TrendLineChart = ({
                 <div className="flex items-center justify-between text-xs">
                   <span className="flex items-center gap-1">
                     <span className="w-2 h-2 rounded-full bg-rose-500" />
-                    Bad
+                    Pis
                   </span>
                   <span className="font-medium">{data.bad}</span>
                 </div>
               </div>
 
               <div className="mt-2 pt-2 border-t border-border text-xs text-muted-foreground">
-                {t("charts.totalResponses")}: <span className="font-semibold text-foreground">{data.responses}</span>
+                Ümumi cavab: <span className="font-semibold text-foreground">{data.responses}</span>
               </div>
             </>
           ) : (
-            <p className="text-sm text-muted-foreground">{t("charts.noData")}</p>
+            <p className="text-sm text-muted-foreground">Məlumat yoxdur</p>
           )}
         </motion.div>
       );
@@ -194,15 +191,15 @@ export const TrendLineChart = ({
                 <Activity className="h-5 w-5 text-emerald-500" />
               </div>
               <div>
-                <CardTitle className="text-foreground">{displayTitle}</CardTitle>
-                <CardDescription>{displayDesc}</CardDescription>
+                <CardTitle className="text-foreground">{title}</CardTitle>
+                <CardDescription>{description}</CardDescription>
               </div>
             </div>
             
             {/* Stats badges */}
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1 text-sm bg-muted/50 px-3 py-1.5 rounded-full">
-                <span className="text-muted-foreground">{t("charts.average")}:</span>
+                <span className="text-muted-foreground">Ort:</span>
                 <span className={cn(
                   "font-bold",
                   avgSatisfaction >= 70 ? "text-emerald-500" : 
@@ -294,11 +291,11 @@ export const TrendLineChart = ({
           <div className="flex justify-center gap-6 mt-4 text-xs text-muted-foreground">
             <div className="flex items-center gap-2">
               <div className="w-8 h-0.5 bg-gradient-to-r from-emerald-500 via-blue-500 to-emerald-500 rounded" />
-              <span>{t("charts.satisfactionTrend")}</span>
+              <span>Məmnuniyyət trendi</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-8 h-0.5 border-t-2 border-dashed border-muted-foreground/50" />
-              <span>{t("charts.average")} ({avgSatisfaction}%)</span>
+              <span>Orta göstərici ({avgSatisfaction}%)</span>
             </div>
           </div>
         </CardContent>
