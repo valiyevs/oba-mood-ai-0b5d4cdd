@@ -25,6 +25,7 @@ import { NotificationButton } from "@/components/NotificationButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useNotifications } from "@/hooks/useNotifications";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface StatCardProps {
   title: string;
@@ -85,7 +86,7 @@ const StatCard = ({ title, value, change, icon: Icon, description, gradient, del
             ) : (
               <TrendingDown className="mr-1 h-3 w-3" />
             )}
-            {Math.abs(change)}% son həftəyə nisbətən
+            {Math.abs(change)}%
           </div>
         </CardContent>
       </Card>
@@ -97,6 +98,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { subscribeToAlerts } = useNotifications();
+  const { t } = useLanguage();
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
     from: subDays(new Date(), 7),
     to: new Date(),
@@ -313,7 +315,7 @@ const Dashboard = () => {
               </div>
               <div className="min-w-0">
                 <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate flex items-center gap-2">
-                  OBA İdarəetmə Paneli
+                  {t("dashboard.title")}
                   {managerBranch && (
                     <span className="text-primary flex items-center gap-1">
                       <ChevronRight className="w-5 h-5" />
@@ -323,7 +325,7 @@ const Dashboard = () => {
                 </h1>
                 <p className="text-sm text-muted-foreground truncate flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  {managerBranch ? `${branchNames[managerBranch] || managerBranch} Bölgəsi Məmnuniyyət Sistemi` : 'Personal Məmnuniyyət Sistemi'}
+                  {managerBranch ? `${branchNames[managerBranch] || managerBranch} ${t("dashboard.regionSatisfaction")}` : t("dashboard.satisfactionSystem")}
                 </p>
               </div>
             </div>
@@ -344,7 +346,7 @@ const Dashboard = () => {
                   className="gap-2 rounded-xl hover:bg-primary/10"
                 >
                   <Home className="w-4 h-4" />
-                  <span className="hidden md:inline">Ana Səhifə</span>
+                  <span className="hidden md:inline">{t("common.home")}</span>
                 </Button>
                 <Button
                   variant="outline"
@@ -353,7 +355,7 @@ const Dashboard = () => {
                   className="gap-2 rounded-xl border-primary/30 hover:bg-primary/10"
                 >
                   <Brain className="w-4 h-4 text-primary" />
-                  <span className="hidden md:inline">Proqnoz</span>
+                  <span className="hidden md:inline">{t("common.forecast")}</span>
                 </Button>
                 <Button
                   variant="default"
@@ -362,7 +364,7 @@ const Dashboard = () => {
                   className="gap-2 rounded-xl bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shadow-primary/25"
                 >
                   <UserCog className="w-4 h-4" />
-                  <span className="hidden md:inline">HR Paneli</span>
+                  <span className="hidden md:inline">{t("common.hrPanel")}</span>
                 </Button>
                 <Button
                   variant="ghost"
@@ -374,7 +376,7 @@ const Dashboard = () => {
                   className="gap-2 rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10"
                 >
                   <LogOut className="w-4 h-4" />
-                  <span className="hidden md:inline">Çıxış</span>
+                  <span className="hidden md:inline">{t("common.logout")}</span>
                 </Button>
               </div>
               {/* Mobile hamburger menu */}
@@ -404,7 +406,7 @@ const Dashboard = () => {
                         onClick={() => setDateRange({ from: subDays(new Date(), 7), to: new Date() })}
                         className="text-xs rounded-lg hover:bg-primary/10"
                       >
-                        Son 7 gün
+                       {t("common.last7days")}
                       </Button>
                       <Button
                         variant="ghost"
@@ -412,7 +414,7 @@ const Dashboard = () => {
                         onClick={() => setDateRange({ from: subDays(new Date(), 30), to: new Date() })}
                         className="text-xs rounded-lg hover:bg-primary/10"
                       >
-                        Son 30 gün
+                        {t("common.last30days")}
                       </Button>
                       <Button
                         variant="ghost"
@@ -420,7 +422,7 @@ const Dashboard = () => {
                         onClick={() => setDateRange({ from: subDays(new Date(), 90), to: new Date() })}
                         className="text-xs rounded-lg hover:bg-primary/10"
                       >
-                        Son 90 gün
+                        {t("common.last90days")}
                       </Button>
                     </div>
                   </div>
@@ -455,48 +457,48 @@ const Dashboard = () => {
             <div className="p-2 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5">
               <Sparkles className="w-6 h-6 text-primary" />
             </div>
-            <h2 className="text-2xl font-bold text-foreground">Ümumi Baxış</h2>
+            <h2 className="text-2xl font-bold text-foreground">{t("dashboard.overview")}</h2>
           </div>
           <p className="text-muted-foreground">
-            {format(dateRange.from, "dd MMMM", { locale: az })} - {format(dateRange.to, "dd MMMM yyyy", { locale: az })} tarixləri üçün statistika
+            {format(dateRange.from, "dd MMMM", { locale: az })} - {format(dateRange.to, "dd MMMM yyyy", { locale: az })} {t("dashboard.statsFor")}
           </p>
         </motion.div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
-            title="Ümumi İndeks"
+            title={t("dashboard.overallIndex")}
             value={`${stats.overallIndex}%`}
             change={5.2}
             icon={Activity}
-            description="Məmnuniyyət səviyyəsi"
+            description={t("dashboard.satisfactionLevel")}
             gradient="from-emerald-500 to-green-500"
             delay={0}
           />
           <StatCard
-            title="Cavablar"
+            title={t("dashboard.totalResponses")}
             value={stats.totalResponses.toLocaleString()}
             change={12.5}
             icon={Users}
-            description="Aktiv iştirakçılar"
+            description={t("dashboard.activeParticipants")}
             gradient="from-blue-500 to-cyan-500"
             delay={0.1}
           />
           <StatCard
-            title="Risk Halları"
+            title={t("dashboard.riskCases")}
             value={stats.riskCount.toString()}
             change={-15.3}
             icon={AlertCircle}
-            description="Tükənmişlik riski"
+            description={t("dashboard.burnoutRisk")}
             gradient="from-rose-500 to-red-500"
             delay={0.2}
           />
           <StatCard
-            title="Cavab Dərəcəsi"
+            title={t("dashboard.responseRate")}
             value={`${stats.responseRate}%`}
             change={3.1}
             icon={BarChart3}
-            description="İştirak aktivliyi"
+            description={t("dashboard.participationActivity")}
             gradient="from-violet-500 to-purple-500"
             delay={0.3}
           />
@@ -556,7 +558,7 @@ const Dashboard = () => {
 
       {/* Footer */}
       <footer className="py-6 text-center text-sm text-muted-foreground border-t border-border/50 bg-card/30 backdrop-blur-sm mt-8">
-        <p>© 2025 OBA İdarəetmə Paneli. Bütün hüquqlar qorunur.</p>
+        <p>{t("dashboard.footer")}</p>
       </footer>
     </div>
   );
