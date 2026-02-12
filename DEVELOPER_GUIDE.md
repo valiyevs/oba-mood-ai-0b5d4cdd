@@ -261,5 +261,5 @@ Bakı Mərkəz, Gəncə, Sumqayıt, Mingəçevir, Şirvan, Lənkəran, Şəki, Q
 ## 📞 Əlaqə
 
 **Sifarişçi:** Şahin
-**İcraçı:** Kərbala Ayı Arzu xanım
+**İcraçı:** PATCO Group
 **Tarix:** Fevral 2026
