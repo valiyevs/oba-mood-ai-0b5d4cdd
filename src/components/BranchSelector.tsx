@@ -1,18 +1,8 @@
 import { MapPin, Sparkles, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { useLanguage } from "@/hooks/useLanguage";
 
 export type BranchType = string | null;
-
-const branches = [
-  { id: "baku", name: "Baku", icon: "🏙️", gradient: "from-blue-500 to-cyan-400", color: "blue" },
-  { id: "ganja", name: "Ganja", icon: "🌆", gradient: "from-purple-500 to-pink-400", color: "purple" },
-  { id: "sumgait", name: "Sumgait", icon: "🏭", gradient: "from-slate-500 to-zinc-400", color: "slate" },
-  { id: "mingachevir", name: "Mingachevir", icon: "⚡", gradient: "from-yellow-500 to-orange-400", color: "yellow" },
-  { id: "shirvan", name: "Shirvan", icon: "🌾", gradient: "from-green-500 to-emerald-400", color: "green" },
-  { id: "lankaran", name: "Lankaran", icon: "🌊", gradient: "from-teal-500 to-cyan-400", color: "teal" },
-  { id: "shaki", name: "Shaki", icon: "🏔️", gradient: "from-indigo-500 to-blue-400", color: "indigo" },
-  { id: "quba", name: "Guba", icon: "🍎", gradient: "from-red-500 to-rose-400", color: "red" },
-];
 
 interface BranchSelectorProps {
   onBranchSelect: (branch: BranchType) => void;
@@ -44,7 +34,20 @@ const itemVariants = {
   },
 };
 
+const branchMeta = [
+  { id: "baku", key: "baku", icon: "🏙️", gradient: "from-blue-500 to-cyan-400" },
+  { id: "ganja", key: "ganja", icon: "🌆", gradient: "from-purple-500 to-pink-400" },
+  { id: "sumgait", key: "sumgait", icon: "🏭", gradient: "from-slate-500 to-zinc-400" },
+  { id: "mingachevir", key: "mingachevir", icon: "⚡", gradient: "from-yellow-500 to-orange-400" },
+  { id: "shirvan", key: "shirvan", icon: "🌾", gradient: "from-green-500 to-emerald-400" },
+  { id: "lankaran", key: "lankaran", icon: "🌊", gradient: "from-teal-500 to-cyan-400" },
+  { id: "shaki", key: "shaki", icon: "🏔️", gradient: "from-indigo-500 to-blue-400" },
+  { id: "quba", key: "quba", icon: "🍎", gradient: "from-red-500 to-rose-400" },
+];
+
 export const BranchSelector = ({ onBranchSelect, selectedBranch }: BranchSelectorProps) => {
+  const { t } = useLanguage();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -73,11 +76,11 @@ export const BranchSelector = ({ onBranchSelect, selectedBranch }: BranchSelecto
           className="space-y-3"
         >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent">
-            Which region are you from?
+            {t("branch.title")}
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto flex items-center justify-center gap-2">
             <Sparkles className="w-5 h-5 text-primary animate-pulse" />
-            Select your region to submit the survey
+            {t("branch.subtitle")}
             <Sparkles className="w-5 h-5 text-primary animate-pulse" />
           </p>
         </motion.div>
@@ -90,7 +93,7 @@ export const BranchSelector = ({ onBranchSelect, selectedBranch }: BranchSelecto
         animate="visible"
         className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4"
       >
-        {branches.map((branch, index) => {
+        {branchMeta.map((branch) => {
           const isSelected = selectedBranch === branch.id;
           
           return (
@@ -108,7 +111,6 @@ export const BranchSelector = ({ onBranchSelect, selectedBranch }: BranchSelecto
                 }
               `}
             >
-              {/* Background Gradient Overlay */}
               <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: isSelected ? 0.2 : 0 }}
@@ -116,7 +118,6 @@ export const BranchSelector = ({ onBranchSelect, selectedBranch }: BranchSelecto
                 className={`absolute inset-0 bg-gradient-to-br ${branch.gradient}`} 
               />
               
-              {/* Animated Border Glow */}
               {isSelected && (
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -127,7 +128,6 @@ export const BranchSelector = ({ onBranchSelect, selectedBranch }: BranchSelecto
                 </motion.div>
               )}
               
-              {/* Shine Effect */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
                 <motion.div 
                   initial={{ x: "-100%" }}
@@ -164,7 +164,7 @@ export const BranchSelector = ({ onBranchSelect, selectedBranch }: BranchSelecto
                       : "text-foreground group-hover:text-primary"
                     }
                   `}>
-                    {branch.name}
+                    {t(`branch.${branch.key}`)}
                   </span>
                   <ChevronRight className={`
                     w-4 h-4 transition-all duration-300
@@ -176,7 +176,6 @@ export const BranchSelector = ({ onBranchSelect, selectedBranch }: BranchSelecto
                 </div>
               </div>
 
-              {/* Selection Indicator */}
               {isSelected && (
                 <motion.div
                   initial={{ scale: 0, rotate: -180 }}
@@ -194,7 +193,6 @@ export const BranchSelector = ({ onBranchSelect, selectedBranch }: BranchSelecto
         })}
       </motion.div>
 
-      {/* Footer Hint */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -205,7 +203,7 @@ export const BranchSelector = ({ onBranchSelect, selectedBranch }: BranchSelecto
           <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          Your selected region is only used for statistics
+          {t("branch.regionInfoHint")}
         </span>
       </motion.div>
     </motion.div>

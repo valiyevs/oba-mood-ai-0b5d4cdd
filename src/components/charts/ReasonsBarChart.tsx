@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { BarChart3, TrendingUp, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface ReasonData {
   reason: string;
@@ -27,9 +28,12 @@ const GRADIENT_COLORS = [
 
 export const ReasonsBarChart = ({ 
   data, 
-  title = "Complaint Reasons", 
-  description = "Most common issues reported" 
+  title, 
+  description 
 }: ReasonsBarChartProps) => {
+  const { t } = useLanguage();
+  const displayTitle = title || t("charts.reasons");
+  const displayDesc = description || t("charts.reasonsDesc");
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const totalComplaints = data.reduce((sum, item) => sum + item.count, 0);
@@ -52,7 +56,7 @@ export const ReasonsBarChart = ({
             <p className="font-bold text-foreground">{label}</p>
           </div>
           <p className="text-sm text-muted-foreground">
-            <span className="text-foreground font-semibold text-lg">{payload[0].value}</span> complaints
+            <span className="text-foreground font-semibold text-lg">{payload[0].value}</span> {t("charts.complaints")}
           </p>
           <div className="flex items-center gap-1 mt-1">
             <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
@@ -135,8 +139,8 @@ export const ReasonsBarChart = ({
                 <BarChart3 className="h-5 w-5 text-violet-500" />
               </div>
               <div>
-                <CardTitle className="text-foreground">{title}</CardTitle>
-                <CardDescription>{description}</CardDescription>
+                <CardTitle className="text-foreground">{displayTitle}</CardTitle>
+                <CardDescription>{displayDesc}</CardDescription>
               </div>
             </div>
             <div className="flex items-center gap-1 text-sm text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-full">

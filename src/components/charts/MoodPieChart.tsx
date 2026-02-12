@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { PieChart as PieChartIcon, Smile, Meh, Frown } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface MoodData {
   mood: string;
@@ -79,16 +80,19 @@ const renderActiveShape = (props: any) => {
 
 export const MoodPieChart = ({ 
   data, 
-  title = "Mood Distribution", 
-  description = "Employee mood breakdown" 
+  title, 
+  description 
 }: MoodPieChartProps) => {
+  const { t } = useLanguage();
+  const displayTitle = title || t("charts.moodDistribution");
+  const displayDesc = description || t("charts.moodPieDesc");
   const [activeIndex, setActiveIndex] = useState<number | undefined>(undefined);
 
   const chartData = data.map(item => {
-    // Map mood names if needed (or assume data comes translated)
     let moodName = item.mood;
-    if (moodName === "Yaxşı") moodName = "Good";
-    if (moodName === "Pis") moodName = "Bad";
+    if (moodName === "Yaxşı") moodName = t("charts.good");
+    else if (moodName === "Normal") moodName = t("charts.normal");
+    else if (moodName === "Pis") moodName = t("charts.bad");
     
     return {
       name: moodName,
@@ -119,10 +123,10 @@ export const MoodPieChart = ({
             <p className="font-bold text-foreground">{data.name}</p>
           </div>
           <p className="text-sm text-muted-foreground">
-            <span className="text-foreground font-semibold">{data.value}</span> people
+            <span className="text-foreground font-semibold">{data.value}</span> {t("charts.people")}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            <span className="font-semibold" style={{ color: data.fill }}>{data.percentage}%</span> of total responses
+            <span className="font-semibold" style={{ color: data.fill }}>{data.percentage}%</span> {t("charts.ofTotalResponses")}
           </p>
         </motion.div>
       );
@@ -196,8 +200,8 @@ export const MoodPieChart = ({
               <PieChartIcon className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <CardTitle className="text-foreground">{title}</CardTitle>
-              <CardDescription>{description}</CardDescription>
+              <CardTitle className="text-foreground">{displayTitle}</CardTitle>
+              <CardDescription>{displayDesc}</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -269,7 +273,7 @@ export const MoodPieChart = ({
 
           {/* Total indicator */}
           <div className="text-center mt-2 text-sm text-muted-foreground">
-            Total: <span className="font-semibold text-foreground">{total}</span> responses
+            {t("charts.total")}: <span className="font-semibold text-foreground">{total}</span> {t("charts.responses")}
           </div>
         </CardContent>
       </Card>
