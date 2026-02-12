@@ -29,11 +29,11 @@ export const NotificationButton = () => {
   const getTooltip = () => {
     switch (permission) {
       case "granted":
-        return "Bildirişlər aktivdir";
+        return "Notifications enabled";
       case "denied":
-        return "Bildirişlər bloklanıb";
+        return "Notifications blocked";
       default:
-        return "Bildirişlərə icazə ver";
+        return "Enable notifications";
     }
   };
 
@@ -64,7 +64,6 @@ export const NotificationButton = () => {
               </motion.div>
             </AnimatePresence>
             
-            {/* Pulse animation for granted state */}
             {permission === "granted" && (
               <motion.span
                 className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-emerald-500"

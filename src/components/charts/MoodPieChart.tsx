@@ -32,8 +32,10 @@ const GRADIENTS = {
 
 const getMoodIcon = (mood: string) => {
   switch (mood) {
+    case "Good": 
     case "Yaxşı": return Smile;
     case "Normal": return Meh;
+    case "Bad":
     case "Pis": return Frown;
     default: return Meh;
   }
@@ -77,19 +79,26 @@ const renderActiveShape = (props: any) => {
 
 export const MoodPieChart = ({ 
   data, 
-  title = "Əhval Bölgüsü", 
-  description = "İşçilərin əhval paylanması" 
+  title = "Mood Distribution", 
+  description = "Employee mood breakdown" 
 }: MoodPieChartProps) => {
   const [activeIndex, setActiveIndex] = useState<number | undefined>(undefined);
 
-  const chartData = data.map(item => ({
-    name: item.mood,
-    value: item.count,
-    percentage: item.percentage,
-    fill: COLORS[item.color as keyof typeof COLORS] || "hsl(var(--primary))",
-    gradient: GRADIENTS[item.color as keyof typeof GRADIENTS] || ["#6366f1", "#4f46e5"],
-    color: item.color,
-  }));
+  const chartData = data.map(item => {
+    // Map mood names if needed (or assume data comes translated)
+    let moodName = item.mood;
+    if (moodName === "Yaxşı") moodName = "Good";
+    if (moodName === "Pis") moodName = "Bad";
+    
+    return {
+      name: moodName,
+      value: item.count,
+      percentage: item.percentage,
+      fill: COLORS[item.color as keyof typeof COLORS] || "hsl(var(--primary))",
+      gradient: GRADIENTS[item.color as keyof typeof GRADIENTS] || ["#6366f1", "#4f46e5"],
+      color: item.color,
+    };
+  });
 
   const total = chartData.reduce((sum, item) => sum + item.value, 0);
 
@@ -110,10 +119,10 @@ export const MoodPieChart = ({
             <p className="font-bold text-foreground">{data.name}</p>
           </div>
           <p className="text-sm text-muted-foreground">
-            <span className="text-foreground font-semibold">{data.value}</span> nəfər
+            <span className="text-foreground font-semibold">{data.value}</span> people
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            Ümumi cavabların <span className="font-semibold" style={{ color: data.fill }}>{data.percentage}%</span>-i
+            <span className="font-semibold" style={{ color: data.fill }}>{data.percentage}%</span> of total responses
           </p>
         </motion.div>
       );
@@ -260,7 +269,7 @@ export const MoodPieChart = ({
 
           {/* Total indicator */}
           <div className="text-center mt-2 text-sm text-muted-foreground">
-            Ümumi: <span className="font-semibold text-foreground">{total}</span> cavab
+            Total: <span className="font-semibold text-foreground">{total}</span> responses
           </div>
         </CardContent>
       </Card>

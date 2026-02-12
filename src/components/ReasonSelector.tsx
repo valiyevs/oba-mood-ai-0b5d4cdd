@@ -16,8 +16,8 @@ const reasons = [
   {
     type: "manager" as const,
     icon: User,
-    label: "Menecer",
-    description: "İdarəetmə ilə bağlı",
+    label: "Manager",
+    description: "Management related",
     gradient: "from-violet-500 to-purple-500",
     bgGradient: "from-violet-500/15 to-purple-500/15",
     iconBg: "bg-gradient-to-br from-violet-500 to-purple-500",
@@ -25,8 +25,8 @@ const reasons = [
   {
     type: "workload" as const,
     icon: Briefcase,
-    label: "İş yükü",
-    description: "Çox iş, stress",
+    label: "Workload",
+    description: "Too much work, stress",
     gradient: "from-orange-500 to-red-500",
     bgGradient: "from-orange-500/15 to-red-500/15",
     iconBg: "bg-gradient-to-br from-orange-500 to-red-500",
@@ -34,8 +34,8 @@ const reasons = [
   {
     type: "schedule" as const,
     icon: Clock,
-    label: "Qrafik",
-    description: "İş saatları problemi",
+    label: "Schedule",
+    description: "Work hours issue",
     gradient: "from-blue-500 to-cyan-500",
     bgGradient: "from-blue-500/15 to-cyan-500/15",
     iconBg: "bg-gradient-to-br from-blue-500 to-cyan-500",
@@ -43,8 +43,8 @@ const reasons = [
   {
     type: "team" as const,
     icon: Users,
-    label: "Komanda",
-    description: "Həmkarlarla münasibət",
+    label: "Team",
+    description: "Colleague relations",
     gradient: "from-green-500 to-emerald-500",
     bgGradient: "from-green-500/15 to-emerald-500/15",
     iconBg: "bg-gradient-to-br from-green-500 to-emerald-500",
@@ -52,8 +52,8 @@ const reasons = [
   {
     type: "conditions" as const,
     icon: Building,
-    label: "Şərtlər",
-    description: "İş mühiti",
+    label: "Conditions",
+    description: "Work environment",
     gradient: "from-slate-500 to-gray-500",
     bgGradient: "from-slate-500/15 to-gray-500/15",
     iconBg: "bg-gradient-to-br from-slate-500 to-gray-500",
@@ -61,8 +61,8 @@ const reasons = [
   {
     type: "other" as const,
     icon: MoreHorizontal,
-    label: "Digər",
-    description: "Başqa səbəb",
+    label: "Other",
+    description: "Other reason",
     gradient: "from-pink-500 to-rose-500",
     bgGradient: "from-pink-500/15 to-rose-500/15",
     iconBg: "bg-gradient-to-br from-pink-500 to-rose-500",
@@ -150,11 +150,11 @@ export const ReasonSelector = ({ onReasonSelect, onBack }: ReasonSelectorProps) 
           className="space-y-2"
         >
           <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent">
-            Nə baş verib?
+            What happened?
           </h2>
           <p className="text-lg text-muted-foreground">
-            Səbəbi seçin •{" "}
-            <span className="text-primary font-medium">Tamamilə anonim</span>
+            Select a reason •{" "}
+            <span className="text-primary font-medium">Completely anonymous</span>
           </p>
         </motion.div>
       </div>
@@ -296,10 +296,10 @@ export const ReasonSelector = ({ onReasonSelect, onBack }: ReasonSelectorProps) 
               <div className="relative bg-gradient-to-br from-card to-card/80 rounded-xl border border-border/50 p-1">
                 <div className="flex items-center gap-2 px-4 py-2 border-b border-border/30">
                   <MessageCircle className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium text-muted-foreground">Əlavə məlumat</span>
+                  <span className="text-sm font-medium text-muted-foreground">Additional details</span>
                 </div>
                 <Textarea
-                  placeholder="Zəhmət olmasa qısaca yazın... (ixtiyari)"
+                  placeholder="Please briefly describe... (optional)"
                   value={customText}
                   onChange={(e) => setCustomText(e.target.value)}
                   className="min-h-[100px] resize-none text-base border-0 focus-visible:ring-0 bg-transparent"
@@ -316,7 +316,7 @@ export const ReasonSelector = ({ onReasonSelect, onBack }: ReasonSelectorProps) 
                   disabled={isSubmitting}
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  Geri
+                  Back
                 </Button>
               </motion.div>
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex-1">
@@ -332,12 +332,12 @@ export const ReasonSelector = ({ onReasonSelect, onBack }: ReasonSelectorProps) 
                         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                         className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
                       />
-                      Göndərilir...
+                      Submitting...
                     </>
                   ) : (
                     <>
                       <Send className="w-4 h-4" />
-                      Göndər
+                      Submit
                     </>
                   )}
                 </Button>
@@ -363,7 +363,7 @@ export const ReasonSelector = ({ onReasonSelect, onBack }: ReasonSelectorProps) 
               className="gap-2 text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="w-4 h-4" />
-              Geri qayıt
+              Go back
             </Button>
           </motion.div>
         )}
