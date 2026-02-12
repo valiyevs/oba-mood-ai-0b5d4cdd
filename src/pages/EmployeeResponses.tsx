@@ -11,6 +11,8 @@ import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, Brain, TrendingUp, TrendingDown, Minus, AlertTriangle, MessageSquare, Calendar, Filter, Sparkles, Activity, Users, Building2 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
 import { MobileNavMenu } from "@/components/MobileNavMenu";
+import { LanguageToggle } from "@/components/LanguageToggle";
+import { useLanguage } from "@/hooks/useLanguage";
 
 // Mock data for anonymized responses
 const mockResponses = [
@@ -102,68 +104,14 @@ const trendData = [
   { date: "10 Yan", avgMood: 3.8, responses: 65, burnoutCases: 1 },
 ];
 
-// Sentiment distribution
-const sentimentData = [
-  { name: "Müsbət", value: 42, color: "emerald", icon: TrendingUp },
-  { name: "Neytral", value: 35, color: "amber", icon: Minus },
-  { name: "Mənfi", value: 23, color: "rose", icon: TrendingDown },
-];
-
 const getMoodEmoji = (mood: number) => {
   const emojis = ["😢", "😟", "😐", "🙂", "😊"];
   return emojis[mood - 1] || "😐";
 };
 
-const getBurnoutBadge = (risk: string) => {
-  switch (risk) {
-    case "critical":
-      return (
-        <Badge className="bg-gradient-to-r from-rose-500 to-red-600 text-white border-0 animate-pulse shadow-lg shadow-rose-500/30">
-          Kritik
-        </Badge>
-      );
-    case "high":
-      return (
-        <Badge className="bg-gradient-to-r from-orange-500 to-rose-500 text-white border-0 shadow-md">
-          Yüksək
-        </Badge>
-      );
-    case "medium":
-      return (
-        <Badge className="bg-gradient-to-r from-amber-400 to-orange-500 text-white border-0 shadow-md">
-          Orta
-        </Badge>
-      );
-    case "low":
-      return (
-        <Badge className="bg-gradient-to-r from-emerald-400 to-teal-500 text-white border-0 shadow-md">
-          Aşağı
-        </Badge>
-      );
-    default:
-      return <Badge variant="outline">Naməlum</Badge>;
-  }
-};
-
-const getSentimentIcon = (sentiment: string) => {
-  switch (sentiment) {
-    case "positive":
-      return <TrendingUp className="h-4 w-4 text-emerald-500" />;
-    case "negative":
-      return <TrendingDown className="h-4 w-4 text-rose-500" />;
-    default:
-      return <Minus className="h-4 w-4 text-amber-500" />;
-  }
-};
-
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
 };
 
 const itemVariants = {
@@ -173,6 +121,7 @@ const itemVariants = {
 
 const EmployeeResponses = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [selectedDepartment, setSelectedDepartment] = useState<string>("all");
   const [selectedBranch, setSelectedBranch] = useState<string>("all");
   const [selectedRisk, setSelectedRisk] = useState<string>("all");
@@ -186,37 +135,35 @@ const EmployeeResponses = () => {
 
   const criticalCases = mockResponses.filter(r => r.burnoutRisk === "critical" || r.burnoutRisk === "high");
 
-  const statsCards = [
-    {
-      title: "Ümumi Cavablar",
-      value: mockResponses.length.toString(),
-      icon: MessageSquare,
-      gradient: "from-blue-500 to-cyan-500",
-      bgGlow: "bg-blue-500/10"
-    },
-    {
-      title: "Orta Əhval",
-      value: "3.5 / 5",
-      emoji: "🙂",
-      icon: Activity,
-      gradient: "from-emerald-500 to-teal-500",
-      bgGlow: "bg-emerald-500/10"
-    },
-    {
-      title: "Tükənmişlik Riski",
-      value: criticalCases.length.toString(),
-      icon: AlertTriangle,
-      gradient: "from-rose-500 to-red-600",
-      bgGlow: "bg-rose-500/10",
-      isAlert: true
-    },
-    {
-      title: "AI Analizləri",
-      value: mockResponses.length.toString(),
-      icon: Brain,
-      gradient: "from-violet-500 to-purple-600",
-      bgGlow: "bg-violet-500/10"
+  const sentimentData = [
+    { name: t("employeeResponses.positive"), value: 42, color: "emerald", icon: TrendingUp },
+    { name: t("employeeResponses.neutral"), value: 35, color: "amber", icon: Minus },
+    { name: t("employeeResponses.negative"), value: 23, color: "rose", icon: TrendingDown },
+  ];
+
+  const getBurnoutBadge = (risk: string) => {
+    switch (risk) {
+      case "critical": return <Badge className="bg-gradient-to-r from-rose-500 to-red-600 text-white border-0 animate-pulse shadow-lg shadow-rose-500/30">{t("employeeResponses.critical")}</Badge>;
+      case "high": return <Badge className="bg-gradient-to-r from-orange-500 to-rose-500 text-white border-0 shadow-md">{t("employeeResponses.high")}</Badge>;
+      case "medium": return <Badge className="bg-gradient-to-r from-amber-400 to-orange-500 text-white border-0 shadow-md">{t("employeeResponses.medium")}</Badge>;
+      case "low": return <Badge className="bg-gradient-to-r from-emerald-400 to-teal-500 text-white border-0 shadow-md">{t("employeeResponses.low")}</Badge>;
+      default: return <Badge variant="outline">{t("employeeResponses.unknown")}</Badge>;
     }
+  };
+
+  const getSentimentIcon = (sentiment: string) => {
+    switch (sentiment) {
+      case "positive": return <TrendingUp className="h-4 w-4 text-emerald-500" />;
+      case "negative": return <TrendingDown className="h-4 w-4 text-rose-500" />;
+      default: return <Minus className="h-4 w-4 text-amber-500" />;
+    }
+  };
+
+  const statsCards = [
+    { title: t("employeeResponses.totalResponses"), value: mockResponses.length.toString(), icon: MessageSquare, gradient: "from-blue-500 to-cyan-500", bgGlow: "bg-blue-500/10" },
+    { title: t("employeeResponses.avgMood"), value: "3.5 / 5", emoji: "🙂", icon: Activity, gradient: "from-emerald-500 to-teal-500", bgGlow: "bg-emerald-500/10" },
+    { title: t("employeeResponses.burnoutRisk"), value: criticalCases.length.toString(), icon: AlertTriangle, gradient: "from-rose-500 to-red-600", bgGlow: "bg-rose-500/10", isAlert: true },
+    { title: t("employeeResponses.aiAnalyses"), value: mockResponses.length.toString(), icon: Brain, gradient: "from-violet-500 to-purple-600", bgGlow: "bg-violet-500/10" }
   ];
 
   return (
@@ -268,19 +215,20 @@ const EmployeeResponses = () => {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent">
-                  İşçi Cavabları
+                  {t("employeeResponses.title")}
                 </h1>
                 <Sparkles className="h-4 w-4 text-primary animate-pulse" />
               </div>
-              <p className="text-sm text-muted-foreground hidden sm:block">Anonim geri bildiriş və AI analizi</p>
+              <p className="text-sm text-muted-foreground hidden sm:block">{t("employeeResponses.subtitle")}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <LanguageToggle />
             <MobileNavMenu />
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="hidden sm:block">
               <Button variant="outline" size="sm" className="rounded-xl border-primary/20 hover:bg-primary/10 hover:border-primary/40">
                 <Calendar className="mr-2 h-4 w-4 text-primary" />
-                Son 30 gün
+                {t("employeeResponses.last30daysBtn")}
               </Button>
             </motion.div>
           </div>
@@ -339,8 +287,8 @@ const EmployeeResponses = () => {
                     <TrendingUp className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <CardTitle>Zaman üzrə Trendlər</CardTitle>
-                    <CardDescription>Əhval və tükənmişlik hallarının dinamikası</CardDescription>
+                    <CardTitle>{t("employeeResponses.trendsOverTime")}</CardTitle>
+                    <CardDescription>{t("employeeResponses.trendsDesc")}</CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -376,7 +324,7 @@ const EmployeeResponses = () => {
                         strokeWidth={3}
                         fillOpacity={1} 
                         fill="url(#colorMood)" 
-                        name="Orta Əhval"
+                        name={t("employeeResponses.avgMoodLabel")}
                       />
                       <Line 
                         type="monotone" 
@@ -385,7 +333,7 @@ const EmployeeResponses = () => {
                         strokeWidth={2}
                         dot={{ fill: "#f43f5e", strokeWidth: 2, r: 4 }}
                         activeDot={{ r: 6, fill: "#f43f5e", stroke: "#fff", strokeWidth: 2 }}
-                        name="Tükənmişlik Halları"
+                        name={t("employeeResponses.burnoutCases")}
                       />
                     </AreaChart>
                   </ResponsiveContainer>
@@ -449,15 +397,15 @@ const EmployeeResponses = () => {
                 <TabsList className="bg-muted/50 backdrop-blur-sm p-1 rounded-xl">
                   <TabsTrigger value="all" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-md">
                     <Users className="h-4 w-4 mr-2" />
-                    Hamısı
+                    {t("employeeResponses.allTab")}
                   </TabsTrigger>
                   <TabsTrigger value="critical" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-md text-rose-500 data-[state=active]:text-rose-600">
                     <AlertTriangle className="h-4 w-4 mr-2" />
-                    Kritik
+                    {t("employeeResponses.criticalTab")}
                   </TabsTrigger>
                   <TabsTrigger value="analysis" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-md">
                     <Brain className="h-4 w-4 mr-2" />
-                    AI Analizi
+                    {t("employeeResponses.aiAnalysisTab")}
                   </TabsTrigger>
                 </TabsList>
                 
@@ -465,10 +413,10 @@ const EmployeeResponses = () => {
                   <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
                     <SelectTrigger className="w-[150px] rounded-xl border-primary/20 bg-background/50 backdrop-blur-sm">
                       <Building2 className="h-4 w-4 mr-2 text-primary" />
-                      <SelectValue placeholder="Şöbə" />
+                      <SelectValue placeholder={t("reports.department")} />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl">
-                      <SelectItem value="all">Bütün Şöbələr</SelectItem>
+                      <SelectItem value="all">{t("employeeResponses.allDepartments")}</SelectItem>
                       <SelectItem value="Satış">Satış</SelectItem>
                       <SelectItem value="IT">IT</SelectItem>
                       <SelectItem value="Maliyyə">Maliyyə</SelectItem>
@@ -480,10 +428,10 @@ const EmployeeResponses = () => {
                   <Select value={selectedBranch} onValueChange={setSelectedBranch}>
                     <SelectTrigger className="w-[150px] rounded-xl border-primary/20 bg-background/50 backdrop-blur-sm">
                       <Filter className="h-4 w-4 mr-2 text-primary" />
-                      <SelectValue placeholder="Filial" />
+                      <SelectValue placeholder={t("reports.branch")} />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl">
-                      <SelectItem value="all">Bütün Filiallar</SelectItem>
+                      <SelectItem value="all">{t("employeeResponses.allBranches")}</SelectItem>
                       <SelectItem value="Bakı Mərkəz">Bakı Mərkəz</SelectItem>
                       <SelectItem value="Gəncə">Gəncə</SelectItem>
                       <SelectItem value="Sumqayıt">Sumqayıt</SelectItem>
@@ -493,14 +441,14 @@ const EmployeeResponses = () => {
                   <Select value={selectedRisk} onValueChange={setSelectedRisk}>
                     <SelectTrigger className="w-[150px] rounded-xl border-primary/20 bg-background/50 backdrop-blur-sm">
                       <AlertTriangle className="h-4 w-4 mr-2 text-primary" />
-                      <SelectValue placeholder="Risk" />
+                      <SelectValue placeholder={t("employeeResponses.risk")} />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl">
-                      <SelectItem value="all">Bütün Risklər</SelectItem>
-                      <SelectItem value="critical">Kritik</SelectItem>
-                      <SelectItem value="high">Yüksək</SelectItem>
-                      <SelectItem value="medium">Orta</SelectItem>
-                      <SelectItem value="low">Aşağı</SelectItem>
+                      <SelectItem value="all">{t("employeeResponses.allRisks")}</SelectItem>
+                      <SelectItem value="critical">{t("employeeResponses.critical")}</SelectItem>
+                      <SelectItem value="high">{t("employeeResponses.high")}</SelectItem>
+                      <SelectItem value="medium">{t("employeeResponses.medium")}</SelectItem>
+                      <SelectItem value="low">{t("employeeResponses.low")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -511,13 +459,13 @@ const EmployeeResponses = () => {
                   <Table>
                     <TableHeader>
                       <TableRow className="hover:bg-transparent border-b border-border/50">
-                        <TableHead className="font-semibold">Tarix</TableHead>
-                        <TableHead className="font-semibold">Əhval</TableHead>
-                        <TableHead className="font-semibold">Kateqoriya</TableHead>
-                        <TableHead className="font-semibold">Şöbə</TableHead>
-                        <TableHead className="font-semibold">Filial</TableHead>
-                        <TableHead className="font-semibold">Sentiment</TableHead>
-                        <TableHead className="font-semibold">Risk</TableHead>
+                        <TableHead className="font-semibold">{t("employeeResponses.date")}</TableHead>
+                        <TableHead className="font-semibold">{t("employeeResponses.moodCol")}</TableHead>
+                        <TableHead className="font-semibold">{t("employeeResponses.category")}</TableHead>
+                        <TableHead className="font-semibold">{t("employeeResponses.departmentCol")}</TableHead>
+                        <TableHead className="font-semibold">{t("employeeResponses.branchCol")}</TableHead>
+                        <TableHead className="font-semibold">{t("employeeResponses.sentiment")}</TableHead>
+                        <TableHead className="font-semibold">{t("employeeResponses.risk")}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -589,7 +537,7 @@ const EmployeeResponses = () => {
                               <Brain className="h-4 w-4 text-rose-500" />
                             </div>
                             <div>
-                              <p className="text-xs font-semibold text-rose-500 mb-1">AI Təhlili</p>
+                              <p className="text-xs font-semibold text-rose-500 mb-1">{t("employeeResponses.aiAnalysisLabel")}</p>
                               <p className="text-sm text-rose-600 dark:text-rose-400">{response.aiAnalysis}</p>
                             </div>
                           </div>
@@ -637,7 +585,7 @@ const EmployeeResponses = () => {
                               <Sparkles className="h-4 w-4 text-primary" />
                             </div>
                             <div>
-                              <p className="text-xs font-semibold text-primary mb-1">AI Sentiment Analizi</p>
+                              <p className="text-xs font-semibold text-primary mb-1">{t("employeeResponses.aiSentimentAnalysis")}</p>
                               <p className="text-sm">{response.aiAnalysis}</p>
                             </div>
                           </div>

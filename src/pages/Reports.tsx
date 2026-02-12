@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { format, subDays, subMonths } from "date-fns";
-import { az } from "date-fns/locale";
+import { az, enUS } from "date-fns/locale";
 import { useQuery } from "@tanstack/react-query";
 import { 
   ArrowLeft, 
@@ -37,6 +37,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { exportToExcel, exportToPDF, formatReportData } from "@/lib/exportUtils";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageToggle } from "@/components/LanguageToggle";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -54,6 +56,8 @@ const itemVariants = {
 const Reports = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t, language } = useLanguage();
+  const dateLocale = language === "az" ? az : enUS;
   const [selectedPeriod, setSelectedPeriod] = useState("month");
   const [selectedBranch, setSelectedBranch] = useState("all");
 
@@ -120,7 +124,6 @@ const Reports = () => {
     },
   });
 
-  // Calculate statistics
   const filteredResponses = selectedBranch === "all" 
     ? responses 
     : responses.filter(r => r.branch === selectedBranch);
@@ -142,7 +145,6 @@ const Reports = () => {
   const resolvedAlerts = burnoutAlerts.filter(a => a.is_resolved).length;
   const completedActions = managerActions.filter(a => a.status === 'completed').length;
 
-  // Branch statistics
   const branchStats = [...new Set(responses.map(r => r.branch))].map(branch => {
     const branchResponses = responses.filter(r => r.branch === branch);
     const branchTotal = branchResponses.length;
@@ -159,7 +161,6 @@ const Reports = () => {
     };
   }).sort((a, b) => b.totalResponses - a.totalResponses);
 
-  // Department statistics
   const departmentStats = [...new Set(responses.map(r => r.department))].map(department => {
     const deptResponses = responses.filter(r => r.department === department);
     const deptTotal = deptResponses.length;
@@ -174,7 +175,6 @@ const Reports = () => {
     };
   }).sort((a, b) => b.totalResponses - a.totalResponses);
 
-  // Reason categories
   const reasonCounts: Record<string, number> = {};
   filteredResponses.forEach(r => {
     if (r.reason_category) {
@@ -188,12 +188,12 @@ const Reports = () => {
 
   const handleExportCSV = () => {
     const csvData = filteredResponses.map(r => ({
-      Tarix: r.response_date,
-      Əhval: r.mood,
-      Filial: r.branch,
-      Şöbə: r.department,
-      Kateqoriya: r.reason_category || '',
-      Səbəb: r.reason || ''
+      Date: r.response_date,
+      Mood: r.mood,
+      Branch: r.branch,
+      Department: r.department,
+      Category: r.reason_category || '',
+      Reason: r.reason || ''
     }));
 
     const headers = Object.keys(csvData[0] || {}).join(',');
@@ -204,111 +204,111 @@ const Reports = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `hesabat_${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    link.download = `report_${format(new Date(), 'yyyy-MM-dd')}.csv`;
     link.click();
 
     toast({
-      title: "Hesabat yükləndi",
-      description: "CSV faylı uğurla yükləndi",
+      title: t("reports.csvDownloaded"),
+      description: t("reports.csvDesc"),
     });
   };
 
   const handlePrint = () => {
     window.print();
     toast({
-      title: "Çap hazırlandı",
-      description: "Hesabat çap üçün hazırlandı",
+      title: t("reports.printReady"),
+      description: t("reports.printDesc"),
     });
   };
 
   const handleExportExcel = () => {
     const data = formatReportData(filteredResponses, burnoutAlerts, managerActions);
-    exportToExcel(data.responses, `hesabat_${format(new Date(), 'yyyy-MM-dd')}`);
+    exportToExcel(data.responses, `report_${format(new Date(), 'yyyy-MM-dd')}`);
     toast({
-      title: "Excel yükləndi",
-      description: "Excel faylı uğurla yükləndi",
+      title: t("reports.excelDownloaded"),
+      description: t("reports.excelDesc"),
     });
   };
 
   const handleExportPDF = () => {
     exportToPDF(
-      "OBA Məmnuniyyət Hesabatı",
-      `${periodLabels[selectedPeriod]} hesabat - ${format(dateRange.from, "d MMM", { locale: az })} - ${format(dateRange.to, "d MMM yyyy", { locale: az })}`,
+      "OBA Satisfaction Report",
+      `${format(dateRange.from, "d MMM", { locale: dateLocale })} - ${format(dateRange.to, "d MMM yyyy", { locale: dateLocale })}`,
       [
         {
-          title: "Əhval Paylanması",
+          title: t("reports.moodDistribution"),
           content: `
             <table>
-              <tr><th>Əhval</th><th>Say</th><th>Faiz</th></tr>
-              <tr><td>Yaxşı</td><td>${moodCounts['Yaxşı']}</td><td>${totalResponses > 0 ? Math.round((moodCounts['Yaxşı'] / totalResponses) * 100) : 0}%</td></tr>
-              <tr><td>Normal</td><td>${moodCounts['Normal']}</td><td>${totalResponses > 0 ? Math.round((moodCounts['Normal'] / totalResponses) * 100) : 0}%</td></tr>
-              <tr><td>Pis</td><td>${moodCounts['Pis']}</td><td>${totalResponses > 0 ? Math.round((moodCounts['Pis'] / totalResponses) * 100) : 0}%</td></tr>
+              <tr><th>Mood</th><th>Count</th><th>%</th></tr>
+              <tr><td>${t("reports.good")}</td><td>${moodCounts['Yaxşı']}</td><td>${totalResponses > 0 ? Math.round((moodCounts['Yaxşı'] / totalResponses) * 100) : 0}%</td></tr>
+              <tr><td>${t("reports.normal")}</td><td>${moodCounts['Normal']}</td><td>${totalResponses > 0 ? Math.round((moodCounts['Normal'] / totalResponses) * 100) : 0}%</td></tr>
+              <tr><td>${t("reports.bad")}</td><td>${moodCounts['Pis']}</td><td>${totalResponses > 0 ? Math.round((moodCounts['Pis'] / totalResponses) * 100) : 0}%</td></tr>
             </table>
           `
         },
         {
-          title: "Əsas Şikayət Səbəbləri",
+          title: t("reports.topReasons"),
           content: topReasons.length > 0 
-            ? `<table><tr><th>Səbəb</th><th>Say</th><th>Faiz</th></tr>${topReasons.map(r => `<tr><td>${r.reason}</td><td>${r.count}</td><td>${r.percentage}%</td></tr>`).join("")}</table>`
-            : "<p>Şikayət qeyd edilməyib</p>"
+            ? `<table><tr><th>Reason</th><th>Count</th><th>%</th></tr>${topReasons.map(r => `<tr><td>${r.reason}</td><td>${r.count}</td><td>${r.percentage}%</td></tr>`).join("")}</table>`
+            : `<p>${t("reports.noReasonsData")}</p>`
         },
         {
-          title: "Filiallara görə statistika",
+          title: t("reports.branchStats"),
           content: branchStats.length > 0
-            ? `<table><tr><th>Filial</th><th>Cavab</th><th>Məmnuniyyət</th><th>Xəbərdarlıq</th></tr>${branchStats.map(b => `<tr><td>${b.branch}</td><td>${b.totalResponses}</td><td>${b.satisfactionRate}%</td><td>${b.alerts}</td></tr>`).join("")}</table>`
-            : "<p>Məlumat yoxdur</p>"
+            ? `<table><tr><th>${t("reports.branch")}</th><th>${t("reports.responses")}</th><th>${t("reports.satisfaction")}</th><th>${t("reports.alerts")}</th></tr>${branchStats.map(b => `<tr><td>${b.branch}</td><td>${b.totalResponses}</td><td>${b.satisfactionRate}%</td><td>${b.alerts}</td></tr>`).join("")}</table>`
+            : `<p>${t("common.noData")}</p>`
         }
       ],
       [
-        { label: "Ümumi Cavablar", value: totalResponses },
-        { label: "Məmnuniyyət", value: `${satisfactionRate}%` },
-        { label: "Kritik Xəbərdarlıqlar", value: criticalAlerts },
-        { label: "Tamamlanmış Tapşırıqlar", value: completedActions }
+        { label: t("reports.totalResponses"), value: totalResponses },
+        { label: t("reports.satisfaction"), value: `${satisfactionRate}%` },
+        { label: t("reports.criticalAlerts"), value: criticalAlerts },
+        { label: t("reports.completedTasks"), value: completedActions }
       ]
     );
     toast({
-      title: "PDF hazırlandı",
-      description: "Hesabat PDF formatında açıldı",
+      title: t("reports.pdfReady"),
+      description: t("reports.pdfDesc"),
     });
   };
 
   const periodLabels: Record<string, string> = {
-    week: "Həftəlik",
-    month: "Aylıq",
-    quarter: "Rüblük",
-    year: "İllik"
+    week: t("common.weekly"),
+    month: t("common.monthly"),
+    quarter: t("common.quarterly"),
+    year: t("common.yearly")
   };
 
   const reportCards = [
     {
-      title: "Ümumi Cavablar",
+      title: t("reports.totalResponses"),
       value: totalResponses.toString(),
-      subtitle: `${uniqueEmployees} unikal işçi`,
+      subtitle: `${uniqueEmployees} ${t("reports.uniqueEmployees")}`,
       icon: FileText,
       gradient: "from-blue-500 to-cyan-500",
       bgGlow: "bg-blue-500/10"
     },
     {
-      title: "Məmnuniyyət Dərəcəsi",
+      title: t("reports.satisfactionRate"),
       value: `${satisfactionRate}%`,
-      subtitle: `${moodCounts['Yaxşı']} müsbət cavab`,
+      subtitle: `${moodCounts['Yaxşı']} ${t("reports.positiveResponses")}`,
       icon: TrendingUp,
       gradient: "from-emerald-500 to-teal-500",
       bgGlow: "bg-emerald-500/10"
     },
     {
-      title: "Kritik Xəbərdarlıqlar",
+      title: t("reports.criticalAlerts"),
       value: criticalAlerts.toString(),
-      subtitle: `${resolvedAlerts} həll edilib`,
+      subtitle: `${resolvedAlerts} ${t("reports.resolved")}`,
       icon: AlertTriangle,
       gradient: "from-rose-500 to-red-600",
       bgGlow: "bg-rose-500/10",
       isAlert: criticalAlerts > 0
     },
     {
-      title: "Tamamlanmış Tapşırıqlar",
+      title: t("reports.completedTasks"),
       value: completedActions.toString(),
-      subtitle: `${managerActions.length} ümumi`,
+      subtitle: `${managerActions.length} ${t("reports.total")}`,
       icon: CheckCircle2,
       gradient: "from-violet-500 to-purple-600",
       bgGlow: "bg-violet-500/10"
@@ -348,16 +348,17 @@ const Reports = () => {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent">
-                  Hesabatlar
+                  {t("reports.title")}
                 </h1>
                 <Sparkles className="h-4 w-4 text-primary animate-pulse" />
               </div>
               <p className="text-sm text-muted-foreground">
-                {format(dateRange.from, "d MMM", { locale: az })} - {format(dateRange.to, "d MMM yyyy", { locale: az })}
+                {format(dateRange.from, "d MMM", { locale: dateLocale })} - {format(dateRange.to, "d MMM yyyy", { locale: dateLocale })}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <LanguageToggle />
             <ThemeToggle />
             <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
               <SelectTrigger className="w-[130px] rounded-xl border-primary/20">
@@ -365,54 +366,34 @@ const Reports = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="rounded-xl">
-                <SelectItem value="week">Həftəlik</SelectItem>
-                <SelectItem value="month">Aylıq</SelectItem>
-                <SelectItem value="quarter">Rüblük</SelectItem>
-                <SelectItem value="year">İllik</SelectItem>
+                <SelectItem value="week">{t("common.weekly")}</SelectItem>
+                <SelectItem value="month">{t("common.monthly")}</SelectItem>
+                <SelectItem value="quarter">{t("common.quarterly")}</SelectItem>
+                <SelectItem value="year">{t("common.yearly")}</SelectItem>
               </SelectContent>
             </Select>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleExportCSV}
-                className="rounded-xl border-primary/20 hover:bg-primary/10 gap-2"
-              >
+              <Button variant="outline" size="sm" onClick={handleExportCSV} className="rounded-xl border-primary/20 hover:bg-primary/10 gap-2">
                 <Download className="h-4 w-4" />
                 <span className="hidden sm:inline">CSV</span>
               </Button>
             </motion.div>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleExportExcel}
-                className="rounded-xl border-primary/20 hover:bg-primary/10 gap-2"
-              >
+              <Button variant="outline" size="sm" onClick={handleExportExcel} className="rounded-xl border-primary/20 hover:bg-primary/10 gap-2">
                 <FileSpreadsheet className="h-4 w-4" />
                 <span className="hidden sm:inline">Excel</span>
               </Button>
             </motion.div>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button 
-                variant="default" 
-                size="sm" 
-                onClick={handleExportPDF}
-                className="rounded-xl gap-2 bg-gradient-to-r from-primary to-primary/80"
-              >
+              <Button variant="default" size="sm" onClick={handleExportPDF} className="rounded-xl gap-2 bg-gradient-to-r from-primary to-primary/80">
                 <FileDown className="h-4 w-4" />
                 <span className="hidden sm:inline">PDF</span>
               </Button>
             </motion.div>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handlePrint}
-                className="rounded-xl border-primary/20 hover:bg-primary/10 gap-2"
-              >
+              <Button variant="outline" size="sm" onClick={handlePrint} className="rounded-xl border-primary/20 hover:bg-primary/10 gap-2">
                 <Printer className="h-4 w-4" />
-                <span className="hidden sm:inline">Çap</span>
+                <span className="hidden sm:inline">{t("common.print")}</span>
               </Button>
             </motion.div>
           </div>
@@ -457,102 +438,81 @@ const Reports = () => {
             ))}
           </motion.div>
 
-          {/* Tabs for different reports */}
+          {/* Tabs */}
           <motion.div variants={itemVariants}>
             <Tabs defaultValue="overview" className="space-y-4">
               <TabsList className="bg-muted/50 backdrop-blur-sm p-1 rounded-xl">
                 <TabsTrigger value="overview" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-md">
                   <BarChart3 className="h-4 w-4 mr-2" />
-                  İcmal
+                  {t("reports.overview")}
                 </TabsTrigger>
                 <TabsTrigger value="branches" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-md">
                   <Building2 className="h-4 w-4 mr-2" />
-                  Filiallar
+                  {t("reports.branches")}
                 </TabsTrigger>
                 <TabsTrigger value="departments" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-md">
                   <Users className="h-4 w-4 mr-2" />
-                  Şöbələr
+                  {t("reports.departments")}
                 </TabsTrigger>
                 <TabsTrigger value="reasons" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-md">
                   <PieChart className="h-4 w-4 mr-2" />
-                  Səbəblər
+                  {t("reports.reasons")}
                 </TabsTrigger>
               </TabsList>
 
               {/* Overview Tab */}
               <TabsContent value="overview" className="space-y-4">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  {/* Mood Distribution Card */}
                   <Card className="border-0 shadow-lg bg-card/50 backdrop-blur-sm overflow-hidden">
                     <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-500 via-amber-500 to-rose-500" />
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Activity className="h-5 w-5 text-primary" />
-                        Əhval Paylanması
+                        {t("reports.moodDistribution")}
                       </CardTitle>
-                      <CardDescription>{periodLabels[selectedPeriod]} hesabat</CardDescription>
+                      <CardDescription>{periodLabels[selectedPeriod]} {t("reports.periodReport")}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       {[
-                        { label: "Yaxşı", count: moodCounts['Yaxşı'], color: "bg-emerald-500", percentage: totalResponses > 0 ? (moodCounts['Yaxşı'] / totalResponses) * 100 : 0 },
-                        { label: "Normal", count: moodCounts['Normal'], color: "bg-amber-500", percentage: totalResponses > 0 ? (moodCounts['Normal'] / totalResponses) * 100 : 0 },
-                        { label: "Pis", count: moodCounts['Pis'], color: "bg-rose-500", percentage: totalResponses > 0 ? (moodCounts['Pis'] / totalResponses) * 100 : 0 },
+                        { label: t("reports.good"), count: moodCounts['Yaxşı'], color: "bg-emerald-500", percentage: totalResponses > 0 ? (moodCounts['Yaxşı'] / totalResponses) * 100 : 0 },
+                        { label: t("reports.normal"), count: moodCounts['Normal'], color: "bg-amber-500", percentage: totalResponses > 0 ? (moodCounts['Normal'] / totalResponses) * 100 : 0 },
+                        { label: t("reports.bad"), count: moodCounts['Pis'], color: "bg-rose-500", percentage: totalResponses > 0 ? (moodCounts['Pis'] / totalResponses) * 100 : 0 },
                       ].map((mood, index) => (
-                        <motion.div 
-                          key={mood.label}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.3 + index * 0.1 }}
-                          className="space-y-2"
-                        >
+                        <motion.div key={mood.label} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 + index * 0.1 }} className="space-y-2">
                           <div className="flex justify-between text-sm">
                             <span className="font-medium">{mood.label}</span>
                             <span className="text-muted-foreground">{mood.count} ({Math.round(mood.percentage)}%)</span>
                           </div>
                           <div className="h-2 rounded-full bg-muted overflow-hidden">
-                            <motion.div 
-                              className={`h-full rounded-full ${mood.color}`}
-                              initial={{ width: 0 }}
-                              animate={{ width: `${mood.percentage}%` }}
-                              transition={{ duration: 1, delay: 0.5 + index * 0.2 }}
-                            />
+                            <motion.div className={`h-full rounded-full ${mood.color}`} initial={{ width: 0 }} animate={{ width: `${mood.percentage}%` }} transition={{ duration: 1, delay: 0.5 + index * 0.2 }} />
                           </div>
                         </motion.div>
                       ))}
                     </CardContent>
                   </Card>
 
-                  {/* Action Summary Card */}
                   <Card className="border-0 shadow-lg bg-card/50 backdrop-blur-sm overflow-hidden">
                     <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-violet-500 to-purple-600" />
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <CheckCircle2 className="h-5 w-5 text-primary" />
-                        Tapşırıq İcmalı
+                        {t("reports.taskSummary")}
                       </CardTitle>
-                      <CardDescription>Menecer fəaliyyətləri</CardDescription>
+                      <CardDescription>{t("reports.managerActivities")}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       {[
-                        { label: "Tamamlanmış", count: completedActions, color: "bg-emerald-500" },
-                        { label: "Davam edən", count: managerActions.filter(a => a.status === 'in_progress').length, color: "bg-amber-500" },
-                        { label: "Gözləyən", count: managerActions.filter(a => a.status === 'pending').length, color: "bg-blue-500" },
-                        { label: "Ləğv edilmiş", count: managerActions.filter(a => a.status === 'cancelled').length, color: "bg-gray-500" },
+                        { label: t("reports.completed"), count: completedActions, color: "bg-emerald-500" },
+                        { label: t("reports.inProgress"), count: managerActions.filter(a => a.status === 'in_progress').length, color: "bg-amber-500" },
+                        { label: t("reports.pending"), count: managerActions.filter(a => a.status === 'pending').length, color: "bg-blue-500" },
+                        { label: t("reports.cancelled"), count: managerActions.filter(a => a.status === 'cancelled').length, color: "bg-gray-500" },
                       ].map((status, index) => (
-                        <motion.div 
-                          key={status.label}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.3 + index * 0.1 }}
-                          className="flex items-center justify-between"
-                        >
+                        <motion.div key={status.label} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 + index * 0.1 }} className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <div className={`w-3 h-3 rounded-full ${status.color}`} />
                             <span className="text-sm font-medium">{status.label}</span>
                           </div>
-                          <Badge variant="secondary" className="rounded-lg">
-                            {status.count}
-                          </Badge>
+                          <Badge variant="secondary" className="rounded-lg">{status.count}</Badge>
                         </motion.div>
                       ))}
                     </CardContent>
@@ -567,50 +527,28 @@ const Reports = () => {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Building2 className="h-5 w-5 text-primary" />
-                      Filial Statistikası
+                      {t("reports.branchStats")}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <Table>
                       <TableHeader>
                         <TableRow className="hover:bg-transparent">
-                          <TableHead>Filial</TableHead>
-                          <TableHead className="text-center">Cavablar</TableHead>
-                          <TableHead className="text-center">Məmnuniyyət</TableHead>
-                          <TableHead className="text-center">Narazılıq</TableHead>
-                          <TableHead className="text-center">Xəbərdarlıqlar</TableHead>
+                          <TableHead>{t("reports.branch")}</TableHead>
+                          <TableHead className="text-center">{t("reports.responses")}</TableHead>
+                          <TableHead className="text-center">{t("reports.satisfaction")}</TableHead>
+                          <TableHead className="text-center">{t("reports.dissatisfaction")}</TableHead>
+                          <TableHead className="text-center">{t("reports.alerts")}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {branchStats.map((stat, index) => (
-                          <motion.tr
-                            key={stat.branch}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                            className="hover:bg-muted/50"
-                          >
+                          <motion.tr key={stat.branch} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.05 }} className="hover:bg-muted/50">
                             <TableCell className="font-medium">{stat.branch}</TableCell>
                             <TableCell className="text-center">{stat.totalResponses}</TableCell>
-                            <TableCell className="text-center">
-                              <Badge className="bg-emerald-500/20 text-emerald-600 border-0">
-                                {stat.satisfactionRate}%
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="text-center">
-                              <Badge className="bg-rose-500/20 text-rose-600 border-0">
-                                {stat.dissatisfactionRate}%
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="text-center">
-                              {stat.alerts > 0 ? (
-                                <Badge className="bg-amber-500/20 text-amber-600 border-0">
-                                  {stat.alerts}
-                                </Badge>
-                              ) : (
-                                <span className="text-muted-foreground">-</span>
-                              )}
-                            </TableCell>
+                            <TableCell className="text-center"><Badge className="bg-emerald-500/20 text-emerald-600 border-0">{stat.satisfactionRate}%</Badge></TableCell>
+                            <TableCell className="text-center"><Badge className="bg-rose-500/20 text-rose-600 border-0">{stat.dissatisfactionRate}%</Badge></TableCell>
+                            <TableCell className="text-center">{stat.alerts > 0 ? <Badge className="bg-amber-500/20 text-amber-600 border-0">{stat.alerts}</Badge> : <span className="text-muted-foreground">-</span>}</TableCell>
                           </motion.tr>
                         ))}
                       </TableBody>
@@ -626,40 +564,26 @@ const Reports = () => {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Users className="h-5 w-5 text-primary" />
-                      Şöbə Statistikası
+                      {t("reports.departmentStats")}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <Table>
                       <TableHeader>
                         <TableRow className="hover:bg-transparent">
-                          <TableHead>Şöbə</TableHead>
-                          <TableHead className="text-center">Cavablar</TableHead>
-                          <TableHead className="text-center">Məmnuniyyət</TableHead>
-                          <TableHead className="text-center">Narazılıq</TableHead>
+                          <TableHead>{t("reports.department")}</TableHead>
+                          <TableHead className="text-center">{t("reports.responses")}</TableHead>
+                          <TableHead className="text-center">{t("reports.satisfaction")}</TableHead>
+                          <TableHead className="text-center">{t("reports.dissatisfaction")}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {departmentStats.map((stat, index) => (
-                          <motion.tr
-                            key={stat.department}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                            className="hover:bg-muted/50"
-                          >
+                          <motion.tr key={stat.department} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.05 }} className="hover:bg-muted/50">
                             <TableCell className="font-medium">{stat.department}</TableCell>
                             <TableCell className="text-center">{stat.totalResponses}</TableCell>
-                            <TableCell className="text-center">
-                              <Badge className="bg-emerald-500/20 text-emerald-600 border-0">
-                                {stat.satisfactionRate}%
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="text-center">
-                              <Badge className="bg-rose-500/20 text-rose-600 border-0">
-                                {stat.dissatisfactionRate}%
-                              </Badge>
-                            </TableCell>
+                            <TableCell className="text-center"><Badge className="bg-emerald-500/20 text-emerald-600 border-0">{stat.satisfactionRate}%</Badge></TableCell>
+                            <TableCell className="text-center"><Badge className="bg-rose-500/20 text-rose-600 border-0">{stat.dissatisfactionRate}%</Badge></TableCell>
                           </motion.tr>
                         ))}
                       </TableBody>
@@ -675,37 +599,26 @@ const Reports = () => {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <PieChart className="h-5 w-5 text-primary" />
-                      Ən Çox Göstərilən Səbəblər
+                      {t("reports.topReasons")}
                     </CardTitle>
-                    <CardDescription>Geri bildirim kateqoriyaları</CardDescription>
+                    <CardDescription>{t("reports.feedbackCategories")}</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {topReasons.length > 0 ? (
                       topReasons.map((reason, index) => (
-                        <motion.div 
-                          key={reason.reason}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.3 + index * 0.1 }}
-                          className="space-y-2"
-                        >
+                        <motion.div key={reason.reason} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 + index * 0.1 }} className="space-y-2">
                           <div className="flex justify-between text-sm">
                             <span className="font-medium">{reason.reason}</span>
                             <span className="text-muted-foreground">{reason.count} ({reason.percentage}%)</span>
                           </div>
                           <div className="h-2 rounded-full bg-muted overflow-hidden">
-                            <motion.div 
-                              className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500"
-                              initial={{ width: 0 }}
-                              animate={{ width: `${reason.percentage}%` }}
-                              transition={{ duration: 1, delay: 0.5 + index * 0.2 }}
-                            />
+                            <motion.div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500" initial={{ width: 0 }} animate={{ width: `${reason.percentage}%` }} transition={{ duration: 1, delay: 0.5 + index * 0.2 }} />
                           </div>
                         </motion.div>
                       ))
                     ) : (
                       <div className="text-center py-8 text-muted-foreground">
-                        Bu dövr üçün səbəb məlumatı yoxdur
+                        {t("reports.noReasonsData")}
                       </div>
                     )}
                   </CardContent>
