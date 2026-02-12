@@ -18,6 +18,7 @@ import SuggestionsManagement from "./pages/SuggestionsManagement";
 import Targets from "./pages/Targets";
 import Analytics from "./pages/Analytics";
 import Install from "./pages/Install";
+import ExportSpec from "./pages/ExportSpec";
 
 const queryClient = new QueryClient();
 
@@ -77,6 +78,7 @@ const App = () => (
               <Analytics />
             </ProtectedRoute>
           } />
+          <Route path="/export-spec" element={<ExportSpec />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
