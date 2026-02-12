@@ -9,6 +9,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import obaLogo from "@/assets/oba-logo.jpg";
+import { useLanguage } from "@/hooks/useLanguage";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
 type StepType = "branch" | "mood" | "reason" | "success";
 
@@ -24,7 +26,7 @@ const branchNames: Record<string, string> = {
   'quba': 'Quba',
 };
 
-// Generate employee code (in real app, this would come from user session/profile)
+// Generate employee code
 const generateEmployeeCode = (): string => {
   return `EMP${String(Math.floor(Math.random() * 9000) + 1000)}`;
 };
@@ -35,6 +37,7 @@ const Index = () => {
   const [selectedMood, setSelectedMood] = useState<MoodType>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const handleBranchSelect = (branch: BranchType) => {
     setSelectedBranch(branch);
@@ -45,10 +48,8 @@ const Index = () => {
     setSelectedMood(mood);
     
     if (mood === "bad") {
-      // If bad mood, ask for reason
       setTimeout(() => setCurrentStep("reason"), 300);
     } else {
-      // If good or normal, go directly to success
       setTimeout(() => handleSubmit(mood), 300);
     }
   };
@@ -66,14 +67,12 @@ const Index = () => {
       const employeeCode = generateEmployeeCode();
       const branchName = branchNames[selectedBranch] || selectedBranch;
       
-      // Map mood to Azerbaijani
       const moodMap: Record<string, string> = {
         good: "Yaxşı",
         normal: "Normal",
         bad: "Pis"
       };
       
-      // Map reason category to Azerbaijani
       const reasonMap: Record<string, string> = {
         workload: "İş yükü",
         schedule: "Qrafik",
@@ -82,13 +81,12 @@ const Index = () => {
         other: "Digər"
       };
 
-      // 1. Save employee response to database
       const { error: responseError } = await supabase
         .from("employee_responses")
         .insert({
           employee_code: employeeCode,
           branch: selectedBranch,
-          department: branchName, // Filialda şöbə yoxdur, bölgə adı istifadə olunur
+          department: branchName,
           mood: moodMap[mood] || mood,
           reason: customText || null,
           reason_category: reason ? (reasonMap[reason] || reason) : null,
@@ -99,16 +97,15 @@ const Index = () => {
         throw responseError;
       }
 
-      // 2. If bad mood, create a burnout alert
       if (mood === "bad" && reason) {
-        const riskScore = 70 + Math.floor(Math.random() * 25); // 70-95 risk score for bad mood
+        const riskScore = 70 + Math.floor(Math.random() * 25);
         
         const { error: alertError } = await supabase
           .from("burnout_alerts")
           .insert({
             employee_code: employeeCode,
             branch: selectedBranch,
-            department: branchName, // Filialda şöbə yoxdur, bölgə adı istifadə olunur
+            department: branchName,
             reason_category: reasonMap[reason] || reason,
             risk_score: riskScore,
             is_resolved: false,
@@ -116,25 +113,12 @@ const Index = () => {
 
         if (alertError) {
           console.error("Error creating burnout alert:", alertError);
-          // Don't throw - the main response was saved successfully
         }
       }
 
-      console.log("Submitted successfully:", { 
-        mood, 
-        reason, 
-        customText, 
-        branch: selectedBranch, 
-        branchName,
-        employeeCode,
-        timestamp: new Date()
-      });
-      
-      // Show success screen
       setCurrentStep("success");
     } catch (error) {
       console.error("Failed to submit:", error);
-      // Still show success for UX (silent failure as per memory)
       setCurrentStep("success");
     } finally {
       setIsSubmitting(false);
@@ -142,7 +126,6 @@ const Index = () => {
   };
 
   const handleComplete = () => {
-    // Reset for next day
     setCurrentStep("branch");
     setSelectedBranch(null);
     setSelectedMood(null);
@@ -164,59 +147,35 @@ const Index = () => {
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-background via-background to-muted/30">
       {/* Animated Background Elements */}
       <div className="fixed inset-0 -z-10 overflow-hidden">
-        {/* Gradient Orbs */}
         <motion.div 
-          animate={{ 
-            x: [0, 30, 0],
-            y: [0, -20, 0],
-          }}
+          animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
           className="absolute top-20 left-1/4 w-[500px] h-[500px] bg-gradient-to-br from-primary/20 via-primary/10 to-transparent rounded-full blur-3xl" 
         />
         <motion.div 
-          animate={{ 
-            x: [0, -20, 0],
-            y: [0, 30, 0],
-          }}
+          animate={{ x: [0, -20, 0], y: [0, 30, 0] }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
           className="absolute bottom-20 right-1/4 w-[600px] h-[600px] bg-gradient-to-tl from-purple-500/15 via-blue-500/10 to-transparent rounded-full blur-3xl" 
         />
         <motion.div 
-          animate={{ 
-            scale: [1, 1.1, 1],
-            opacity: [0.1, 0.2, 0.1],
-          }}
+          animate={{ scale: [1, 1.1, 1], opacity: [0.1, 0.2, 0.1] }}
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-emerald-500/10 via-transparent to-cyan-500/10 rounded-full blur-3xl" 
         />
         
-        {/* Floating Stars */}
         {[...Array(6)].map((_, i) => (
           <motion.div
             key={i}
             initial={{ opacity: 0, scale: 0 }}
-            animate={{ 
-              opacity: [0.3, 0.7, 0.3],
-              scale: [0.8, 1, 0.8],
-              y: [0, -20, 0],
-            }}
-            transition={{ 
-              duration: 3 + i,
-              repeat: Infinity,
-              delay: i * 0.5,
-              ease: "easeInOut"
-            }}
+            animate={{ opacity: [0.3, 0.7, 0.3], scale: [0.8, 1, 0.8], y: [0, -20, 0] }}
+            transition={{ duration: 3 + i, repeat: Infinity, delay: i * 0.5, ease: "easeInOut" }}
             className="absolute"
-            style={{
-              left: `${15 + i * 15}%`,
-              top: `${20 + (i % 3) * 25}%`,
-            }}
+            style={{ left: `${15 + i * 15}%`, top: `${20 + (i % 3) * 25}%` }}
           >
             <Star className="w-4 h-4 text-primary/40 fill-primary/20" />
           </motion.div>
         ))}
 
-        {/* Grid Pattern */}
         <div className="absolute inset-0 opacity-[0.02]" style={{
           backgroundImage: "linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)",
           backgroundSize: "60px 60px"
@@ -233,63 +192,42 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <motion.div 
-                whileHover={{ scale: 1.05, rotate: 2 }}
-                className="relative group"
-              >
+              <motion.div whileHover={{ scale: 1.05, rotate: 2 }} className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-primary/40 to-purple-500/40 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-lg" />
-                <img 
-                  src={obaLogo} 
-                  alt="OBA Logo" 
-                  className="relative w-14 h-14 rounded-2xl shadow-xl object-cover ring-2 ring-border/50 transition-all duration-300"
-                />
+                <img src={obaLogo} alt="OBA Logo" className="relative w-14 h-14 rounded-2xl shadow-xl object-cover ring-2 ring-border/50 transition-all duration-300" />
               </motion.div>
               <div>
                 <h1 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-                  OBA Əhval Sistemi
+                  {t("index.title")}
                 </h1>
                 <p className="text-sm text-muted-foreground flex items-center gap-2">
                   <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                   </span>
-                  Gündəlik check-in
+                  {t("index.dailyCheckIn")}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <LanguageToggle />
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate("/install")}
-                  className="gap-2 rounded-xl hover:bg-emerald-500/10"
-                >
+                <Button variant="ghost" size="sm" onClick={() => navigate("/install")} className="gap-2 rounded-xl hover:bg-emerald-500/10">
                   <Download className="w-4 h-4" />
-                  <span className="hidden sm:inline">Quraşdır</span>
+                  <span className="hidden sm:inline">{t("index.installApp")}</span>
                 </Button>
               </motion.div>
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate("/suggestion-box")}
-                  className="gap-2 rounded-xl hover:bg-violet-500/10"
-                >
+                <Button variant="ghost" size="sm" onClick={() => navigate("/suggestion-box")} className="gap-2 rounded-xl hover:bg-violet-500/10">
                   <Sparkles className="w-4 h-4" />
-                  <span className="hidden sm:inline">Təklif</span>
+                  <span className="hidden sm:inline">{t("index.suggestion")}</span>
                 </Button>
               </motion.div>
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate("/dashboard")}
-                  className="gap-2 rounded-xl border-border/50 bg-card/50 backdrop-blur-sm hover:bg-primary/10 hover:border-primary/50 transition-all duration-300 shadow-lg shadow-black/5"
-                >
+                <Button variant="outline" size="sm" onClick={() => navigate("/dashboard")} className="gap-2 rounded-xl border-border/50 bg-card/50 backdrop-blur-sm hover:bg-primary/10 hover:border-primary/50 transition-all duration-300 shadow-lg shadow-black/5">
                   <TrendingUp className="w-4 h-4" />
-                  <span className="hidden sm:inline">İdarəetmə Paneli</span>
+                  <span className="hidden sm:inline">{t("index.dashboardBtn")}</span>
                 </Button>
               </motion.div>
             </div>
@@ -302,14 +240,10 @@ const Index = () => {
             <div className="flex items-center gap-2 max-w-md mx-auto">
               {["branch", "mood", "reason"].map((step, i) => (
                 <div key={step} className="flex-1 relative">
-                  <motion.div 
-                    className="h-1.5 rounded-full bg-muted overflow-hidden"
-                  >
+                  <motion.div className="h-1.5 rounded-full bg-muted overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
-                      animate={{ 
-                        width: i < stepIndex ? "100%" : i === stepIndex ? "50%" : "0%" 
-                      }}
+                      animate={{ width: i < stepIndex ? "100%" : i === stepIndex ? "50%" : "0%" }}
                       transition={{ duration: 0.5, ease: "easeOut" }}
                       className="h-full bg-gradient-to-r from-primary to-primary/80 rounded-full"
                     />
@@ -321,9 +255,9 @@ const Index = () => {
               ))}
             </div>
             <div className="flex justify-between max-w-md mx-auto mt-2 px-1">
-              <span className={`text-xs font-medium transition-colors ${stepIndex >= 0 ? "text-primary" : "text-muted-foreground"}`}>Bölgə</span>
-              <span className={`text-xs font-medium transition-colors ${stepIndex >= 1 ? "text-primary" : "text-muted-foreground"}`}>Əhval</span>
-              <span className={`text-xs font-medium transition-colors ${stepIndex >= 2 ? "text-primary" : "text-muted-foreground"}`}>Səbəb</span>
+              <span className={`text-xs font-medium transition-colors ${stepIndex >= 0 ? "text-primary" : "text-muted-foreground"}`}>{t("index.region")}</span>
+              <span className={`text-xs font-medium transition-colors ${stepIndex >= 1 ? "text-primary" : "text-muted-foreground"}`}>{t("index.mood")}</span>
+              <span className={`text-xs font-medium transition-colors ${stepIndex >= 2 ? "text-primary" : "text-muted-foreground"}`}>{t("index.reason")}</span>
             </div>
           </div>
         )}
@@ -333,112 +267,52 @@ const Index = () => {
       <main className="container mx-auto px-4 py-8 md:py-12 flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
         <AnimatePresence mode="wait">
           {currentStep === "branch" && (
-            <motion.div
-              key="branch"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <BranchSelector
-                onBranchSelect={handleBranchSelect}
-                selectedBranch={selectedBranch}
-              />
+            <motion.div key="branch" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}>
+              <BranchSelector onBranchSelect={handleBranchSelect} selectedBranch={selectedBranch} />
             </motion.div>
           )}
 
           {currentStep === "mood" && (
-            <motion.div
-              key="mood"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              transition={{ duration: 0.3 }}
-              className="w-full max-w-4xl space-y-10"
-            >
+            <motion.div key="mood" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }} className="w-full max-w-4xl space-y-10">
               <div className="text-center space-y-4">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 200, delay: 0.1 }}
-                  className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-gradient-to-br from-primary/20 via-purple-500/15 to-primary/10 backdrop-blur-sm border border-primary/20 shadow-xl shadow-primary/10"
-                >
-                  <motion.span 
-                    animate={{ rotate: [0, -10, 10, 0] }}
-                    transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-                    className="text-6xl"
-                  >
-                    👋
-                  </motion.span>
+                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200, delay: 0.1 }} className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-gradient-to-br from-primary/20 via-purple-500/15 to-primary/10 backdrop-blur-sm border border-primary/20 shadow-xl shadow-primary/10">
+                  <motion.span animate={{ rotate: [0, -10, 10, 0] }} transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }} className="text-6xl">👋</motion.span>
                 </motion.div>
-                <motion.h2 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent"
-                >
-                  Bu gün necəsən?
+                <motion.h2 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent">
+                  {t("index.howAreYou")}
                 </motion.h2>
-                <motion.p 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto"
-                >
-                  Hisslərini bizimlə paylaş. Cavabın tamamilə{" "}
+                <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+                  {t("index.shareFeelingsAnonymous")}{" "}
                   <span className="inline-flex items-center gap-1 text-primary font-semibold">
                     <Sparkles className="w-4 h-4" />
-                    anonim
+                    {t("index.anonymous")}
                   </span>{" "}
-                  və konfidensiyaldır.
+                  {t("index.andConfidential")}
                 </motion.p>
               </div>
 
-              <MoodSelector
-                onMoodSelect={handleMoodSelect}
-                selectedMood={selectedMood}
-              />
+              <MoodSelector onMoodSelect={handleMoodSelect} selectedMood={selectedMood} />
 
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className="text-center"
-              >
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="text-center">
                 <span className="inline-flex items-center gap-2 bg-gradient-to-r from-card/80 to-card/60 backdrop-blur-sm rounded-full px-5 py-2.5 border border-border/50 shadow-lg text-sm text-muted-foreground">
                   <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                   </span>
-                  Hər gün bir dəfə doldurulur
+                  {t("index.filledOnceDaily")}
                 </span>
               </motion.div>
             </motion.div>
           )}
 
           {currentStep === "reason" && (
-            <motion.div
-              key="reason"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <ReasonSelector
-                onReasonSelect={handleReasonSelect}
-                onBack={handleBack}
-              />
+            <motion.div key="reason" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}>
+              <ReasonSelector onReasonSelect={handleReasonSelect} onBack={handleBack} />
             </motion.div>
           )}
 
           {currentStep === "success" && (
-            <motion.div
-              key="success"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.3 }}
-            >
+            <motion.div key="success" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ duration: 0.3 }}>
               <SuccessScreen onComplete={handleComplete} />
             </motion.div>
           )}
@@ -453,9 +327,9 @@ const Index = () => {
         className="py-6 text-center text-sm text-muted-foreground border-t border-border/30 bg-gradient-to-t from-card/50 to-transparent backdrop-blur-sm"
       >
         <p className="flex items-center justify-center gap-2">
-          © 2025 Personal Məmnuniyyət Sistemi
+          {t("index.footer")}
           <span className="text-primary">•</span>
-          Bütün hüquqlar qorunur
+          {t("index.allRightsReserved")}
         </p>
       </motion.footer>
     </div>
