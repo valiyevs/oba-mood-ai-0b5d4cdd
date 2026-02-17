@@ -435,8 +435,8 @@ const Landing = () => {
               <button onClick={() => navigate("/auth")} className="hover:text-primary transition-colors">
                 Giriş
               </button>
-              <button onClick={() => navigate("/export-spec")} className="hover:text-primary transition-colors">
-                Sənədlər
+              <button onClick={() => navigate("/auth")} className="hover:text-primary transition-colors">
+                Giriş
               </button>
             </div>
           </div>
