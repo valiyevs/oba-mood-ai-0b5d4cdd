@@ -45,7 +45,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 /* ─── Pain Point Statistics ─── */
 const painStats = [
@@ -195,6 +195,55 @@ const sectors = [
     emoji: "📡",
   },
 ];
+
+/* ─── Counter Animation Component ─── */
+const CounterItem = ({ end, suffix, label, delay }: { end: number; suffix: string; label: string; delay: number }) => {
+  const [count, setCount] = useState(0);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated) {
+          setHasAnimated(true);
+          const duration = 1500;
+          const steps = 40;
+          const increment = end / steps;
+          let current = 0;
+          const timer = setInterval(() => {
+            current += increment;
+            if (current >= end) {
+              setCount(end);
+              clearInterval(timer);
+            } else {
+              setCount(Math.floor(current));
+            }
+          }, duration / steps);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [end, hasAnimated]);
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay }}
+      className="space-y-1"
+    >
+      <div className="text-3xl md:text-4xl font-extrabold text-primary">
+        {count}{suffix}
+      </div>
+      <p className="text-sm text-muted-foreground">{label}</p>
+    </motion.div>
+  );
+};
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -423,6 +472,22 @@ const Landing = () => {
             </motion.div>
           </div>
         </motion.div>
+      </section>
+
+      {/* ═══ Counter / Social Proof Bar ═══ */}
+      <section className="py-12 md:py-16 border-y border-border/40 bg-primary/[0.03]">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto text-center">
+            {[
+              { end: 50, suffix: "+", label: "Şirkət istifadə edir" },
+              { end: 340, suffix: "+", label: "Aktiv istifadəçi" },
+              { end: 12, suffix: "", label: "Sektor əhatə olunub" },
+              { end: 98, suffix: "%", label: "Müştəri məmnuniyyəti" },
+            ].map((item, i) => (
+              <CounterItem key={item.label} end={item.end} suffix={item.suffix} label={item.label} delay={i * 0.15} />
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* ═══ Pain Point Statistics ═══ */}
