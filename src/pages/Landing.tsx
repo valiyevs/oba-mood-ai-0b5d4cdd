@@ -52,7 +52,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useCmsMenus } from "@/hooks/useCmsMenus";
-import { useRef, useState, useEffect, useMemo } from "react";
+import { useRef, useState, useEffect } from "react";
 
 /* ─── Pain Point Statistics ─── */
 const painStats = [
@@ -263,14 +263,7 @@ const Landing = () => {
   const heroOpacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 100]);
 
-  // CMS Data
-  const { data: cmsContent = [] } = useQuery({
-    queryKey: ["cms_content_landing"],
-    queryFn: async () => {
-      const { data } = await supabase.from("cms_content").select("*").eq("is_active", true).order("sort_order");
-      return data || [];
-    },
-  });
+  // CMS Data (FAQs & Partners loaded directly, content via t() from useLanguage)
   const { data: cmsFaqs = [] } = useQuery({
     queryKey: ["cms_faqs_landing"],
     queryFn: async () => {
@@ -286,11 +279,7 @@ const Landing = () => {
     },
   });
 
-  const cms = useMemo(() => {
-    const map: Record<string, string> = {};
-    cmsContent.forEach((c: any) => { map[c.content_key] = c.content_value; });
-    return map;
-  }, [cmsContent]);
+  // cms helper removed — use t() from useLanguage which handles translations
 
   const fadeUp = {
     hidden: { opacity: 0, y: 30 },
@@ -390,7 +379,7 @@ const Landing = () => {
               <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}>
                 <Badge variant="outline" className="text-sm px-4 py-1.5 rounded-full border-destructive/30 text-destructive font-medium">
                   <AlertTriangle className="w-3.5 h-3.5 mr-1.5" />
-                  {cms.hero_badge || 'Görünməyən satış itkisi — hər gün baş verir'}
+                  {t('hero_badge', 'Görünməyən satış itkisi — hər gün baş verir')}
                 </Badge>
               </motion.div>
 
@@ -400,11 +389,7 @@ const Landing = () => {
                 transition={{ duration: 0.7 }}
                 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight"
               >
-                {cms.hero_title ? cms.hero_title : (<>İşçi əhvalını{" "}
-                <span className="bg-gradient-to-r from-secondary to-secondary/70 bg-clip-text text-transparent">
-                  biznesin qazancına
-                </span>{" "}
-                çevirin.</>)}
+                 {t('hero_title', 'İşçi əhvalını biznesin qazancına çevirin.')}
               </motion.h1>
 
               <motion.p
@@ -413,9 +398,7 @@ const Landing = () => {
                 transition={{ delay: 0.3 }}
                 className="text-lg text-muted-foreground max-w-lg leading-relaxed"
               >
-                {cms.hero_subtitle || (<>Satışı ölçürsünüz. Bəs satışı{" "}
-                <strong className="text-foreground">yaradan insanın əhvalını?</strong>{" "}
-                Ölçülməyən emosiya idarə oluna bilməz.</>)}
+                 {t('hero_subtitle', 'Satışı ölçürsünüz. Bəs satışı yaradan insanın əhvalını? Ölçülməyən emosiya idarə oluna bilməz.')}
               </motion.p>
 
               <motion.div
@@ -521,10 +504,10 @@ const Landing = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto text-center">
             {[
-              { end: parseInt(cms.stat_companies || "50"), suffix: "+", label: cms.stat_companies_label || "Şirkət istifadə edir" },
-              { end: parseInt(cms.stat_users || "340"), suffix: "+", label: cms.stat_users_label || "Aktiv istifadəçi" },
-              { end: parseInt(cms.stat_branches || "120"), suffix: "+", label: cms.stat_branches_label || "Filial" },
-              { end: parseInt(cms.stat_satisfaction || "98"), suffix: "%", label: cms.stat_satisfaction_label || "Məmnuniyyət" },
+              { end: parseInt(t('stat_companies', '50')), suffix: "+", label: t('stat_companies_label', 'Şirkət istifadə edir') },
+              { end: parseInt(t('stat_users', '340')), suffix: "+", label: t('stat_users_label', 'Aktiv istifadəçi') },
+              { end: parseInt(t('stat_branches', '120')), suffix: "+", label: t('stat_branches_label', 'Filial') },
+              { end: parseInt(t('stat_satisfaction', '98')), suffix: "%", label: t('stat_satisfaction_label', 'Məmnuniyyət') },
             ].map((item, i) => (
               <CounterItem key={item.label} end={item.end} suffix={item.suffix} label={item.label} delay={i * 0.15} />
             ))}
@@ -992,8 +975,8 @@ const Landing = () => {
                   transition={{ delay: i * 0.05 }}
                 >
                   <AccordionItem value={faq.id} className="border border-border/50 rounded-xl px-5 bg-card/50 backdrop-blur-sm">
-                    <AccordionTrigger className="text-left font-medium hover:no-underline py-4">{faq.question}</AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground pb-4">{faq.answer}</AccordionContent>
+                     <AccordionTrigger className="text-left font-medium hover:no-underline py-4">{locale !== 'az' ? (tField('cms_faqs', faq.id, 'question', faq.question) || faq.question) : faq.question}</AccordionTrigger>
+                     <AccordionContent className="text-muted-foreground pb-4">{locale !== 'az' ? (tField('cms_faqs', faq.id, 'answer', faq.answer) || faq.answer) : faq.answer}</AccordionContent>
                   </AccordionItem>
                 </motion.div>
               ))}
