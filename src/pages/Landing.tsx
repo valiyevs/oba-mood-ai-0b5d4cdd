@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import {
   Shield,
   Bell,
   TrendingUp,
+  TrendingDown,
   Users,
   Zap,
   ArrowRight,
@@ -23,83 +24,126 @@ import {
   Check,
   Activity,
   Lock,
+  AlertTriangle,
+  XCircle,
+  Clock,
+  Eye,
+  Gauge,
+  HeartCrack,
+  ShieldAlert,
+  LineChart,
+  Layers,
+  MousePointerClick,
 } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useRef } from "react";
 
-const features = [
+/* ─── Pain Point Statistics ─── */
+const painStats = [
+  {
+    value: "65%",
+    label: "İtirilmiş müştəri",
+    detail: "Müştərilərin 65%-i əməkdaşın mənfi münasibətinə görə rəqibə keçir",
+    source: "Oxford Global Resources 2024",
+    icon: HeartCrack,
+    color: "text-destructive",
+  },
+  {
+    value: "79%",
+    label: "Risk zonasında",
+    detail: "Retail işçilərinin yalnız 21%-i işinə həvəslə yanaşır. Qalan 79% — gizli itki riski",
+    source: "Gallup 2024",
+    icon: ShieldAlert,
+    color: "text-destructive",
+  },
+  {
+    value: "+3%",
+    label: "Gizli qazanc",
+    detail: "Əməkdaş loyallığı yüksək olan nöqtələr digərlərindən 3% daha çox satış edir",
+    source: "McKinsey",
+    icon: TrendingUp,
+    color: "text-primary",
+  },
+  {
+    value: "5%",
+    label: "Stress dalğası",
+    detail: "Cəmi 5% stressli işçi, gün ərzində on minlərlə mənfi müştəri təması yaradır",
+    source: "Daxili araşdırma",
+    icon: AlertTriangle,
+    color: "text-secondary",
+  },
+];
+
+/* ─── Solution Features ─── */
+const solutionFeatures = [
+  {
+    icon: MousePointerClick,
+    title: "3 Saniyəlik Mikro-Sorğu",
+    description: "Əməkdaşın gününün cəmi 3 saniyəsini alır. Bir kliklə anonim əhval bildirişi.",
+    gradient: "from-primary to-primary-glow",
+  },
+  {
+    icon: Gauge,
+    title: "Real-Time Mood Index",
+    description: "0–100 arası hesablanan Əhval İndeksi kritik həddə düşdükdə menecerə dərhal alert göndərilir.",
+    gradient: "from-amber-500 to-orange-500",
+  },
   {
     icon: Brain,
-    title: "AI ilə Dərin Analiz",
-    description: "Süni intellekt əhval datalarını real vaxtda analiz edib hərəkətə keçməyə imkan verən tövsiyələr yaradır.",
-    color: "from-violet-500 to-purple-600",
+    title: "AI Root Cause Analysis",
+    description: "Süni intellekt stressin, yorğunluğun və konfliktlərin kök səbəblərini trend analizləri ilə müəyyən edir.",
+    gradient: "from-violet-500 to-purple-600",
   },
   {
-    icon: BarChart3,
-    title: "İnteraktiv Dashboard",
-    description: "Məmnuniyyət indeksi, əhval bölgüsü, trend analizi və filial müqayisəsi bir baxışda.",
-    color: "from-primary to-emerald-600",
+    icon: LineChart,
+    title: "Satışla İnteqrasiya",
+    description: "Əhval göstəricilərinin satış datası ilə çarpaz analizi — əhvalın satışa real təsirini görün.",
+    gradient: "from-blue-500 to-cyan-500",
   },
   {
-    icon: Shield,
-    title: "Tam Anonimlik",
-    description: "İşçilərin şəxsi məlumatları saxlanmır. Cavablar 100% anonim və konfidensiyaldır.",
-    color: "from-blue-500 to-cyan-500",
+    icon: Eye,
+    title: "Emosional Dashboard",
+    description: "Regionlar, filiallar və növbələr üzrə Emosional Xəritə və Burnout Risk Skoru vizuallaşdırılır.",
+    gradient: "from-rose-500 to-pink-600",
   },
   {
     icon: Bell,
-    title: "Anlıq Xəbərdarlıqlar",
-    description: "Tükənmişlik riski aşkarlandıqda menecerlərə dərhal push bildiriş göndərilir.",
-    color: "from-amber-500 to-orange-500",
-  },
-  {
-    icon: TrendingUp,
-    title: "Proqnozlaşdırma",
-    description: "1C/SAP datalarına əsasən gələcək risk proqnozu və satış korrelyasiyası.",
-    color: "from-rose-500 to-pink-600",
-  },
-  {
-    icon: Target,
-    title: "Hədəf İdarəetmə",
-    description: "Filial və şöbə üzrə məmnuniyyət hədəfləri təyin edin, progress real vaxtda izlənsin.",
-    color: "from-teal-500 to-green-500",
+    title: "Proaktiv Tövsiyələr",
+    description: "AI tərəfindən idarəetmə heyəti üçün hazırlanan stressi azaltma və motivasiyanı artırma strategiyaları.",
+    gradient: "from-teal-500 to-green-500",
   },
 ];
 
-const stats = [
-  { value: "9", label: "Filial əhatəsi", suffix: "+" },
-  { value: "500", label: "Aktiv işçi", suffix: "+" },
-  { value: "100", label: "Anonimlik", suffix: "%" },
-  { value: "3x", label: "Sürətli müdaxilə", suffix: "" },
-];
-
+/* ─── How it works ─── */
 const steps = [
   {
     step: "01",
-    title: "İşçi sorğu doldurur",
-    description: "Hər gün 30 saniyəlik anonim sorğu — 'Bu gün özünüzü necə hiss edirsiniz?'",
+    title: "Əməkdaş əhval bildirir",
+    description: "Gündə 1 dəfə, bir kliklə — sadə, intuitiv, tam anonim. Psixoloji təhlükəsizlik qorunur.",
     icon: MessageSquare,
   },
   {
     step: "02",
     title: "AI datanı analiz edir",
-    description: "Süni intellekt tendensiyaları, risk amillərini və hərəkət planlarını müəyyənləşdirir.",
+    description: "Süni intellekt tendensiyaları, kök səbəbləri və risk faktorlarını real vaxtda müəyyənləşdirir.",
     icon: Brain,
   },
   {
     step: "03",
-    title: "Menecer hərəkətə keçir",
-    description: "AI tövsiyələrinə əsasən vaxtında müdaxilə — tükənmişlik baş verməzdən əvvəl.",
+    title: "Rəhbərlik hərəkətə keçir",
+    description: "Müştəri itkisi baş vermədən ÖNCƏ riskli filiallar və kritik zaman dilimləri müəyyən edilir.",
     icon: Zap,
   },
 ];
 
+/* ─── Pricing ─── */
 const pricingPlans = [
   {
     name: "Basic",
     price: "20",
     period: "ay / filial",
-    description: "Kiçik komandalar üçün əsas əhval izləmə funksiyaları",
+    description: "Kiçik komandalar üçün əsas əhval izləmə",
     icon: Star,
     popular: false,
     features: [
@@ -120,7 +164,7 @@ const pricingPlans = [
     name: "Premium",
     price: "35",
     period: "ay / filial",
-    description: "AI proqnozları və ətraflı analitika ilə gücləndirilmiş paket",
+    description: "AI proqnozları və ətraflı analitika ilə gücləndirilmiş",
     icon: Crown,
     popular: true,
     features: [
@@ -133,15 +177,13 @@ const pricingPlans = [
       "Excel və PDF export",
       "Prioritet dəstək",
     ],
-    notIncluded: [
-      "1C/SAP inteqrasiya",
-    ],
+    notIncluded: ["1C/SAP inteqrasiya"],
   },
   {
     name: "Enterprise",
     price: "50",
     period: "ay / filial",
-    description: "Tam funksional platforma — satış korrelyasiyası və dərin analiz",
+    description: "Tam funksional — satış korrelyasiyası və dərin analiz",
     icon: Building2,
     popular: false,
     features: [
@@ -158,13 +200,30 @@ const pricingPlans = [
   },
 ];
 
+/* ─── Result metrics ─── */
+const resultMetrics = [
+  { value: "60%", label: "Tükənmişlik risklərinin əvvəlcədən aşkarlanması" },
+  { value: "35%", label: "İşçi dönüşümünün (turnover) azalması" },
+  { value: "25%", label: "Müştəri məmnuniyyətinin artması" },
+  { value: "3x", label: "Menecer müdaxilə sürətinin artması" },
+];
+
 const Landing = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const heroOpacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, 100]);
+
+  const fadeUp = {
+    hidden: { opacity: 0, y: 30 },
+    visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.5 } }),
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
-      {/* Navigation */}
+      {/* ═══ Navigation ═══ */}
       <motion.nav
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -178,72 +237,92 @@ const Landing = () => {
             <span className="text-lg font-bold">MoodAI</span>
           </div>
           <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
-            <a href="#features" className="hover:text-foreground transition-colors">İmkanlar</a>
+            <a href="#problem" className="hover:text-foreground transition-colors">Problem</a>
+            <a href="#solution" className="hover:text-foreground transition-colors">Həll</a>
             <a href="#how-it-works" className="hover:text-foreground transition-colors">Necə işləyir</a>
             <a href="#pricing" className="hover:text-foreground transition-colors">Qiymətlər</a>
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate("/survey")}
-              className="hidden sm:inline-flex"
-            >
-              Sorğu
+            <Button variant="ghost" size="sm" onClick={() => navigate("/survey")} className="hidden sm:inline-flex">
+              Demo
             </Button>
-            <Button
-              size="sm"
-              onClick={() => navigate("/auth")}
-              className="gap-1"
-            >
-              Giriş
-              <ArrowRight className="w-3.5 h-3.5" />
+            <Button size="sm" onClick={() => navigate("/auth")} className="gap-1">
+              Giriş <ArrowRight className="w-3.5 h-3.5" />
             </Button>
           </div>
         </div>
       </motion.nav>
 
-      {/* Hero Section */}
-      <section className="relative py-24 md:py-36 overflow-hidden">
+      {/* ═══ Hero — Problem-Centric ═══ */}
+      <section ref={heroRef} className="relative py-24 md:py-40 overflow-hidden">
         <div className="absolute inset-0 -z-10">
-          <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-primary/8 rounded-full blur-[140px]" />
-          <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-secondary/8 rounded-full blur-[140px]" />
+          <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-destructive/5 rounded-full blur-[140px]" />
+          <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-primary/8 rounded-full blur-[140px]" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/3 rounded-full blur-[200px]" />
         </div>
 
-        <div className="container mx-auto px-4 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="max-w-5xl mx-auto space-y-8"
-          >
+        <motion.div style={{ opacity: heroOpacity, y: heroY }} className="container mx-auto px-4 text-center">
+          <div className="max-w-5xl mx-auto space-y-8">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1 }}
-              className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-5 py-2 text-sm text-primary font-medium"
+              className="inline-flex items-center gap-2 rounded-full border border-destructive/30 bg-destructive/5 px-5 py-2 text-sm font-medium text-destructive"
             >
-              <Sparkles className="w-4 h-4" />
-              AI ilə gücləndirilmiş HR analitika platforması
+              <AlertTriangle className="w-4 h-4" />
+              Görünməyən satış itkisi — hər gün baş verir
             </motion.div>
 
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold leading-[1.05] tracking-tight">
-              İşçi əhvalını{" "}
-              <span className="bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent">
-                real vaxtda
-              </span>
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7 }}
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.08] tracking-tight"
+            >
+              Müştərilərinizin{" "}
+              <span className="bg-gradient-to-r from-destructive to-destructive/70 bg-clip-text text-transparent">
+                65%-ni
+              </span>{" "}
+              itirirsiniz.
               <br />
-              izləyin, analiz edin
-            </h1>
+              <span className="text-muted-foreground text-[0.7em]">
+                Qiymətə görə deyil.{" "}
+                <span className="bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent font-extrabold">
+                  Emosiyaya
+                </span>{" "}
+                görə.
+              </span>
+            </motion.h1>
 
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Tükənmişlik baş verməzdən <strong className="text-foreground">əvvəl</strong> müdaxilə edin. 
-              Süni intellekt analitikası ilə komandanızın məmnuniyyətini <strong className="text-foreground">ölçün və artırın</strong>.
-            </p>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed"
+            >
+              Şirkətlər satış rəqəmlərini ölçürlər — <strong className="text-foreground">nəticəni</strong>.
+              Lakin bu nəticəni doğuran əsas amili — kassanın, bank masasının arxasındakı{" "}
+              <strong className="text-foreground">insanın emosional vəziyyətini</strong> — ölçmürlər.
+            </motion.p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="inline-block rounded-2xl border border-primary/20 bg-primary/5 px-8 py-4"
+            >
+              <p className="text-xl md:text-2xl font-bold text-primary">
+                Ölçülməyən emosiya idarə oluna bilməz.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center pt-4"
+            >
               <Button
                 size="lg"
                 onClick={() => navigate("/auth")}
@@ -261,69 +340,136 @@ const Landing = () => {
                 Canlı demo
                 <ChevronRight className="w-5 h-5" />
               </Button>
-            </div>
+            </motion.div>
 
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
+              transition={{ delay: 0.6 }}
               className="text-sm text-muted-foreground flex items-center justify-center gap-2"
             >
               <Lock className="w-3.5 h-3.5" />
               Kredit kartı tələb olunmur · 14 gün pulsuz sınaq
             </motion.p>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       </section>
 
-      {/* Trusted by / Stats */}
-      <section className="py-16 border-y border-border/40 bg-muted/20">
+      {/* ═══ Pain Point Statistics ═══ */}
+      <section id="problem" className="py-20 md:py-28 bg-muted/20 border-y border-border/40">
         <div className="container mx-auto px-4">
-          <p className="text-center text-sm text-muted-foreground mb-10 uppercase tracking-widest font-medium">
-            Platformanın göstəriciləri
-          </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
-            {stats.map((stat, i) => (
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="text-center mb-16 space-y-4"
+          >
+            <motion.div variants={fadeUp} custom={0}>
+              <Badge variant="outline" className="text-sm px-4 py-1.5 rounded-full border-destructive/30 text-destructive">
+                <XCircle className="w-3.5 h-3.5 mr-1.5" /> Problem
+              </Badge>
+            </motion.div>
+            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-bold">
+              Rəqəmlərin arxasındakı{" "}
+              <span className="bg-gradient-to-r from-destructive to-destructive/60 bg-clip-text text-transparent">həqiqət</span>
+            </motion.h2>
+            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-3xl mx-auto">
+              Pərakəndə, bank və telekommunikasiya sektorlarında rəqabət artıq qiymətdə deyil, müştəri təcrübəsindədir.
+              Eyni xidmət standartlarına baxmayaraq, müştəri məmnuniyyəti filiallar üzrə kəskin fərqlənir.
+            </motion.p>
+          </motion.div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {painStats.map((stat, i) => (
               <motion.div
                 key={stat.label}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="text-center"
               >
-                <div className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-                  {stat.value}{stat.suffix}
-                </div>
-                <div className="text-sm text-muted-foreground mt-2">{stat.label}</div>
+                <Card className="h-full border-border/50 hover:border-destructive/30 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 bg-card/80 backdrop-blur-sm">
+                  <CardContent className="p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <stat.icon className={`w-8 h-8 ${stat.color}`} />
+                      <span className={`text-3xl md:text-4xl font-extrabold ${stat.color}`}>{stat.value}</span>
+                    </div>
+                    <h3 className="text-lg font-semibold">{stat.label}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{stat.detail}</p>
+                    <p className="text-xs text-muted-foreground/60 italic">— {stat.source}</p>
+                  </CardContent>
+                </Card>
               </motion.div>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Features */}
-      <section id="features" className="py-24 md:py-32">
-        <div className="container mx-auto px-4">
+          {/* Pain point callout */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-20 space-y-4"
+            className="mt-12 max-w-4xl mx-auto"
           >
-            <Badge variant="outline" className="text-sm px-4 py-1.5 rounded-full">
-              <Activity className="w-3.5 h-3.5 mr-1.5" /> İmkanlar
-            </Badge>
-            <h2 className="text-3xl md:text-5xl font-bold">
-              Hər şey bir platformada
-            </h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              İşçi məmnuniyyətini artırmaq və tükənmişlik risklərini azaltmaq üçün ehtiyacınız olan bütün alətlər.
-            </p>
+            <Card className="border-destructive/20 bg-gradient-to-r from-destructive/5 via-background to-destructive/5">
+              <CardContent className="p-8 text-center space-y-3">
+                <AlertTriangle className="w-10 h-10 text-destructive mx-auto" />
+                <h3 className="text-xl md:text-2xl font-bold">Əsas Ağrı Nöqtəsi</h3>
+                <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
+                  Şirkətlər satış rəqəmlərini <strong className="text-foreground">(nəticəni)</strong> ölçürlər, lakin bu nəticəni doğuran əsas amili —{" "}
+                  <strong className="text-destructive">kassanın arxasındakı insanın emosional vəziyyətini</strong> — ölçmürlər.
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ═══ Solution Introduction ═══ */}
+      <section id="solution" className="py-20 md:py-28">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="text-center mb-8 space-y-4"
+          >
+            <motion.div variants={fadeUp} custom={0}>
+              <Badge variant="outline" className="text-sm px-4 py-1.5 rounded-full">
+                <Sparkles className="w-3.5 h-3.5 mr-1.5" /> Həll
+              </Badge>
+            </motion.div>
+            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-bold">
+              Tanış olun:{" "}
+              <span className="bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">MoodAI</span>
+            </motion.h2>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, i) => (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="max-w-4xl mx-auto mb-20"
+          >
+            <Card className="border-primary/20 bg-gradient-to-br from-primary/5 via-card to-transparent shadow-xl overflow-hidden">
+              <CardContent className="p-8 md:p-12 text-center space-y-6">
+                <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center mx-auto shadow-lg shadow-primary/30">
+                  <span className="text-4xl">😊</span>
+                </div>
+                <p className="text-xl md:text-2xl leading-relaxed text-foreground/90 max-w-3xl mx-auto">
+                  Əməkdaşların emosional vəziyyətini real vaxt rejimində{" "}
+                  <strong className="text-primary">biznes göstəricisinə (KPI)</strong> çevirən və süni intellektlə idarə olunan analitika platforması.
+                </p>
+                <div className="flex items-center justify-center gap-2 text-primary font-medium">
+                  <Shield className="w-5 h-5" />
+                  <span>Müştəri itkisi baş vermədən ÖNCƏ proaktiv müdaxilə imkanı</span>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Solution Features Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {solutionFeatures.map((feature, i) => (
               <motion.div
                 key={feature.title}
                 initial={{ opacity: 0, y: 20 }}
@@ -333,15 +479,11 @@ const Landing = () => {
               >
                 <Card className="h-full border-border/50 hover:border-primary/30 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group bg-card/50 backdrop-blur-sm">
                   <CardContent className="p-7 space-y-4">
-                    <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} text-white shadow-lg`}>
+                    <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${feature.gradient} text-white shadow-lg`}>
                       <feature.icon className="w-6 h-6" />
                     </div>
-                    <h3 className="text-xl font-semibold group-hover:text-primary transition-colors">
-                      {feature.title}
-                    </h3>
-                    <p className="text-muted-foreground leading-relaxed">
-                      {feature.description}
-                    </p>
+                    <h3 className="text-xl font-semibold group-hover:text-primary transition-colors">{feature.title}</h3>
+                    <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -350,22 +492,24 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section id="how-it-works" className="py-24 md:py-32 bg-muted/15">
+      {/* ═══ How it Works ═══ */}
+      <section id="how-it-works" className="py-20 md:py-28 bg-muted/15">
         <div className="container mx-auto px-4">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial="hidden"
+            whileInView="visible"
             viewport={{ once: true }}
             className="text-center mb-20 space-y-4"
           >
-            <Badge variant="outline" className="text-sm px-4 py-1.5 rounded-full">
-              <Zap className="w-3.5 h-3.5 mr-1.5" /> Proses
-            </Badge>
-            <h2 className="text-3xl md:text-5xl font-bold">3 addımda başlayın</h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            <motion.div variants={fadeUp} custom={0}>
+              <Badge variant="outline" className="text-sm px-4 py-1.5 rounded-full">
+                <Zap className="w-3.5 h-3.5 mr-1.5" /> Proses
+              </Badge>
+            </motion.div>
+            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-bold">3 addımda başlayın</motion.h2>
+            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-2xl mx-auto">
               Quraşdırma sadədir. Komandanız dəqiqələr ərzində əhval bildirməyə başlaya bilər.
-            </p>
+            </motion.p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -385,9 +529,7 @@ const Landing = () => {
                   Addım {item.step}
                 </div>
                 <h3 className="text-xl font-semibold">{item.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {item.description}
-                </p>
+                <p className="text-muted-foreground leading-relaxed">{item.description}</p>
                 {i < 2 && (
                   <div className="hidden md:block absolute top-10 -right-4 translate-x-1/2">
                     <ArrowRight className="w-6 h-6 text-primary/25" />
@@ -399,24 +541,111 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section id="pricing" className="py-24 md:py-32">
+      {/* ═══ Results & Impact ═══ */}
+      <section className="py-20 md:py-28">
         <div className="container mx-auto px-4">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="text-center mb-16 space-y-4"
+          >
+            <motion.div variants={fadeUp} custom={0}>
+              <Badge variant="outline" className="text-sm px-4 py-1.5 rounded-full">
+                <TrendingUp className="w-3.5 h-3.5 mr-1.5" /> Nəticələr
+              </Badge>
+            </motion.div>
+            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-bold">
+              Ölçülə bilən{" "}
+              <span className="bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">nəticələr</span>
+            </motion.h2>
+          </motion.div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+            {resultMetrics.map((m, i) => (
+              <motion.div
+                key={m.label}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <Card className="text-center border-primary/20 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                  <CardContent className="p-8 space-y-3">
+                    <div className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+                      {m.value}
+                    </div>
+                    <p className="text-sm text-muted-foreground leading-snug">{m.label}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Who Benefits */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            className="mt-16 max-w-5xl mx-auto"
+          >
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                {
+                  sector: "Pərakəndə ticarət",
+                  detail: "Hər filialda müştəri ilə təmasda olan satıcıların əhvalı birbaşa satışa təsir edir",
+                  emoji: "🛒",
+                },
+                {
+                  sector: "Bankçılıq",
+                  detail: "Bank masasının arxasındakı əməkdaşın münasibəti müştəri loyallığını müəyyən edir",
+                  emoji: "🏦",
+                },
+                {
+                  sector: "Telekommunikasiya",
+                  detail: "Xidmət şöbəsinin enerjisi brendin ən güclü reklam alətidir",
+                  emoji: "📡",
+                },
+              ].map((item, i) => (
+                <motion.div
+                  key={item.sector}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                >
+                  <Card className="h-full border-border/50 hover:border-primary/30 transition-all duration-300">
+                    <CardContent className="p-6 space-y-3">
+                      <span className="text-3xl">{item.emoji}</span>
+                      <h3 className="text-lg font-semibold">{item.sector}</h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{item.detail}</p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ═══ Pricing ═══ */}
+      <section id="pricing" className="py-20 md:py-28 bg-muted/15">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
             className="text-center mb-20 space-y-4"
           >
-            <Badge variant="outline" className="text-sm px-4 py-1.5 rounded-full">
-              <Crown className="w-3.5 h-3.5 mr-1.5" /> Qiymətlər
-            </Badge>
-            <h2 className="text-3xl md:text-5xl font-bold">
-              Abunə Paketləri
-            </h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            <motion.div variants={fadeUp} custom={0}>
+              <Badge variant="outline" className="text-sm px-4 py-1.5 rounded-full">
+                <Crown className="w-3.5 h-3.5 mr-1.5" /> Qiymətlər
+              </Badge>
+            </motion.div>
+            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-bold">Abunə Paketləri</motion.h2>
+            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-2xl mx-auto">
               Filial sayına görə miqyaslanan B2B SaaS modeli. Bütün paketlərdə 14 gün pulsuz sınaq.
-            </p>
+            </motion.p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
@@ -437,15 +666,15 @@ const Landing = () => {
                   </div>
                 )}
                 <Card className={`h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
-                  plan.popular 
-                    ? "border-primary/50 shadow-lg shadow-primary/10 bg-gradient-to-b from-primary/5 to-transparent" 
+                  plan.popular
+                    ? "border-primary/50 shadow-lg shadow-primary/10 bg-gradient-to-b from-primary/5 to-transparent"
                     : "border-border/50"
                 }`}>
                   <CardHeader className="pb-4 pt-8">
                     <div className="flex items-center gap-3 mb-4">
                       <div className={`w-11 h-11 rounded-xl flex items-center justify-center shadow-md ${
-                        plan.popular 
-                          ? "bg-gradient-to-br from-primary to-primary-glow text-primary-foreground" 
+                        plan.popular
+                          ? "bg-gradient-to-br from-primary to-primary-glow text-primary-foreground"
                           : "bg-muted text-muted-foreground"
                       }`}>
                         <plan.icon className="w-5 h-5" />
@@ -462,17 +691,11 @@ const Landing = () => {
                   <CardContent className="space-y-6">
                     <Button
                       onClick={() => navigate("/auth")}
-                      className={`w-full h-11 rounded-xl ${
-                        plan.popular 
-                          ? "shadow-md shadow-primary/20" 
-                          : ""
-                      }`}
+                      className={`w-full h-11 rounded-xl ${plan.popular ? "shadow-md shadow-primary/20" : ""}`}
                       variant={plan.popular ? "default" : "outline"}
                     >
-                      Pulsuz başla
-                      <ArrowRight className="w-4 h-4 ml-1" />
+                      Pulsuz başla <ArrowRight className="w-4 h-4 ml-1" />
                     </Button>
-                    
                     <div className="space-y-3">
                       {plan.features.map((feature) => (
                         <div key={feature} className="flex items-start gap-2.5 text-sm">
@@ -495,91 +718,8 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Benefits */}
-      <section className="py-24 md:py-32 bg-muted/15">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-16 items-center max-w-6xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="space-y-8"
-            >
-              <div className="space-y-4">
-                <Badge variant="outline" className="text-sm px-4 py-1.5 rounded-full">
-                  <TrendingUp className="w-3.5 h-3.5 mr-1.5" /> Nəticələr
-                </Badge>
-                <h2 className="text-3xl md:text-5xl font-bold leading-tight">
-                  Nəyə görə{" "}
-                  <span className="bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">MoodAI?</span>
-                </h2>
-              </div>
-              <div className="space-y-5">
-                {[
-                  "Tükənmişlik risklərinin 60%-ni əvvəlcədən aşkarlayır",
-                  "İşçi dönüşümünü (turnover) 35% azaldır",
-                  "Müştəri məmnuniyyətini 25% artırır",
-                  "Menecer müdaxilə vaxtını 3x sürətləndirir",
-                  "Tam anonim — işçi etibarını qoruyur",
-                  "PWA — mobil cihazlardan istənilən yerdə istifadə",
-                ].map((benefit, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, x: -10 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.06 }}
-                    className="flex items-start gap-3"
-                  >
-                    <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                      <CheckCircle2 className="w-4 h-4 text-primary" />
-                    </div>
-                    <span className="text-foreground/80 text-lg">{benefit}</span>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-            >
-              <Card className="border-primary/20 bg-gradient-to-br from-primary/5 via-card to-transparent shadow-xl">
-                <CardContent className="p-8 space-y-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center shadow-md">
-                      <Users className="w-6 h-6 text-primary-foreground" />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-lg">İstifadəçi Rolları</div>
-                      <div className="text-sm text-muted-foreground">Üç səviyyəli giriş nəzarəti</div>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    {[
-                      { role: "İşçi", desc: "Anonim sorğu doldurma, təklif göndərmə", emoji: "👤" },
-                      { role: "Menecer", desc: "Dashboard, AI analiz, tapşırıq idarəetmə", emoji: "👔" },
-                      { role: "HR", desc: "Bütün filiallar, hesabatlar, hədəflər", emoji: "🏢" },
-                    ].map((item) => (
-                      <div key={item.role} className="flex items-start gap-3 p-4 rounded-xl bg-background/60 border border-border/30">
-                        <span className="text-xl mt-0.5">{item.emoji}</span>
-                        <div>
-                          <div className="text-sm font-semibold">{item.role}</div>
-                          <div className="text-xs text-muted-foreground">{item.desc}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-24 md:py-32">
+      {/* ═══ CTA ═══ */}
+      <section className="py-20 md:py-28">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -591,10 +731,13 @@ const Landing = () => {
               <span className="text-3xl">🚀</span>
             </div>
             <h2 className="text-3xl md:text-5xl font-bold">
-              Komandanızın əhvalını izləməyə başlayın
+              Emosiyaları ölçməyə başlayın.
+              <br />
+              <span className="text-muted-foreground text-[0.7em]">Satışları qoruyun.</span>
             </h2>
             <p className="text-muted-foreground text-lg max-w-xl mx-auto">
               14 gün pulsuz sınaq müddəti ilə başlayın. Kredit kartı tələb olunmur.
+              Dəqiqələr ərzində ilk nəticələri görün.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
               <Button
@@ -611,14 +754,14 @@ const Landing = () => {
                 onClick={() => navigate("/survey")}
                 className="text-base px-10 h-14 rounded-2xl text-lg"
               >
-                Sorğunu sınayın
+                Canlı demo sınayın
               </Button>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Footer */}
+      {/* ═══ Footer ═══ */}
       <footer className="border-t border-border/40 py-12 bg-muted/10">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8 items-center">
@@ -628,22 +771,16 @@ const Landing = () => {
               </div>
               <div>
                 <span className="font-semibold">MoodAI</span>
-                <p className="text-xs text-muted-foreground">Personal Məmnuniyyət Platforması</p>
+                <p className="text-xs text-muted-foreground">Əməkdaş Emosiya Analitika Platforması</p>
               </div>
             </div>
             <div className="text-sm text-muted-foreground text-center">
               © 2026 PATCO Group. Bütün hüquqlar qorunur.
             </div>
             <div className="flex items-center justify-end gap-6 text-sm text-muted-foreground">
-              <button onClick={() => navigate("/survey")} className="hover:text-primary transition-colors">
-                Sorğu
-              </button>
-              <button onClick={() => navigate("/auth")} className="hover:text-primary transition-colors">
-                Giriş
-              </button>
-              <button onClick={() => navigate("/suggestion-box")} className="hover:text-primary transition-colors">
-                Təklif
-              </button>
+              <button onClick={() => navigate("/survey")} className="hover:text-primary transition-colors">Demo</button>
+              <button onClick={() => navigate("/auth")} className="hover:text-primary transition-colors">Giriş</button>
+              <button onClick={() => navigate("/suggestion-box")} className="hover:text-primary transition-colors">Təklif</button>
             </div>
           </div>
         </div>
