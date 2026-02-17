@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Menu, Home, LayoutDashboard, UserCog, ClipboardCheck, MessageSquare, CalendarIcon, LogOut, Users, Brain } from "lucide-react";
+import { Menu, Home, LayoutDashboard, UserCog, ClipboardCheck, MessageSquare, CalendarIcon, LogOut, Users, Brain, Globe } from "lucide-react";
 import { format, subDays } from "date-fns";
 import { az } from "date-fns/locale";
 import { Calendar } from "@/components/ui/calendar";
@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { useCmsMenus } from "@/hooks/useCmsMenus";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 const navItems = [
   { label: "Ana Səhifə", to: "/survey", icon: Home },
@@ -30,6 +32,15 @@ export const MobileNavMenu = ({ dateRange, onDateRangeChange, showDatePicker = f
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { menus: cmsMenus } = useCmsMenus("main_nav");
+
+  // Use CMS menus if available, fallback to static
+  const activeNavItems = cmsMenus.length > 0
+    ? cmsMenus.map(m => {
+        const iconMap: Record<string, any> = { Home, LayoutDashboard, UserCog, ClipboardCheck, MessageSquare, Brain, Users };
+        return { label: m.label, to: m.url || "/", icon: iconMap[m.icon || ""] || Home };
+      })
+    : navItems;
 
   const handleNavigate = (to: string) => {
     navigate(to);
@@ -55,11 +66,14 @@ export const MobileNavMenu = ({ dateRange, onDateRangeChange, showDatePicker = f
         </Button>
       </SheetTrigger>
       <SheetContent side="right" className="flex flex-col gap-6 pt-8">
-        <SheetHeader>
-          <SheetTitle className="text-left">Naviqasiya</SheetTitle>
+       <SheetHeader>
+          <div className="flex items-center justify-between">
+            <SheetTitle className="text-left">Naviqasiya</SheetTitle>
+            <LanguageSelector variant="outline" size="sm" />
+          </div>
         </SheetHeader>
         <nav className="space-y-2 flex-1">
-          {navItems.map((item) => {
+          {activeNavItems.map((item) => {
             const isActive = location.pathname === item.to;
             const Icon = item.icon;
             return (

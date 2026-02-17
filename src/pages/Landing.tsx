@@ -49,6 +49,9 @@ import {
 } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { useLanguage } from "@/hooks/useLanguage";
+import { useCmsMenus } from "@/hooks/useCmsMenus";
 import { useRef, useState, useEffect, useMemo } from "react";
 
 /* ─── Pain Point Statistics ─── */
@@ -252,6 +255,8 @@ const CounterItem = ({ end, suffix, label, delay }: { end: number; suffix: strin
 const Landing = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const { locale, t, tField } = useLanguage();
+  const { menus: landingMenus } = useCmsMenus("landing_nav");
   const heroRef = useRef<HTMLDivElement>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
@@ -292,14 +297,17 @@ const Landing = () => {
     visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.5 } }),
   };
 
-  const navLinks = [
-    { href: "#problem", label: "Problem" },
-    { href: "#solution", label: "Həll" },
-    { href: "#sectors", label: "Sektorlar" },
-    { href: "#how-it-works", label: "Necə işləyir" },
-    { href: "#testimonials", label: "Rəylər" },
-    { href: "#pricing", label: "Qiymətlər" },
-  ];
+  // Use CMS menus if available, fallback to static
+  const navLinks = landingMenus.length > 0
+    ? landingMenus.map(m => ({ href: m.url || "#", label: m.label }))
+    : [
+        { href: "#problem", label: "Problem" },
+        { href: "#solution", label: "Həll" },
+        { href: "#sectors", label: "Sektorlar" },
+        { href: "#how-it-works", label: "Necə işləyir" },
+        { href: "#testimonials", label: "Rəylər" },
+        { href: "#pricing", label: "Qiymətlər" },
+      ];
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -322,6 +330,7 @@ const Landing = () => {
             ))}
           </div>
           <div className="flex items-center gap-2">
+            <LanguageSelector />
             <ThemeToggle />
             <Button variant="ghost" size="sm" onClick={() => navigate("/survey")} className="hidden sm:inline-flex">
               Demo
