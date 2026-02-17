@@ -306,13 +306,13 @@ const Dashboard = () => {
                 <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-lg" />
                 <img 
                   src={obaLogo} 
-                  alt="OBA Logo" 
+                  alt="MoodAI Logo" 
                   className="relative w-14 h-14 rounded-2xl shadow-lg object-cover ring-2 ring-border/50"
                 />
               </div>
               <div className="min-w-0">
                 <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate flex items-center gap-2">
-                  OBA İdarəetmə Paneli
+                  MoodAI İdarəetmə Paneli
                   {managerBranch && (
                     <span className="text-primary flex items-center gap-1">
                       <ChevronRight className="w-5 h-5" />
@@ -554,7 +554,7 @@ const Dashboard = () => {
 
       {/* Footer */}
       <footer className="py-6 text-center text-sm text-muted-foreground border-t border-border/50 bg-card/30 backdrop-blur-sm mt-8">
-        <p>© 2025 OBA İdarəetmə Paneli. Bütün hüquqlar qorunur.</p>
+        <p>© 2026 MoodAI İdarəetmə Paneli. Bütün hüquqlar qorunur.</p>
       </footer>
     </div>
   );

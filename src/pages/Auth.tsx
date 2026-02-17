@@ -214,7 +214,7 @@ const Auth = () => {
               <div className="relative">
                 <img 
                   src={obaLogo} 
-                  alt="OBA Logo" 
+                  alt="MoodAI Logo" 
                   className="w-20 h-20 rounded-2xl shadow-xl object-cover ring-2 ring-border/50"
                 />
                 <motion.div
@@ -272,7 +272,7 @@ const Auth = () => {
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center justify-between bg-background/50 rounded-lg px-3 py-2">
                     <span className="text-muted-foreground">Email:</span>
-                    <code className="font-mono text-foreground bg-muted/50 px-2 py-0.5 rounded">demo@oba.az</code>
+                    <code className="font-mono text-foreground bg-muted/50 px-2 py-0.5 rounded">demo@moodai.az</code>
                   </div>
                   <div className="flex items-center justify-between bg-background/50 rounded-lg px-3 py-2">
                     <span className="text-muted-foreground">Şifrə:</span>

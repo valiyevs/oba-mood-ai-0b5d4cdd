@@ -102,8 +102,8 @@ const Landing = () => {
       >
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src={obaLogo} alt="OBA" className="w-10 h-10 rounded-xl object-cover ring-1 ring-border/50" />
-            <span className="text-lg font-bold">OBA Əhval Sistemi</span>
+            <img src={obaLogo} alt="MoodAI" className="w-10 h-10 rounded-xl object-cover ring-1 ring-border/50" />
+            <span className="text-lg font-bold">MoodAI</span>
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
@@ -315,7 +315,7 @@ const Landing = () => {
             >
               <h2 className="text-3xl md:text-4xl font-bold">
                 Nəyə görə{" "}
-                <span className="text-primary">OBA Əhval Sistemi?</span>
+                <span className="text-primary">MoodAI?</span>
               </h2>
               <div className="space-y-4">
                 {[
@@ -422,8 +422,8 @@ const Landing = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <img src={obaLogo} alt="OBA" className="w-8 h-8 rounded-lg object-cover" />
-              <span className="text-sm font-medium">OBA Əhval Sistemi</span>
+              <img src={obaLogo} alt="MoodAI" className="w-8 h-8 rounded-lg object-cover" />
+              <span className="text-sm font-medium">MoodAI</span>
             </div>
             <div className="text-sm text-muted-foreground">
               © 2026 PATCO Group. Bütün hüquqlar qorunur.

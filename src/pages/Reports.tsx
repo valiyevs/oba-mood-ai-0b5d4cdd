@@ -232,7 +232,7 @@ const Reports = () => {
 
   const handleExportPDF = () => {
     exportToPDF(
-      "OBA Məmnuniyyət Hesabatı",
+      "MoodAI Məmnuniyyət Hesabatı",
       `${periodLabels[selectedPeriod]} hesabat - ${format(dateRange.from, "d MMM", { locale: az })} - ${format(dateRange.to, "d MMM yyyy", { locale: az })}`,
       [
         {

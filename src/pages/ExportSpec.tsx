@@ -63,7 +63,7 @@ const ExportSpec = () => {
             <FileText className="w-4 h-4" />
             Sənədlər
           </div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">OBA Əhval Sistemi — Sənədlər</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-2">MoodAI — Sənədlər</h1>
           <p className="text-muted-foreground">Layihə sənədlərini PDF formatında yükləyin</p>
         </div>
 

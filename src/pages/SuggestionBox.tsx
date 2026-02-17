@@ -172,7 +172,7 @@ const SuggestionBox = () => {
                 <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-lg" />
                 <img 
                   src={obaLogo} 
-                  alt="OBA Logo" 
+                  alt="MoodAI Logo" 
                   className="relative w-12 h-12 rounded-2xl shadow-lg object-cover ring-2 ring-border/50"
                 />
               </div>

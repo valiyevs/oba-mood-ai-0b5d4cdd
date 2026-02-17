@@ -181,7 +181,7 @@ const Targets = () => {
               >
                 <ArrowLeft className="w-5 h-5" />
               </Button>
-              <img src={obaLogo} alt="OBA" className="w-12 h-12 rounded-xl object-cover" />
+              <img src={obaLogo} alt="MoodAI" className="w-12 h-12 rounded-xl object-cover" />
               <div>
                 <h1 className="text-xl font-bold flex items-center gap-2">
                   <Target className="w-5 h-5 text-emerald-500" />
