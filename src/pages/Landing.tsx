@@ -54,126 +54,11 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { useCmsMenus } from "@/hooks/useCmsMenus";
 import { useRef, useState, useEffect } from "react";
 
-/* ─── Pain Point Statistics ─── */
-const painStats = [
-  {
-    value: "65%",
-    label: "Müştəri itkisi",
-    detail: "Qiymətə görə deyil, əməkdaşın enerjisine görə gedir",
-    source: "Oxford 2024",
-    icon: HeartCrack,
-  },
-  {
-    value: "79%",
-    label: "Həvəssiz işçi",
-    detail: "Hər 5 işçidən 4-ü motivasiyasız. Hər biri — itirilmiş satış",
-    source: "Gallup 2024",
-    icon: ShieldAlert,
-  },
-  {
-    value: "+3%",
-    label: "Gizli qazanc",
-    detail: "Motivasiyalı komanda = daha çox satış. Sadəcə ölçün",
-    source: "McKinsey",
-    icon: TrendingUp,
-  },
-  {
-    value: "5%",
-    label: "Zəncir reaksiya",
-    detail: "5% stressli işçi → minlərlə mənfi müştəri təması",
-    source: "Sektor araşdırması",
-    icon: AlertTriangle,
-  },
-];
-
-/* ─── Solution Features ─── */
-const solutionFeatures = [
-  {
-    icon: MousePointerClick,
-    title: "10–20 saniyə. 1–2 klik ilə.",
-    description: "Anonim. Sadə. İşçi gününü pozmadan əhval toplayın.",
-    metric: "Cavab nisbəti: 94%",
-  },
-  {
-    icon: Gauge,
-    title: "Canlı Əhval İndeksi",
-    description: "Kritik həddə düşəndə menecer dərhal xəbərdarlıq alır.",
-    metric: "Əhval Skoru: 78%",
-  },
-  {
-    icon: Brain,
-    title: "Süni İntellekt Analizi",
-    description: "Stress nədən qaynaqlanır? Süni intellekt cavabı tapır.",
-    metric: "Tükənmə Riski: Aşağı",
-  },
-  {
-    icon: LineChart,
-    title: "Satış ↔ Əhval",
-    description: "Əhval düşdü → satış düşdü? Korrelyasiyanı rəqəmlərlə görün.",
-    metric: "Korrelyasiya: 0.82",
-  },
-  {
-    icon: Eye,
-    title: "Emosional Xəritə",
-    description: "Hansı filial risk altında? Bir baxışda görün.",
-    metric: "12 filial izlənir",
-  },
-  {
-    icon: Bell,
-    title: "Süni İntellekt Tövsiyələri",
-    description: "Nə etməli? Konkret addımlar təklif edir. Oxu və tətbiq et.",
-    metric: "3 aktiv tapşırıq",
-  },
-];
-
-/* ─── How it works ─── */
-const steps = [
-  { step: "01", title: "İşçi klik edir", description: "10–20 saniyə. Anonim. Hər gün.", icon: MessageSquare },
-  { step: "02", title: "Süni intellekt analiz edir", description: "Risk, trend, kök səbəb — hamısı avtomatik.", icon: Brain },
-  { step: "03", title: "Siz hərəkətə keçirsiniz", description: "İtki olmadan ÖNCƏ müdaxilə edin.", icon: Zap },
-];
-
-/* ─── Pricing ─── */
-const pricingPlans = [
-  {
-    name: "Basic",
-    price: "20",
-    period: "ay / filial",
-    description: "Kiçik komandalar üçün əsas əhval izləmə",
-    icon: Star,
-    popular: false,
-    features: ["Gündəlik əhval sorğusu", "Əsas idarəetmə paneli", "Əhval bölgüsü qrafikləri", "CSV ixrac", "Anonim təklif qutusu", "Elektron poçt dəstəyi"],
-    notIncluded: ["AI analiz və tövsiyələr", "Proqnozlaşdırıcı analitika", "Satış korrelyasiyası"],
-  },
-  {
-    name: "Premium",
-    price: "35",
-    period: "ay / filial",
-    description: "AI proqnozları və ətraflı analitika ilə gücləndirilmiş",
-    icon: Crown,
-    popular: true,
-    features: ["Basic-in bütün funksiyaları", "Süni intellekt ilə dərin analiz", "Tükənmişlik risk proqnozu", "Menecer tapşırıq sistemi", "Anlıq bildirişlər", "Trend analizi", "Excel və PDF ixrac", "Prioritet dəstək"],
-    notIncluded: ["1C/SAP inteqrasiya"],
-  },
-  {
-    name: "Enterprise",
-    price: "50",
-    period: "ay / filial",
-    description: "Tam funksional — satış korrelyasiyası və dərin analiz",
-    icon: Building2,
-    popular: false,
-    features: ["Premium-un bütün funksiyaları", "1C/SAP satış korrelyasiyası", "Müştəri şikayəti proqnozu", "Xüsusi hesabat şablonları", "API inteqrasiya", "Xüsusi brendləmə", "İlkin quraşdırma dəstəyi", "7/24 prioritet dəstək"],
-    notIncluded: [],
-  },
-];
-
-/* ─── Result metrics ─── */
-const resultMetrics = [
-  { value: "60%", label: "Tükənmə riski əvvəlcədən tutulur" },
-  { value: "35%", label: "İşçi itkisi azalır" },
-  { value: "25%", label: "Müştəri məmnuniyyəti artır" },
-  { value: "3x", label: "Daha sürətli müdaxilə" },
-];
+/* ─── Icon maps for CMS-driven arrays ─── */
+const painIcons = [HeartCrack, ShieldAlert, TrendingUp, AlertTriangle];
+const featureIcons = [MousePointerClick, Gauge, Brain, LineChart, Eye, Bell];
+const stepIcons = [MessageSquare, Brain, Zap];
+const planIcons = [Star, Crown, Building2];
 
 /* ─── Sectors ─── */
 const sectors = [
@@ -279,7 +164,74 @@ const Landing = () => {
     },
   });
 
-  // cms helper removed — use t() from useLanguage which handles translations
+  // CMS-driven dynamic arrays
+  const painStats = [1, 2, 3, 4].map((i, idx) => ({
+    value: t(`pain_${i}_value`, ['65%', '79%', '+3%', '5%'][idx]),
+    label: t(`pain_${i}_label`, ['Müştəri itkisi', 'Həvəssiz işçi', 'Gizli qazanc', 'Zəncir reaksiya'][idx]),
+    detail: t(`pain_${i}_detail`, ''),
+    source: t(`pain_${i}_source`, ''),
+    icon: painIcons[idx],
+  }));
+
+  const solutionFeatures = [1, 2, 3, 4, 5, 6].map((i, idx) => ({
+    icon: featureIcons[idx],
+    title: t(`feature_${i}_title`, ''),
+    description: t(`feature_${i}_desc`, ''),
+    metric: t(`feature_${i}_metric`, ''),
+  }));
+
+  const steps = [1, 2, 3].map((i, idx) => ({
+    step: `0${i}`,
+    title: t(`step_${i}_title`, ''),
+    description: t(`step_${i}_desc`, ''),
+    icon: stepIcons[idx],
+  }));
+
+  const resultMetrics = [1, 2, 3, 4].map((i, idx) => ({
+    value: t(`result_${i}_value`, ['60%', '35%', '25%', '3x'][idx]),
+    label: t(`result_${i}_label`, ''),
+  }));
+
+  const sectors = [
+    { icon: ShoppingCart, emoji: "🛒", n: 1 },
+    { icon: Landmark, emoji: "🏦", n: 2 },
+    { icon: Wifi, emoji: "📡", n: 3 },
+  ].map(s => ({
+    icon: s.icon,
+    emoji: s.emoji,
+    title: t(`sector_${s.n}_title`, ''),
+    subtitle: t(`sector_${s.n}_subtitle`, ''),
+    pain: t(`sector_${s.n}_pain`, ''),
+    solution: t(`sector_${s.n}_solution`, ''),
+  }));
+
+  const testimonials = [1, 2, 3].map((i, idx) => ({
+    quote: t(`testimonial_${i}_quote`, ''),
+    name: t(`testimonial_${i}_name`, ''),
+    role: t(`testimonial_${i}_role`, ''),
+    emoji: ["🛒", "🏦", "📡"][idx],
+  }));
+
+  const pricingFeatureCounts: Record<string, { f: number; n: number }> = {
+    basic: { f: 6, n: 3 },
+    premium: { f: 8, n: 1 },
+    enterprise: { f: 8, n: 0 },
+  };
+
+  const pricingPlans = [
+    { key: 'basic', icon: planIcons[0], popular: false },
+    { key: 'premium', icon: planIcons[1], popular: true },
+    { key: 'enterprise', icon: planIcons[2], popular: false },
+  ].map(p => ({
+    name: t(`pricing_${p.key}_name`, p.key),
+    price: t(`pricing_${p.key}_price`, '0'),
+    period: t(`pricing_${p.key}_period`, 'ay / filial'),
+    description: t(`pricing_${p.key}_desc`, ''),
+    icon: p.icon,
+    popular: p.popular,
+    features: Array.from({ length: pricingFeatureCounts[p.key].f }, (_, i) => t(`pricing_${p.key}_f${i + 1}`, '')).filter(Boolean),
+    notIncluded: Array.from({ length: pricingFeatureCounts[p.key].n }, (_, i) => t(`pricing_${p.key}_n${i + 1}`, '')).filter(Boolean),
+  }));
 
   const fadeUp = {
     hidden: { opacity: 0, y: 30 },
@@ -521,16 +473,15 @@ const Landing = () => {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-16 space-y-4">
             <motion.div variants={fadeUp} custom={0}>
               <Badge variant="outline" className="text-sm px-4 py-1.5 rounded-full border-destructive/30 text-destructive">
-                <XCircle className="w-3.5 h-3.5 mr-1.5" /> Problem
+                <XCircle className="w-3.5 h-3.5 mr-1.5" /> {t('problem_badge', 'Problem')}
               </Badge>
             </motion.div>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-bold">
-              Rəqəmlərin arxasındakı{" "}
-              <span className="bg-gradient-to-r from-destructive to-destructive/60 bg-clip-text text-transparent">həqiqət</span>
-            </motion.h2>
-            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Rəqabət qiymətdə deyil, müştəri təcrübəsindədir. Fərq yaradan — sistem yox, insan faktorudur.
-            </motion.p>
+             <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-bold">
+               {t('problem_title', 'Rəqəmlərin arxasındakı həqiqət')}
+             </motion.h2>
+             <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-2xl mx-auto">
+               {t('problem_subtitle', 'Rəqabət qiymətdə deyil, müştəri təcrübəsindədir.')}
+             </motion.p>
           </motion.div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -567,13 +518,12 @@ const Landing = () => {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-8 space-y-4">
             <motion.div variants={fadeUp} custom={0}>
               <Badge variant="outline" className="text-sm px-4 py-1.5 rounded-full">
-                <Sparkles className="w-3.5 h-3.5 mr-1.5" /> Həll
+                <Sparkles className="w-3.5 h-3.5 mr-1.5" /> {t('solution_badge', 'Həll')}
               </Badge>
             </motion.div>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-bold">
-              Tanış olun:{" "}
-              <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">MoodAI</span>
-            </motion.h2>
+             <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-bold">
+               {t('solution_title', 'Tanış olun: MoodAI')}
+             </motion.h2>
           </motion.div>
 
           {/* MoodAI intro card */}
@@ -631,15 +581,15 @@ const Landing = () => {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-16 space-y-4">
             <motion.div variants={fadeUp} custom={0}>
               <Badge variant="outline" className="text-sm px-4 py-1.5 rounded-full">
-                <Layers className="w-3.5 h-3.5 mr-1.5" /> Sektorlar
+                <Layers className="w-3.5 h-3.5 mr-1.5" /> {t('sectors_title', 'Sektorlar')}
               </Badge>
             </motion.div>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-bold">
-              Sektorlar üçün <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">MoodAI</span>
-            </motion.h2>
-            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Hər sektorun öz ağrı nöqtəsi var. MoodAI hər birinə uyğunlaşır.
-            </motion.p>
+             <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-bold">
+               {t('sectors_title', 'Sektorlar üçün MoodAI')}
+             </motion.h2>
+             <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-2xl mx-auto">
+               {t('sectors_subtitle', 'Hər sektorun öz ağrı nöqtəsi var. MoodAI hər birinə uyğunlaşır.')}
+             </motion.p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
@@ -690,13 +640,13 @@ const Landing = () => {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-20 space-y-4">
             <motion.div variants={fadeUp} custom={0}>
               <Badge variant="outline" className="text-sm px-4 py-1.5 rounded-full">
-                <Zap className="w-3.5 h-3.5 mr-1.5" /> Proses
+                <Zap className="w-3.5 h-3.5 mr-1.5" /> {t('badge_process', 'Proses')}
               </Badge>
             </motion.div>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-bold">Sadəcə 3 addım</motion.h2>
-            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-xl mx-auto">
-              Dəqiqələr ərzində quraşdırın. Elə bu gün nəticə görün.
-            </motion.p>
+             <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-bold">{t('steps_title', 'Sadəcə 3 addım')}</motion.h2>
+             <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-xl mx-auto">
+               {t('steps_subtitle', 'Dəqiqələr ərzində quraşdırın. Elə bu gün nəticə görün.')}
+             </motion.p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -713,7 +663,7 @@ const Landing = () => {
                   <item.icon className="w-9 h-9 text-secondary" />
                 </div>
                 <div className="inline-block text-xs font-bold text-secondary bg-secondary/10 px-3 py-1 rounded-full tracking-widest uppercase">
-                  Addım {item.step}
+                  {t('step_label', 'Addım')} {item.step}
                 </div>
                 <h3 className="text-xl font-semibold">{item.title}</h3>
                 <p className="text-muted-foreground leading-relaxed">{item.description}</p>
@@ -734,14 +684,13 @@ const Landing = () => {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-16 space-y-4">
             <motion.div variants={fadeUp} custom={0}>
               <Badge variant="outline" className="text-sm px-4 py-1.5 rounded-full">
-                <TrendingUp className="w-3.5 h-3.5 mr-1.5" /> Nəticələr
+                <TrendingUp className="w-3.5 h-3.5 mr-1.5" /> {t('badge_results', 'Nəticələr')}
               </Badge>
             </motion.div>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-bold">
-              Ölçülə bilən{" "}
-              <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">nəticələr</span>
-            </motion.h2>
-          </motion.div>
+             <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-bold">
+               {t('results_title', 'Ölçülə bilən nəticələr')}
+             </motion.h2>
+           </motion.div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
             {resultMetrics.map((m, i) => (
@@ -772,37 +721,18 @@ const Landing = () => {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-16 space-y-4">
             <motion.div variants={fadeUp} custom={0}>
               <Badge variant="outline" className="text-sm px-4 py-1.5 rounded-full">
-                <Quote className="w-3.5 h-3.5 mr-1.5" /> Rəylər
+                <Quote className="w-3.5 h-3.5 mr-1.5" /> {t('badge_reviews', 'Rəylər')}
               </Badge>
             </motion.div>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-bold">
-              Müştərilərimiz nə deyir?
-            </motion.h2>
+             <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-bold">
+               {t('reviews_title', 'Müştərilərimiz nə deyir?')}
+             </motion.h2>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {[
-              {
-                quote: "MoodAI-dan istifadə etdikdən sonra filiallarımızda işçi itkisi 40% azaldı. İndi problemləri əvvəlcədən görürük.",
-                name: "Rəşad M.",
-                role: "HR Direktoru, Pərakəndə şəbəkə",
-                emoji: "🛒",
-              },
-              {
-                quote: "Əvvəl işçi narazılığını müştəri şikayətindən öyrənirdik. İndi isə MoodAI sayəsində həmin gün müdaxilə edirik.",
-                name: "Aynur H.",
-                role: "Regional Menecer, Bank sektoru",
-                emoji: "🏦",
-              },
-              {
-                quote: "Quraşdırma 10 dəqiqə çəkdi. İlk həftədən 3 kritik filialdakı stress səbəbini müəyyən etdik.",
-                name: "Tural K.",
-                role: "Əməliyyat Direktoru, Telekom",
-                emoji: "📡",
-              },
-            ].map((t, i) => (
+           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {testimonials.map((item, i) => (
               <motion.div
-                key={t.name}
+                key={item.name}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -811,12 +741,12 @@ const Landing = () => {
                 <Card className="h-full border-border/50 hover:border-secondary/20 transition-all duration-300 bg-card/80 rounded-2xl group">
                   <CardContent className="p-7 space-y-5">
                     <Quote className="w-10 h-10 text-secondary/20 group-hover:text-secondary/30 transition-colors" />
-                    <p className="text-foreground/80 leading-relaxed italic text-[15px]">"{t.quote}"</p>
+                    <p className="text-foreground/80 leading-relaxed italic text-[15px]">"{item.quote}"</p>
                     <div className="flex items-center gap-3 pt-2 border-t border-border/30">
-                      <span className="text-2xl">{t.emoji}</span>
+                      <span className="text-2xl">{item.emoji}</span>
                       <div>
-                        <div className="text-sm font-semibold">{t.name}</div>
-                        <div className="text-xs text-muted-foreground">{t.role}</div>
+                        <div className="text-sm font-semibold">{item.name}</div>
+                        <div className="text-xs text-muted-foreground">{item.role}</div>
                       </div>
                     </div>
                   </CardContent>
@@ -855,7 +785,7 @@ const Landing = () => {
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
                     <Badge className="gradient-primary text-primary-foreground px-4 py-1 text-xs shadow-lg">
-                      <Sparkles className="w-3 h-3 mr-1" /> Ən populyar
+                      <Sparkles className="w-3 h-3 mr-1" /> {t('popular_badge', 'Ən populyar')}
                     </Badge>
                   </div>
                 )}
@@ -946,7 +876,7 @@ const Landing = () => {
               className="flex items-center gap-2 bg-secondary/10 border border-secondary/20 rounded-full px-5 py-2"
             >
               <Award className="w-5 h-5 text-secondary" />
-              <span className="text-sm font-semibold text-secondary">Etibarlı Tərəfdaş</span>
+              <span className="text-sm font-semibold text-secondary">{t('trusted_partner', 'Etibarlı Tərəfdaş')}</span>
             </motion.div>
           </div>
         </div>
@@ -962,7 +892,7 @@ const Landing = () => {
                   <HelpCircle className="w-3.5 h-3.5 mr-1.5" /> FAQ
                 </Badge>
               </motion.div>
-              <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-bold">Tez-tez Verilən Suallar</motion.h2>
+              <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-bold">{t('faq_title', 'Tez-tez Verilən Suallar')}</motion.h2>
             </motion.div>
 
             <Accordion type="single" collapsible className="space-y-3">
@@ -997,22 +927,20 @@ const Landing = () => {
             <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mx-auto shadow-lg">
               <span className="text-3xl">🚀</span>
             </div>
-            <h2 className="text-3xl md:text-5xl font-bold">
-              Emosiyaları ölçməyə başlayın.
-              <br />
-              <span className="text-muted-foreground text-[0.7em]">Satışları qoruyun.</span>
-            </h2>
-            <p className="text-muted-foreground text-lg max-w-md mx-auto">
-              14 gün pulsuz. Kredit kartı lazım deyil.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
-              <Button size="lg" onClick={() => navigate("/auth")} className="text-base px-10 h-14 rounded-2xl gap-2 shadow-xl shadow-primary/20 text-lg">
-                Pulsuz başlayın <ArrowRight className="w-5 h-5" />
-              </Button>
-              <Button variant="outline" size="lg" onClick={() => navigate("/survey")} className="text-base px-10 h-14 rounded-2xl text-lg">
-                Canlı demo sınayın
-              </Button>
-            </div>
+             <h2 className="text-3xl md:text-5xl font-bold">
+               {t('cta_title', 'Emosiyaları ölçməyə başlayın. Satışları qoruyun.')}
+             </h2>
+             <p className="text-muted-foreground text-lg max-w-md mx-auto">
+               {t('cta_subtitle', '14 gün pulsuz. Kredit kartı lazım deyil.')}
+             </p>
+             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
+               <Button size="lg" onClick={() => navigate("/auth")} className="text-base px-10 h-14 rounded-2xl gap-2 shadow-xl shadow-primary/20 text-lg">
+                 {t('nav_free_start', 'Pulsuz başlayın')} <ArrowRight className="w-5 h-5" />
+               </Button>
+               <Button variant="outline" size="lg" onClick={() => navigate("/survey")} className="text-base px-10 h-14 rounded-2xl text-lg">
+                 {t('cta_demo_btn', 'Canlı demo sınayın')}
+               </Button>
+             </div>
           </motion.div>
         </div>
       </section>
@@ -1027,11 +955,11 @@ const Landing = () => {
               </div>
               <div>
                 <span className="font-semibold">MoodAI</span>
-                <p className="text-xs text-muted-foreground">Əməkdaş Emosiya Analitika Platforması</p>
+                <p className="text-xs text-muted-foreground">{t('footer_tagline', 'Əməkdaş Emosiya Analitika Platforması')}</p>
               </div>
             </div>
             <div className="text-sm text-muted-foreground text-center">
-              © 2026 PATCO Group. Bütün hüquqlar qorunur.
+              {t('footer_copyright', '© 2026 PATCO Group. Bütün hüquqlar qorunur.')}
             </div>
             <div className="flex items-center justify-end gap-6 text-sm text-muted-foreground">
               <button onClick={() => navigate("/survey")} className="hover:text-secondary transition-colors">Demo</button>
