@@ -360,10 +360,10 @@ const Landing = () => {
                 className="flex flex-col sm:flex-row gap-4"
               >
                 <Button size="lg" onClick={() => navigate("/auth")} className="text-base px-8 h-13 rounded-xl gap-2 shadow-lg shadow-primary/20">
-                  Pulsuz başlayın <ArrowRight className="w-5 h-5" />
+                  {t('hero_cta_primary', 'Pulsuz başlayın')} <ArrowRight className="w-5 h-5" />
                 </Button>
                 <Button variant="outline" size="lg" onClick={() => navigate("/survey")} className="text-base px-8 h-13 rounded-xl gap-2">
-                  Canlı demo <ChevronRight className="w-5 h-5" />
+                  {t('hero_cta_secondary', 'Canlı demo')} <ChevronRight className="w-5 h-5" />
                 </Button>
               </motion.div>
 
@@ -374,7 +374,7 @@ const Landing = () => {
                 className="text-sm text-muted-foreground flex items-center gap-2"
               >
                 <Lock className="w-3.5 h-3.5" />
-                Kredit kartı tələb olunmur · 14 gün pulsuz sınaq
+                {t('hero_trust_text', 'Kredit kartı tələb olunmur · 14 gün pulsuz sınaq')}
               </motion.p>
             </div>
 
@@ -533,13 +533,11 @@ const Landing = () => {
                 <div className="w-20 h-20 rounded-2xl gradient-primary flex items-center justify-center mx-auto shadow-lg">
                   <span className="text-4xl">😊</span>
                 </div>
-                <p className="text-xl md:text-2xl leading-relaxed text-foreground/90 max-w-2xl mx-auto">
-                  Emosiyaları <strong className="text-secondary">KPI-ya</strong> çevirin. İtkini gözləməyin — <strong className="text-secondary">qarşısını alın.</strong>
-                </p>
-                <div className="flex items-center justify-center gap-2 text-secondary font-medium">
-                  <Shield className="w-5 h-5" />
-                  <span>İtki olmadan ÖNCƏ müdaxilə</span>
-                </div>
+                 <p className="text-xl md:text-2xl leading-relaxed text-foreground/90 max-w-2xl mx-auto" dangerouslySetInnerHTML={{ __html: t('solution_intro', 'Emosiyaları <strong class="text-secondary">KPI-ya</strong> çevirin. İtkini gözləməyin — <strong class="text-secondary">qarşısını alın.</strong>') }} />
+                 <div className="flex items-center justify-center gap-2 text-secondary font-medium">
+                   <Shield className="w-5 h-5" />
+                   <span>{t('solution_shield', 'İtki olmadan ÖNCƏ müdaxilə')}</span>
+                 </div>
               </CardContent>
             </Card>
           </motion.div>
@@ -762,14 +760,14 @@ const Landing = () => {
         <div className="container mx-auto px-4">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-20 space-y-4">
             <motion.div variants={fadeUp} custom={0}>
-              <Badge variant="outline" className="text-sm px-4 py-1.5 rounded-full">
-                <Crown className="w-3.5 h-3.5 mr-1.5" /> Qiymətlər
-              </Badge>
-            </motion.div>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-bold">Abunə Paketləri</motion.h2>
-            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-xl mx-auto">
-              Filial bazasında. 14 gün pulsuz.
-            </motion.p>
+               <Badge variant="outline" className="text-sm px-4 py-1.5 rounded-full">
+                 <Crown className="w-3.5 h-3.5 mr-1.5" /> {t('badge_pricing', 'Qiymətlər')}
+               </Badge>
+             </motion.div>
+             <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-bold">{t('pricing_title', 'Abunə Paketləri')}</motion.h2>
+             <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-xl mx-auto">
+               {t('pricing_subtitle', 'Filial bazasında. 14 gün pulsuz.')}
+             </motion.p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
@@ -811,13 +809,13 @@ const Landing = () => {
                     <p className="text-sm text-muted-foreground mt-2">{plan.description}</p>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    <Button
-                      onClick={() => navigate("/auth")}
-                      className={`w-full h-11 rounded-xl ${plan.popular ? "shadow-md shadow-primary/20" : ""}`}
-                      variant={plan.popular ? "default" : "outline"}
-                    >
-                      Pulsuz başla <ArrowRight className="w-4 h-4 ml-1" />
-                    </Button>
+                     <Button
+                       onClick={() => navigate("/auth")}
+                       className={`w-full h-11 rounded-xl ${plan.popular ? "shadow-md shadow-primary/20" : ""}`}
+                       variant={plan.popular ? "default" : "outline"}
+                     >
+                       {t('free_start_btn', 'Pulsuz başla')} <ArrowRight className="w-4 h-4 ml-1" />
+                     </Button>
                     <div className="space-y-3">
                       {plan.features.map((feature) => (
                         <div key={feature} className="flex items-start gap-2.5 text-sm">
@@ -844,8 +842,8 @@ const Landing = () => {
       <section className="py-16 md:py-20 border-y border-border/40">
         <div className="container mx-auto px-4">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12 space-y-3">
-            <h3 className="text-xl md:text-2xl font-bold text-muted-foreground">Güvən və Tərəfdaşlıq</h3>
-            <p className="text-sm text-muted-foreground/70">Etibarlı şirkətlər tərəfindən istifadə olunur</p>
+             <h3 className="text-xl md:text-2xl font-bold text-muted-foreground">{t('trust_title', 'Güvən və Tərəfdaşlıq')}</h3>
+             <p className="text-sm text-muted-foreground/70">{t('trust_subtitle', 'Etibarlı şirkətlər tərəfindən istifadə olunur')}</p>
           </motion.div>
 
           <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16">
