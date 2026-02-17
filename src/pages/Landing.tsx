@@ -43,16 +43,16 @@ import { useRef } from "react";
 const painStats = [
   {
     value: "65%",
-    label: "İtirilmiş müştəri",
-    detail: "Müştərilərin 65%-i əməkdaşın mənfi münasibətinə görə rəqibə keçir",
-    source: "Oxford Global Resources 2024",
+    label: "Müştəri itkisi",
+    detail: "Qiymətə görə deyil, əməkdaşın enerjisine görə gedir",
+    source: "Oxford 2024",
     icon: HeartCrack,
     color: "text-destructive",
   },
   {
     value: "79%",
-    label: "Risk zonasında",
-    detail: "Retail işçilərinin yalnız 21%-i işinə həvəslə yanaşır. Qalan 79% — gizli itki riski",
+    label: "Həvəssiz işçi",
+    detail: "Hər 5 işçidən 4-ü motivasiyasız. Hər biri — itirilmiş satış",
     source: "Gallup 2024",
     icon: ShieldAlert,
     color: "text-destructive",
@@ -60,16 +60,16 @@ const painStats = [
   {
     value: "+3%",
     label: "Gizli qazanc",
-    detail: "Əməkdaş loyallığı yüksək olan nöqtələr digərlərindən 3% daha çox satış edir",
+    detail: "Motivasiyalı komanda = daha çox satış. Sadəcə ölçün",
     source: "McKinsey",
     icon: TrendingUp,
     color: "text-primary",
   },
   {
     value: "5%",
-    label: "Stress dalğası",
-    detail: "Cəmi 5% stressli işçi, gün ərzində on minlərlə mənfi müştəri təması yaradır",
-    source: "Daxili araşdırma",
+    label: "Zəncir reaksiya",
+    detail: "5% stressli işçi → minlərlə mənfi müştəri təması",
+    source: "Sektor araşdırması",
     icon: AlertTriangle,
     color: "text-secondary",
   },
@@ -79,38 +79,38 @@ const painStats = [
 const solutionFeatures = [
   {
     icon: MousePointerClick,
-    title: "3 Saniyəlik Mikro-Sorğu",
-    description: "Əməkdaşın gününün cəmi 3 saniyəsini alır. Bir kliklə anonim əhval bildirişi.",
+    title: "3 saniyə. 1 klik.",
+    description: "Anonim. Sadə. İşçi gününü pozmadan əhval toplayın.",
     gradient: "from-primary to-primary-glow",
   },
   {
     icon: Gauge,
-    title: "Real-Time Mood Index",
-    description: "0–100 arası hesablanan Əhval İndeksi kritik həddə düşdükdə menecerə dərhal alert göndərilir.",
+    title: "Canlı Əhval İndeksi",
+    description: "Kritik həddə düşəndə menecer dərhal alert alır. Gecikmə yoxdur.",
     gradient: "from-amber-500 to-orange-500",
   },
   {
     icon: Brain,
-    title: "AI Root Cause Analysis",
-    description: "Süni intellekt stressin, yorğunluğun və konfliktlərin kök səbəblərini trend analizləri ilə müəyyən edir.",
+    title: "AI Kök Səbəb Analizi",
+    description: "Stress nədən qaynaqlanır? AI cavabı tapır, siz hərəkətə keçirsiniz.",
     gradient: "from-violet-500 to-purple-600",
   },
   {
     icon: LineChart,
-    title: "Satışla İnteqrasiya",
-    description: "Əhval göstəricilərinin satış datası ilə çarpaz analizi — əhvalın satışa real təsirini görün.",
+    title: "Satış ↔ Əhval",
+    description: "Əhval düşdü → satış düşdü? Korrelyasiyanı rəqəmlərlə görün.",
     gradient: "from-blue-500 to-cyan-500",
   },
   {
     icon: Eye,
-    title: "Emosional Dashboard",
-    description: "Regionlar, filiallar və növbələr üzrə Emosional Xəritə və Burnout Risk Skoru vizuallaşdırılır.",
+    title: "Emosional Xəritə",
+    description: "Hansı filial risk altında? Bir baxışda görün, dərhal müdaxilə edin.",
     gradient: "from-rose-500 to-pink-600",
   },
   {
     icon: Bell,
-    title: "Proaktiv Tövsiyələr",
-    description: "AI tərəfindən idarəetmə heyəti üçün hazırlanan stressi azaltma və motivasiyanı artırma strategiyaları.",
+    title: "AI Tövsiyələr",
+    description: "Nə etməli? AI konkret addımlar təklif edir. Oxu və tətbiq et.",
     gradient: "from-teal-500 to-green-500",
   },
 ];
@@ -119,20 +119,20 @@ const solutionFeatures = [
 const steps = [
   {
     step: "01",
-    title: "Əməkdaş əhval bildirir",
-    description: "Gündə 1 dəfə, bir kliklə — sadə, intuitiv, tam anonim. Psixoloji təhlükəsizlik qorunur.",
+    title: "İşçi klik edir",
+    description: "3 saniyə. Anonim. Hər gün.",
     icon: MessageSquare,
   },
   {
     step: "02",
-    title: "AI datanı analiz edir",
-    description: "Süni intellekt tendensiyaları, kök səbəbləri və risk faktorlarını real vaxtda müəyyənləşdirir.",
+    title: "AI analiz edir",
+    description: "Risk, trend, kök səbəb — hamısı avtomatik.",
     icon: Brain,
   },
   {
     step: "03",
-    title: "Rəhbərlik hərəkətə keçir",
-    description: "Müştəri itkisi baş vermədən ÖNCƏ riskli filiallar və kritik zaman dilimləri müəyyən edilir.",
+    title: "Siz hərəkətə keçirsiniz",
+    description: "İtki olmadan ÖNCƏ müdaxilə edin.",
     icon: Zap,
   },
 ];
@@ -202,10 +202,10 @@ const pricingPlans = [
 
 /* ─── Result metrics ─── */
 const resultMetrics = [
-  { value: "60%", label: "Tükənmişlik risklərinin əvvəlcədən aşkarlanması" },
-  { value: "35%", label: "İşçi dönüşümünün (turnover) azalması" },
-  { value: "25%", label: "Müştəri məmnuniyyətinin artması" },
-  { value: "3x", label: "Menecer müdaxilə sürətinin artması" },
+  { value: "60%", label: "Burnout riski əvvəlcədən tutulur" },
+  { value: "35%", label: "İşçi itkisi azalır" },
+  { value: "25%", label: "Müştəri məmnuniyyəti artır" },
+  { value: "3x", label: "Daha sürətli müdaxilə" },
 ];
 
 const Landing = () => {
@@ -299,11 +299,10 @@ const Landing = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.6 }}
-              className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed"
+              className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
             >
-              Şirkətlər satış rəqəmlərini ölçürlər — <strong className="text-foreground">nəticəni</strong>.
-              Lakin bu nəticəni doğuran əsas amili — kassanın, bank masasının arxasındakı{" "}
-              <strong className="text-foreground">insanın emosional vəziyyətini</strong> — ölçmürlər.
+              Satışı ölçürsünüz. Bəs satışı{" "}
+              <strong className="text-foreground">yaradan insanın əhvalını?</strong>
             </motion.p>
 
             <motion.div
@@ -373,9 +372,8 @@ const Landing = () => {
               Rəqəmlərin arxasındakı{" "}
               <span className="bg-gradient-to-r from-destructive to-destructive/60 bg-clip-text text-transparent">həqiqət</span>
             </motion.h2>
-            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-3xl mx-auto">
-              Pərakəndə, bank və telekommunikasiya sektorlarında rəqabət artıq qiymətdə deyil, müştəri təcrübəsindədir.
-              Eyni xidmət standartlarına baxmayaraq, müştəri məmnuniyyəti filiallar üzrə kəskin fərqlənir.
+            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Rəqabət qiymətdə deyil, müştəri təcrübəsindədir. Fərq yaradan — sistem yox, insan faktorudur.
             </motion.p>
           </motion.div>
 
@@ -403,24 +401,7 @@ const Landing = () => {
             ))}
           </div>
 
-          {/* Pain point callout */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mt-12 max-w-4xl mx-auto"
-          >
-            <Card className="border-destructive/20 bg-gradient-to-r from-destructive/5 via-background to-destructive/5">
-              <CardContent className="p-8 text-center space-y-3">
-                <AlertTriangle className="w-10 h-10 text-destructive mx-auto" />
-                <h3 className="text-xl md:text-2xl font-bold">Əsas Ağrı Nöqtəsi</h3>
-                <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
-                  Şirkətlər satış rəqəmlərini <strong className="text-foreground">(nəticəni)</strong> ölçürlər, lakin bu nəticəni doğuran əsas amili —{" "}
-                  <strong className="text-destructive">kassanın arxasındakı insanın emosional vəziyyətini</strong> — ölçmürlər.
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
+          {/* Pain point callout — removed, already covered above */}
         </div>
       </section>
 
@@ -455,13 +436,14 @@ const Landing = () => {
                 <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center mx-auto shadow-lg shadow-primary/30">
                   <span className="text-4xl">😊</span>
                 </div>
-                <p className="text-xl md:text-2xl leading-relaxed text-foreground/90 max-w-3xl mx-auto">
-                  Əməkdaşların emosional vəziyyətini real vaxt rejimində{" "}
-                  <strong className="text-primary">biznes göstəricisinə (KPI)</strong> çevirən və süni intellektlə idarə olunan analitika platforması.
+                <p className="text-xl md:text-2xl leading-relaxed text-foreground/90 max-w-2xl mx-auto">
+                  Emosiyaları{" "}
+                  <strong className="text-primary">KPI-ya</strong> çevirin.
+                  İtkini gözləməyin — <strong className="text-primary">qarşısını alın.</strong>
                 </p>
                 <div className="flex items-center justify-center gap-2 text-primary font-medium">
                   <Shield className="w-5 h-5" />
-                  <span>Müştəri itkisi baş vermədən ÖNCƏ proaktiv müdaxilə imkanı</span>
+                  <span>İtki olmadan ÖNCƏ müdaxilə</span>
                 </div>
               </CardContent>
             </Card>
@@ -506,9 +488,9 @@ const Landing = () => {
                 <Zap className="w-3.5 h-3.5 mr-1.5" /> Proses
               </Badge>
             </motion.div>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-bold">3 addımda başlayın</motion.h2>
-            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Quraşdırma sadədir. Komandanız dəqiqələr ərzində əhval bildirməyə başlaya bilər.
+            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-bold">Sadəcə 3 addım</motion.h2>
+            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-xl mx-auto">
+              Dəqiqələr ərzində quraşdırın. Elə bu gün nəticə görün.
             </motion.p>
           </motion.div>
 
@@ -592,18 +574,18 @@ const Landing = () => {
             <div className="grid md:grid-cols-3 gap-6">
               {[
                 {
-                  sector: "Pərakəndə ticarət",
-                  detail: "Hər filialda müştəri ilə təmasda olan satıcıların əhvalı birbaşa satışa təsir edir",
+                  sector: "Pərakəndə",
+                  detail: "Satıcının əhvalı = müştəri çeki",
                   emoji: "🛒",
                 },
                 {
-                  sector: "Bankçılıq",
-                  detail: "Bank masasının arxasındakı əməkdaşın münasibəti müştəri loyallığını müəyyən edir",
+                  sector: "Bank",
+                  detail: "Əməkdaş münasibəti = müştəri loyallığı",
                   emoji: "🏦",
                 },
                 {
-                  sector: "Telekommunikasiya",
-                  detail: "Xidmət şöbəsinin enerjisi brendin ən güclü reklam alətidir",
+                  sector: "Telekom",
+                  detail: "Xidmət enerjisi = brend reputasiyası",
                   emoji: "📡",
                 },
               ].map((item, i) => (
@@ -615,10 +597,10 @@ const Landing = () => {
                   transition={{ delay: i * 0.1 }}
                 >
                   <Card className="h-full border-border/50 hover:border-primary/30 transition-all duration-300">
-                    <CardContent className="p-6 space-y-3">
+                    <CardContent className="p-6 space-y-2">
                       <span className="text-3xl">{item.emoji}</span>
                       <h3 className="text-lg font-semibold">{item.sector}</h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{item.detail}</p>
+                      <p className="text-sm text-muted-foreground">{item.detail}</p>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -643,8 +625,8 @@ const Landing = () => {
               </Badge>
             </motion.div>
             <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-bold">Abunə Paketləri</motion.h2>
-            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Filial sayına görə miqyaslanan B2B SaaS modeli. Bütün paketlərdə 14 gün pulsuz sınaq.
+            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground text-lg max-w-xl mx-auto">
+              Filial bazasında. 14 gün pulsuz.
             </motion.p>
           </motion.div>
 
@@ -735,9 +717,8 @@ const Landing = () => {
               <br />
               <span className="text-muted-foreground text-[0.7em]">Satışları qoruyun.</span>
             </h2>
-            <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-              14 gün pulsuz sınaq müddəti ilə başlayın. Kredit kartı tələb olunmur.
-              Dəqiqələr ərzində ilk nəticələri görün.
+            <p className="text-muted-foreground text-lg max-w-md mx-auto">
+              14 gün pulsuz. Kredit kartı lazım deyil.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
               <Button
