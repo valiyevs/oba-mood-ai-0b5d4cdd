@@ -181,7 +181,9 @@ const Targets = () => {
               >
                 <ArrowLeft className="w-5 h-5" />
               </Button>
-              <img src={obaLogo} alt="MoodAI" className="w-12 h-12 rounded-xl object-cover" />
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center shadow-lg">
+                <span className="text-2xl">😊</span>
+              </div>
               <div>
                 <h1 className="text-xl font-bold flex items-center gap-2">
                   <Target className="w-5 h-5 text-emerald-500" />
