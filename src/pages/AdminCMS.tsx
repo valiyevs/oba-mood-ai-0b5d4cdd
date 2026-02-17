@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import {
   LayoutDashboard, FileText, HelpCircle, Handshake,
   Plus, Pencil, Trash2, Save, ArrowLeft, Eye, EyeOff,
-  GripVertical, ExternalLink, LogOut,
+  GripVertical, ExternalLink, LogOut, Upload, Image,
 } from "lucide-react";
 
 /* ═══════════════════════════════════════════════ */
@@ -266,6 +266,7 @@ const PartnersTab = () => {
   const [editItem, setEditItem] = useState<any>(null);
   const [showAdd, setShowAdd] = useState(false);
   const [newPartner, setNewPartner] = useState({ name: "", logo_url: "", website_url: "" });
+  const [uploading, setUploading] = useState(false);
 
   const { data: partners = [], isLoading } = useQuery({
     queryKey: ["cms_partners"],
@@ -275,6 +276,31 @@ const PartnersTab = () => {
       return data;
     },
   });
+
+  const uploadLogo = async (file: File): Promise<string> => {
+    const ext = file.name.split(".").pop();
+    const path = `partner-logos/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("cms-assets").upload(path, file, { upsert: true });
+    if (error) throw error;
+    const { data: urlData } = supabase.storage.from("cms-assets").getPublicUrl(path);
+    return urlData.publicUrl;
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: "new" | "edit") => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const url = await uploadLogo(file);
+      if (target === "new") setNewPartner(p => ({ ...p, logo_url: url }));
+      else if (editItem) setEditItem((p: any) => ({ ...p, logo_url: url }));
+      toast.success("Logo yükləndi");
+    } catch (err: any) {
+      toast.error(err.message || "Yükləmə xətası");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const addMutation = useMutation({
     mutationFn: async (item: typeof newPartner) => {
@@ -315,9 +341,24 @@ const PartnersTab = () => {
             <DialogHeader><DialogTitle>Yeni tərəfdaş</DialogTitle></DialogHeader>
             <div className="space-y-3">
               <div><Label>Ad</Label><Input value={newPartner.name} onChange={e => setNewPartner({ ...newPartner, name: e.target.value })} /></div>
-              <div><Label>Logo URL</Label><Input value={newPartner.logo_url} onChange={e => setNewPartner({ ...newPartner, logo_url: e.target.value })} placeholder="https://..." /></div>
+              <div>
+                <Label>Logo</Label>
+                <div className="flex items-center gap-3 mt-1">
+                  {newPartner.logo_url ? (
+                    <img src={newPartner.logo_url} alt="Logo" className="w-12 h-12 object-contain rounded border" />
+                  ) : (
+                    <div className="w-12 h-12 rounded border border-dashed flex items-center justify-center text-muted-foreground"><Image className="w-5 h-5" /></div>
+                  )}
+                  <label className="cursor-pointer">
+                    <input type="file" accept="image/*" className="hidden" onChange={e => handleFileUpload(e, "new")} disabled={uploading} />
+                    <span className="inline-flex items-center gap-1 text-sm px-3 py-1.5 rounded-md border hover:bg-muted transition-colors">
+                      <Upload className="w-3.5 h-3.5" /> {uploading ? "Yüklənir..." : "Yüklə"}
+                    </span>
+                  </label>
+                </div>
+              </div>
               <div><Label>Veb-sayt URL</Label><Input value={newPartner.website_url} onChange={e => setNewPartner({ ...newPartner, website_url: e.target.value })} placeholder="https://..." /></div>
-              <Button onClick={() => addMutation.mutate(newPartner)} disabled={!newPartner.name} className="w-full">
+              <Button onClick={() => addMutation.mutate(newPartner)} disabled={!newPartner.name || uploading} className="w-full">
                 <Save className="w-4 h-4 mr-1" /> Saxla
               </Button>
             </div>
@@ -337,7 +378,19 @@ const PartnersTab = () => {
                 {editItem?.id === p.id ? (
                   <div className="space-y-2">
                     <Input value={editItem.name} onChange={e => setEditItem({ ...editItem, name: e.target.value })} />
-                    <Input value={editItem.logo_url || ""} onChange={e => setEditItem({ ...editItem, logo_url: e.target.value })} placeholder="Logo URL" />
+                    <div className="flex items-center gap-3">
+                      {editItem.logo_url ? (
+                        <img src={editItem.logo_url} alt="Logo" className="w-10 h-10 object-contain rounded border" />
+                      ) : (
+                        <div className="w-10 h-10 rounded border border-dashed flex items-center justify-center text-muted-foreground"><Image className="w-4 h-4" /></div>
+                      )}
+                      <label className="cursor-pointer">
+                        <input type="file" accept="image/*" className="hidden" onChange={e => handleFileUpload(e, "edit")} disabled={uploading} />
+                        <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded border hover:bg-muted transition-colors">
+                          <Upload className="w-3 h-3" /> {uploading ? "..." : "Dəyiş"}
+                        </span>
+                      </label>
+                    </div>
                     <Input value={editItem.website_url || ""} onChange={e => setEditItem({ ...editItem, website_url: e.target.value })} placeholder="Website URL" />
                     <div className="flex items-center gap-2">
                       <Switch checked={editItem.is_active} onCheckedChange={v => setEditItem({ ...editItem, is_active: v })} />

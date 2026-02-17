@@ -1,8 +1,11 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
   Brain,
   BarChart3,
@@ -42,10 +45,11 @@ import {
   Wifi,
   Award,
   Handshake,
+  HelpCircle,
 } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 
 /* ─── Pain Point Statistics ─── */
 const painStats = [
@@ -254,6 +258,35 @@ const Landing = () => {
   const heroOpacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 100]);
 
+  // CMS Data
+  const { data: cmsContent = [] } = useQuery({
+    queryKey: ["cms_content_landing"],
+    queryFn: async () => {
+      const { data } = await supabase.from("cms_content").select("*").eq("is_active", true).order("sort_order");
+      return data || [];
+    },
+  });
+  const { data: cmsFaqs = [] } = useQuery({
+    queryKey: ["cms_faqs_landing"],
+    queryFn: async () => {
+      const { data } = await supabase.from("cms_faqs").select("*").eq("is_active", true).order("sort_order");
+      return data || [];
+    },
+  });
+  const { data: cmsPartners = [] } = useQuery({
+    queryKey: ["cms_partners_landing"],
+    queryFn: async () => {
+      const { data } = await supabase.from("cms_partners").select("*").eq("is_active", true).order("sort_order");
+      return data || [];
+    },
+  });
+
+  const cms = useMemo(() => {
+    const map: Record<string, string> = {};
+    cmsContent.forEach((c: any) => { map[c.content_key] = c.content_value; });
+    return map;
+  }, [cmsContent]);
+
   const fadeUp = {
     hidden: { opacity: 0, y: 30 },
     visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.5 } }),
@@ -348,7 +381,7 @@ const Landing = () => {
               <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}>
                 <Badge variant="outline" className="text-sm px-4 py-1.5 rounded-full border-destructive/30 text-destructive font-medium">
                   <AlertTriangle className="w-3.5 h-3.5 mr-1.5" />
-                  Görünməyən satış itkisi — hər gün baş verir
+                  {cms.hero_badge || 'Görünməyən satış itkisi — hər gün baş verir'}
                 </Badge>
               </motion.div>
 
@@ -358,11 +391,11 @@ const Landing = () => {
                 transition={{ duration: 0.7 }}
                 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight"
               >
-                İşçi əhvalını{" "}
+                {cms.hero_title ? cms.hero_title : (<>İşçi əhvalını{" "}
                 <span className="bg-gradient-to-r from-secondary to-secondary/70 bg-clip-text text-transparent">
                   biznesin qazancına
                 </span>{" "}
-                çevirin.
+                çevirin.</>)}
               </motion.h1>
 
               <motion.p
@@ -371,9 +404,9 @@ const Landing = () => {
                 transition={{ delay: 0.3 }}
                 className="text-lg text-muted-foreground max-w-lg leading-relaxed"
               >
-                Satışı ölçürsünüz. Bəs satışı{" "}
+                {cms.hero_subtitle || (<>Satışı ölçürsünüz. Bəs satışı{" "}
                 <strong className="text-foreground">yaradan insanın əhvalını?</strong>{" "}
-                Ölçülməyən emosiya idarə oluna bilməz.
+                Ölçülməyən emosiya idarə oluna bilməz.</>)}
               </motion.p>
 
               <motion.div
@@ -479,10 +512,10 @@ const Landing = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto text-center">
             {[
-              { end: 50, suffix: "+", label: "Şirkət istifadə edir" },
-              { end: 340, suffix: "+", label: "Aktiv istifadəçi" },
-              { end: 12, suffix: "", label: "Sektor əhatə olunub" },
-              { end: 98, suffix: "%", label: "Müştəri məmnuniyyəti" },
+              { end: parseInt(cms.stat_companies || "50"), suffix: "+", label: cms.stat_companies_label || "Şirkət istifadə edir" },
+              { end: parseInt(cms.stat_users || "340"), suffix: "+", label: cms.stat_users_label || "Aktiv istifadəçi" },
+              { end: parseInt(cms.stat_branches || "120"), suffix: "+", label: cms.stat_branches_label || "Filial" },
+              { end: parseInt(cms.stat_satisfaction || "98"), suffix: "%", label: cms.stat_satisfaction_label || "Məmnuniyyət" },
             ].map((item, i) => (
               <CounterItem key={item.label} end={item.end} suffix={item.suffix} label={item.label} delay={i * 0.15} />
             ))}
@@ -885,7 +918,7 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* ═══ Trust & Social Proof ═══ */}
+      {/* ═══ Trust & Social Proof (CMS) ═══ */}
       <section className="py-16 md:py-20 border-y border-border/40">
         <div className="container mx-auto px-4">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12 space-y-3">
@@ -894,19 +927,23 @@ const Landing = () => {
           </motion.div>
 
           <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16">
-            {["OBA Market", "PATCO Group"].map((name, i) => (
+            {(cmsPartners.length > 0 ? cmsPartners : [{ name: "OBA Market", logo_url: null }, { name: "PATCO Group", logo_url: null }]).map((partner: any, i: number) => (
               <motion.div
-                key={name}
+                key={partner.name}
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.15 }}
                 className="flex items-center gap-3 grayscale hover:grayscale-0 opacity-50 hover:opacity-100 transition-all duration-500 cursor-default"
               >
-                <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center">
-                  <Building2 className="w-6 h-6 text-muted-foreground" />
-                </div>
-                <span className="text-lg font-semibold text-muted-foreground">{name}</span>
+                {partner.logo_url ? (
+                  <img src={partner.logo_url} alt={partner.name} className="w-12 h-12 object-contain rounded-xl" />
+                ) : (
+                  <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center">
+                    <Building2 className="w-6 h-6 text-muted-foreground" />
+                  </div>
+                )}
+                <span className="text-lg font-semibold text-muted-foreground">{partner.name}</span>
               </motion.div>
             ))}
             <motion.div
@@ -922,6 +959,39 @@ const Landing = () => {
           </div>
         </div>
       </section>
+
+      {/* ═══ FAQ (CMS) ═══ */}
+      {cmsFaqs.length > 0 && (
+        <section id="faq" className="py-20 md:py-28 bg-muted/15">
+          <div className="container mx-auto px-4 max-w-3xl">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12 space-y-4">
+              <motion.div variants={fadeUp} custom={0}>
+                <Badge variant="outline" className="text-sm px-4 py-1.5 rounded-full">
+                  <HelpCircle className="w-3.5 h-3.5 mr-1.5" /> FAQ
+                </Badge>
+              </motion.div>
+              <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-bold">Tez-tez Verilən Suallar</motion.h2>
+            </motion.div>
+
+            <Accordion type="single" collapsible className="space-y-3">
+              {cmsFaqs.map((faq: any, i: number) => (
+                <motion.div
+                  key={faq.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05 }}
+                >
+                  <AccordionItem value={faq.id} className="border border-border/50 rounded-xl px-5 bg-card/50 backdrop-blur-sm">
+                    <AccordionTrigger className="text-left font-medium hover:no-underline py-4">{faq.question}</AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pb-4">{faq.answer}</AccordionContent>
+                  </AccordionItem>
+                </motion.div>
+              ))}
+            </Accordion>
+          </div>
+        </section>
+      )}
 
       {/* ═══ CTA ═══ */}
       <section className="py-20 md:py-28">
