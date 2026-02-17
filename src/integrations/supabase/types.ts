@@ -152,6 +152,105 @@ export type Database = {
         }
         Relationships: []
       }
+      cms_content: {
+        Row: {
+          content_key: string
+          content_type: string
+          content_value: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          section: string
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          content_key: string
+          content_type?: string
+          content_value: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          section?: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          content_key?: string
+          content_type?: string
+          content_value?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          section?: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_faqs: {
+        Row: {
+          answer: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          question: string
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          question: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          question?: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_partners: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean | null
+          logo_url: string | null
+          name: string
+          sort_order: number | null
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          name: string
+          sort_order?: number | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          name?: string
+          sort_order?: number | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       employee_responses: {
         Row: {
           branch: string
@@ -492,7 +591,7 @@ export type Database = {
         | "team_meeting"
         | "training"
         | "other"
-      app_role: "hr" | "manager" | "employee"
+      app_role: "hr" | "manager" | "employee" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -629,7 +728,7 @@ export const Constants = {
         "training",
         "other",
       ],
-      app_role: ["hr", "manager", "employee"],
+      app_role: ["hr", "manager", "employee", "admin"],
     },
   },
 } as const
