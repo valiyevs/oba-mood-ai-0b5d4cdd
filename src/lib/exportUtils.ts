@@ -227,7 +227,7 @@ export const generatePrintableHTML = (
       `).join("")}
       
       <div class="footer">
-        <p>OBA Personal Məmnuniyyət Sistemi © ${new Date().getFullYear()}</p>
+        <p>MoodAI Personal Məmnuniyyət Sistemi © ${new Date().getFullYear()}</p>
         <p>Hesabat tarixi: ${format(new Date(), "d MMMM yyyy, HH:mm", { locale: az })}</p>
       </div>
     </body>

@@ -245,7 +245,7 @@ const ManagerActions = () => {
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <img src={obaLogo} alt="OBA Logo" className="h-10 w-10 rounded-lg object-cover" />
+            <img src={obaLogo} alt="MoodAI Logo" className="h-10 w-10 rounded-lg object-cover" />
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-foreground">Menecer Tapşırıqları</h1>
               <p className="text-sm text-muted-foreground hidden sm:block">Tükənmişlik hallarına görülən tədbirlər</p>

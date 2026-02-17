@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 
 const navItems = [
-  { label: "Ana Səhifə", to: "/", icon: Home },
+  { label: "Ana Səhifə", to: "/survey", icon: Home },
   { label: "İdarəetmə Paneli", to: "/dashboard", icon: LayoutDashboard },
   { label: "Proqnozlaşdırıcı Analitika", to: "/analytics", icon: Brain },
   { label: "HR Paneli", to: "/hr-panel", icon: UserCog },

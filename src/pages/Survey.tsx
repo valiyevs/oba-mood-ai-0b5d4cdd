@@ -241,13 +241,13 @@ const Index = () => {
                 <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-lg" />
                 <img 
                   src={obaLogo} 
-                  alt="OBA Logo" 
+                  alt="MoodAI Logo" 
                   className="relative w-14 h-14 rounded-2xl shadow-xl object-cover ring-2 ring-border/50 transition-all duration-300"
                 />
               </motion.div>
               <div>
                 <h1 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-                  OBA Əhval Sistemi
+                  MoodAI
                 </h1>
                 <p className="text-sm text-muted-foreground flex items-center gap-2">
                   <span className="relative flex h-2 w-2">

@@ -433,7 +433,7 @@ const HRPanel = () => {
                 <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-lg" />
                 <img 
                   src={obaLogo} 
-                  alt="OBA Logo" 
+                  alt="MoodAI Logo" 
                   className="relative w-14 h-14 rounded-2xl shadow-lg object-cover ring-2 ring-border/50"
                 />
               </div>
@@ -709,7 +709,7 @@ const HRPanel = () => {
 
       {/* Footer */}
       <footer className="py-6 text-center text-sm text-muted-foreground border-t border-border/50 bg-card/30 backdrop-blur-sm mt-8">
-        <p>© 2025 OBA İnsan Resursları Paneli. Bütün hüquqlar qorunur.</p>
+        <p>© 2026 MoodAI İnsan Resursları Paneli. Bütün hüquqlar qorunur.</p>
       </footer>
     </div>
   );

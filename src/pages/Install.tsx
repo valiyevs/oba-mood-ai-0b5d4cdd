@@ -65,7 +65,7 @@ const Install = () => {
             </div>
             <CardTitle className="text-2xl">Tətbiqi Quraşdır</CardTitle>
             <CardDescription>
-              OBA Mood tətbiqini telefonunuzun ana ekranına əlavə edin
+              MoodAI tətbiqini telefonunuzun ana ekranına əlavə edin
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">

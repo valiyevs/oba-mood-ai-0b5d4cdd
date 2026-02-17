@@ -38,15 +38,15 @@ const wrapHtml = (title: string, body: string) => `<!DOCTYPE html>
 <head><meta charset="UTF-8"><title>${title}</title><style>${baseStyles}</style></head>
 <body>${body}
 <div class="footer">
-  <p><strong>OBA Personal Məmnuniyyət İdarəetmə Sistemi</strong></p>
+  <p><strong>MoodAI Personal Məmnuniyyət İdarəetmə Sistemi</strong></p>
   <p>Sifarişçi: Şahin | İcraçı: PATCO Group</p>
   <p>Fevral 2026 | Versiya 2.0</p>
 </div>
 </body></html>`;
 
-export const generateProjectAboutPDF = () => wrapHtml("OBA — Layihə Haqqında", `
+export const generateProjectAboutPDF = () => wrapHtml("MoodAI — Layihə Haqqında", `
 <div class="cover">
-  <h1>OBA ƏHVAL SİSTEMİ</h1>
+  <h1>MoodAI ƏHVAL SİSTEMİ</h1>
   <h2>Personal Məmnuniyyət İdarəetmə Sistemi</h2>
   <p>Layihə Haqqında Sənəd</p>
   <p>Versiya: 2.0 | Fevral 2026</p>
@@ -55,7 +55,7 @@ export const generateProjectAboutPDF = () => wrapHtml("OBA — Layihə Haqqında
 
 <div class="section">
 <h2>1. ÜMUMİ MƏLUMAT</h2>
-<p><strong>OBA Əhval Sistemi</strong> — işçilərin gündəlik əhval-ruhiyyəsini real vaxtda izləyən, süni intellekt (AI) ilə analiz edən və burnout (tükənmə) risklərini əvvəlcədən aşkarlayan web tətbiqdir.</p>
+<p><strong>MoodAI</strong> — işçilərin gündəlik əhval-ruhiyyəsini real vaxtda izləyən, süni intellekt (AI) ilə analiz edən və burnout (tükənmə) risklərini əvvəlcədən aşkarlayan web tətbiqdir.</p>
 <h3>🎯 Məqsəd</h3>
 <p>Personalın əhvalı düşəndə müştəri təcrübəsi zərər görməzdən <strong>əvvəl</strong> müdaxilə etmək. Rəhbərliyə vaxtında, dəqiq və hərəkətə keçməyə imkan verən tövsiyələr təqdim etmək.</p>
 </div>
@@ -181,9 +181,9 @@ Nəticə izlənir</div>
 </div>
 `);
 
-export const generateDeveloperGuidePDF = () => wrapHtml("OBA — Developer Guide", `
+export const generateDeveloperGuidePDF = () => wrapHtml("MoodAI — Developer Guide", `
 <div class="cover">
-  <h1>OBA ƏHVAL SİSTEMİ</h1>
+  <h1>MoodAI ƏHVAL SİSTEMİ</h1>
   <h2>Developer Guide</h2>
   <p>Texnologiya steki, folder strukturu, database sxemi</p>
   <p>Versiya: 2.0 | Fevral 2026</p>
@@ -284,9 +284,9 @@ export const generateDeveloperGuidePDF = () => wrapHtml("OBA — Developer Guide
 </div>
 `);
 
-export const generateProjectOverviewPDF = () => wrapHtml("OBA — Layihə İcmalı", `
+export const generateProjectOverviewPDF = () => wrapHtml("MoodAI — Layihə İcmalı", `
 <div class="cover">
-  <h1>OBA ƏHVAL SİSTEMİ</h1>
+  <h1>MoodAI ƏHVAL SİSTEMİ</h1>
   <h2>Layihə İcmalı (V1)</h2>
   <p>İlkin versiya xüsusiyyətləri və roadmap</p>
   <p>Versiya: 1.0 | Noyabr 2025</p>
@@ -351,9 +351,9 @@ export const generateProjectOverviewPDF = () => wrapHtml("OBA — Layihə İcmal
 </div>
 `);
 
-export const generateTechnicalSpecPDF = () => wrapHtml("OBA — Texniki Tapşırıq", `
+export const generateTechnicalSpecPDF = () => wrapHtml("MoodAI — Texniki Tapşırıq", `
 <div class="cover">
-  <h1>OBA ƏHVAL SİSTEMİ</h1>
+  <h1>MoodAI ƏHVAL SİSTEMİ</h1>
   <h2>Texniki Tapşırıq (Technical Specification)</h2>
   <p>Tam texniki spesifikasiya sənədi</p>
   <p>Versiya: 2.0 | Fevral 2026</p>
@@ -362,7 +362,7 @@ export const generateTechnicalSpecPDF = () => wrapHtml("OBA — Texniki Tapşır
 
 <div class="section">
 <h2>1. ÜMUMİ MƏLUMAT</h2>
-<p><strong>OBA Əhval Sistemi</strong> — Personal Məmnuniyyət İdarəetmə Platforması</p>
+<p><strong>MoodAI</strong> — Personal Məmnuniyyət İdarəetmə Platforması</p>
 <table>
   <tr><th>Rol</th><th>Təsvir</th><th>Giriş</th></tr>
   <tr><td>İşçi</td><td>Gündəlik əhval sorğusu</td><td>Anonim</td></tr>
