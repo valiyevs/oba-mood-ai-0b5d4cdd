@@ -23,6 +23,7 @@ import { TrendLineChart } from "@/components/charts/TrendLineChart";
 import { BranchComparisonChart } from "@/components/charts/BranchComparisonChart";
 import { NotificationButton } from "@/components/NotificationButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { useNotifications } from "@/hooks/useNotifications";
 
 interface StatCardProps {
@@ -327,6 +328,7 @@ const Dashboard = () => {
             <div className="flex items-center gap-2">
               {/* Theme & Notification controls */}
               <div className="hidden sm:flex items-center gap-2">
+                <LanguageSelector />
                 <ThemeToggle />
                 <NotificationButton />
               </div>
