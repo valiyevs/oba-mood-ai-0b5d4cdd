@@ -34,10 +34,13 @@ import {
   LineChart,
   Layers,
   MousePointerClick,
+  Menu,
+  X,
+  Quote,
 } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 /* ─── Pain Point Statistics ─── */
 const painStats = [
@@ -79,20 +82,20 @@ const painStats = [
 const solutionFeatures = [
   {
     icon: MousePointerClick,
-    title: "3 saniyə. 1 klik.",
+    title: "10–20 saniyə. 1–2 klik ilə.",
     description: "Anonim. Sadə. İşçi gününü pozmadan əhval toplayın.",
     gradient: "from-primary to-primary-glow",
   },
   {
     icon: Gauge,
     title: "Canlı Əhval İndeksi",
-    description: "Kritik həddə düşəndə menecer dərhal alert alır. Gecikmə yoxdur.",
+    description: "Kritik həddə düşəndə menecer dərhal xəbərdarlıq alır. Gecikmə yoxdur.",
     gradient: "from-amber-500 to-orange-500",
   },
   {
     icon: Brain,
-    title: "AI Kök Səbəb Analizi",
-    description: "Stress nədən qaynaqlanır? AI cavabı tapır, siz hərəkətə keçirsiniz.",
+    title: "Süni İntellekt Səbəb Analizi",
+    description: "Stress nədən qaynaqlanır? Süni intellekt cavabı tapır, siz hərəkətə keçirsiniz.",
     gradient: "from-violet-500 to-purple-600",
   },
   {
@@ -109,8 +112,8 @@ const solutionFeatures = [
   },
   {
     icon: Bell,
-    title: "AI Tövsiyələr",
-    description: "Nə etməli? AI konkret addımlar təklif edir. Oxu və tətbiq et.",
+    title: "Süni İntellekt Tövsiyələri",
+    description: "Nə etməli? Süni intellekt konkret addımlar təklif edir. Oxu və tətbiq et.",
     gradient: "from-teal-500 to-green-500",
   },
 ];
@@ -120,12 +123,12 @@ const steps = [
   {
     step: "01",
     title: "İşçi klik edir",
-    description: "3 saniyə. Anonim. Hər gün.",
+    description: "10–20 saniyə. Anonim. Hər gün.",
     icon: MessageSquare,
   },
   {
     step: "02",
-    title: "AI analiz edir",
+    title: "Süni intellekt analiz edir",
     description: "Risk, trend, kök səbəb — hamısı avtomatik.",
     icon: Brain,
   },
@@ -148,11 +151,11 @@ const pricingPlans = [
     popular: false,
     features: [
       "Gündəlik əhval sorğusu",
-      "Əsas dashboard",
+      "Əsas idarəetmə paneli",
       "Əhval bölgüsü qrafikləri",
-      "CSV export",
+      "CSV ixrac",
       "Anonim təklif qutusu",
-      "Email dəstək",
+      "Elektron poçt dəstəyi",
     ],
     notIncluded: [
       "AI analiz və tövsiyələr",
@@ -169,12 +172,12 @@ const pricingPlans = [
     popular: true,
     features: [
       "Basic-in bütün funksiyaları",
-      "AI ilə dərin analiz",
+      "Süni intellekt ilə dərin analiz",
       "Tükənmişlik risk proqnozu",
       "Menecer tapşırıq sistemi",
-      "Real-time bildirişlər",
+      "Anlıq bildirişlər",
       "Trend analizi",
-      "Excel və PDF export",
+      "Excel və PDF ixrac",
       "Prioritet dəstək",
     ],
     notIncluded: ["1C/SAP inteqrasiya"],
@@ -192,8 +195,8 @@ const pricingPlans = [
       "Müştəri şikayəti proqnozu",
       "Xüsusi hesabat şablonları",
       "API inteqrasiya",
-      "Xüsusi branding",
-      "Onboarding dəstəyi",
+      "Xüsusi brendləmə",
+      "İlkin quraşdırma dəstəyi",
       "7/24 prioritet dəstək",
     ],
     notIncluded: [],
@@ -202,7 +205,7 @@ const pricingPlans = [
 
 /* ─── Result metrics ─── */
 const resultMetrics = [
-  { value: "60%", label: "Burnout riski əvvəlcədən tutulur" },
+  { value: "60%", label: "Tükənmə riski əvvəlcədən tutulur" },
   { value: "35%", label: "İşçi itkisi azalır" },
   { value: "25%", label: "Müştəri məmnuniyyəti artır" },
   { value: "3x", label: "Daha sürətli müdaxilə" },
@@ -212,6 +215,7 @@ const Landing = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const heroRef = useRef<HTMLDivElement>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroOpacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 100]);
@@ -220,6 +224,14 @@ const Landing = () => {
     hidden: { opacity: 0, y: 30 },
     visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.5 } }),
   };
+
+  const navLinks = [
+    { href: "#problem", label: "Problem" },
+    { href: "#solution", label: "Həll" },
+    { href: "#how-it-works", label: "Necə işləyir" },
+    { href: "#testimonials", label: "Rəylər" },
+    { href: "#pricing", label: "Qiymətlər" },
+  ];
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -237,21 +249,59 @@ const Landing = () => {
             <span className="text-lg font-bold">MoodAI</span>
           </div>
           <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
-            <a href="#problem" className="hover:text-foreground transition-colors">Problem</a>
-            <a href="#solution" className="hover:text-foreground transition-colors">Həll</a>
-            <a href="#how-it-works" className="hover:text-foreground transition-colors">Necə işləyir</a>
-            <a href="#pricing" className="hover:text-foreground transition-colors">Qiymətlər</a>
+            {navLinks.map(link => (
+              <a key={link.href} href={link.href} className="hover:text-foreground transition-colors">{link.label}</a>
+            ))}
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <Button variant="ghost" size="sm" onClick={() => navigate("/survey")} className="hidden sm:inline-flex">
               Demo
             </Button>
-            <Button size="sm" onClick={() => navigate("/auth")} className="gap-1">
+            <Button size="sm" onClick={() => navigate("/auth")} className="gap-1 hidden sm:inline-flex">
               Giriş <ArrowRight className="w-3.5 h-3.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </Button>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden border-t border-border/40 bg-background/95 backdrop-blur-xl"
+          >
+            <div className="container mx-auto px-4 py-4 space-y-3">
+              {navLinks.map(link => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {link.label}
+                </a>
+              ))}
+              <div className="pt-2 flex flex-col gap-2">
+                <Button variant="outline" size="sm" onClick={() => { navigate("/survey"); setMobileMenuOpen(false); }}>
+                  Demo
+                </Button>
+                <Button size="sm" onClick={() => { navigate("/auth"); setMobileMenuOpen(false); }}>
+                  Giriş <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        )}
       </motion.nav>
 
       {/* ═══ Hero — Problem-Centric ═══ */}
@@ -691,6 +741,72 @@ const Landing = () => {
                           <span className="line-through">{feature}</span>
                         </div>
                       ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ Testimonials ═══ */}
+      <section id="testimonials" className="py-20 md:py-28 bg-muted/15">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="text-center mb-16 space-y-4"
+          >
+            <motion.div variants={fadeUp} custom={0}>
+              <Badge variant="outline" className="text-sm px-4 py-1.5 rounded-full">
+                <Quote className="w-3.5 h-3.5 mr-1.5" /> Rəylər
+              </Badge>
+            </motion.div>
+            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-5xl font-bold">
+              Müştərilərimiz nə deyir?
+            </motion.h2>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {[
+              {
+                quote: "MoodAI-dan istifadə etdikdən sonra filiallarımızda işçi itkisi 40% azaldı. İndi problemləri əvvəlcədən görürük.",
+                name: "Rəşad M.",
+                role: "HR Direktoru, Pərakəndə şəbəkə",
+                emoji: "🛒",
+              },
+              {
+                quote: "Əvvəl işçi narazılığını müştəri şikayətindən öyrənirdik. İndi isə MoodAI sayəsində həmin gün müdaxilə edirik.",
+                name: "Aynur H.",
+                role: "Regional Menecer, Bank sektoru",
+                emoji: "🏦",
+              },
+              {
+                quote: "Quraşdırma 10 dəqiqə çəkdi. İlk həftədən 3 kritik filialdakı stress səbəbini müəyyən etdik.",
+                name: "Tural K.",
+                role: "Əməliyyat Direktoru, Telekom",
+                emoji: "📡",
+              },
+            ].map((t, i) => (
+              <motion.div
+                key={t.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <Card className="h-full border-border/50 hover:border-primary/20 transition-all duration-300 bg-card/80">
+                  <CardContent className="p-6 space-y-4">
+                    <Quote className="w-8 h-8 text-primary/20" />
+                    <p className="text-foreground/80 leading-relaxed italic">"{t.quote}"</p>
+                    <div className="flex items-center gap-3 pt-2">
+                      <span className="text-2xl">{t.emoji}</span>
+                      <div>
+                        <div className="text-sm font-semibold">{t.name}</div>
+                        <div className="text-xs text-muted-foreground">{t.role}</div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
