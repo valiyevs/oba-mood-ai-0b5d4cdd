@@ -160,8 +160,10 @@ export type Database = {
           created_at: string
           id: string
           is_active: boolean | null
+          publish_at: string | null
           section: string
           sort_order: number | null
+          unpublish_at: string | null
           updated_at: string
         }
         Insert: {
@@ -171,8 +173,10 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean | null
+          publish_at?: string | null
           section?: string
           sort_order?: number | null
+          unpublish_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -182,9 +186,41 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean | null
+          publish_at?: string | null
           section?: string
           sort_order?: number | null
+          unpublish_at?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_content_versions: {
+        Row: {
+          content_id: string
+          content_table: string
+          created_at: string
+          created_by: string | null
+          id: string
+          version_data: Json
+          version_number: number
+        }
+        Insert: {
+          content_id: string
+          content_table: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          version_data: Json
+          version_number?: number
+        }
+        Update: {
+          content_id?: string
+          content_table?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          version_data?: Json
+          version_number?: number
         }
         Relationships: []
       }
@@ -194,8 +230,10 @@ export type Database = {
           created_at: string
           id: string
           is_active: boolean | null
+          publish_at: string | null
           question: string
           sort_order: number | null
+          unpublish_at: string | null
           updated_at: string
         }
         Insert: {
@@ -203,8 +241,10 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean | null
+          publish_at?: string | null
           question: string
           sort_order?: number | null
+          unpublish_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -212,11 +252,99 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean | null
+          publish_at?: string | null
           question?: string
           sort_order?: number | null
+          unpublish_at?: string | null
           updated_at?: string
         }
         Relationships: []
+      }
+      cms_media: {
+        Row: {
+          alt_text: string | null
+          created_at: string
+          file_name: string
+          file_size: number | null
+          file_type: string
+          file_url: string
+          folder: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          alt_text?: string | null
+          created_at?: string
+          file_name: string
+          file_size?: number | null
+          file_type?: string
+          file_url: string
+          folder?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          alt_text?: string | null
+          created_at?: string
+          file_name?: string
+          file_size?: number | null
+          file_type?: string
+          file_url?: string
+          folder?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_menus: {
+        Row: {
+          created_at: string
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          label: string
+          menu_group: string
+          open_in_new_tab: boolean | null
+          parent_id: string | null
+          sort_order: number | null
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          label: string
+          menu_group?: string
+          open_in_new_tab?: boolean | null
+          parent_id?: string | null
+          sort_order?: number | null
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          menu_group?: string
+          open_in_new_tab?: boolean | null
+          parent_id?: string | null
+          sort_order?: number | null
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cms_menus_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "cms_menus"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       cms_partners: {
         Row: {
@@ -248,6 +376,81 @@ export type Database = {
           sort_order?: number | null
           updated_at?: string
           website_url?: string | null
+        }
+        Relationships: []
+      }
+      cms_seo: {
+        Row: {
+          canonical_url: string | null
+          created_at: string
+          id: string
+          meta_description: string | null
+          meta_title: string | null
+          no_index: boolean | null
+          og_description: string | null
+          og_image_url: string | null
+          og_title: string | null
+          page_path: string
+          updated_at: string
+        }
+        Insert: {
+          canonical_url?: string | null
+          created_at?: string
+          id?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          no_index?: boolean | null
+          og_description?: string | null
+          og_image_url?: string | null
+          og_title?: string | null
+          page_path: string
+          updated_at?: string
+        }
+        Update: {
+          canonical_url?: string | null
+          created_at?: string
+          id?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          no_index?: boolean | null
+          og_description?: string | null
+          og_image_url?: string | null
+          og_title?: string | null
+          page_path?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_translations: {
+        Row: {
+          content_id: string
+          content_table: string
+          created_at: string
+          field_name: string
+          id: string
+          locale: string
+          translated_value: string
+          updated_at: string
+        }
+        Insert: {
+          content_id: string
+          content_table: string
+          created_at?: string
+          field_name: string
+          id?: string
+          locale?: string
+          translated_value: string
+          updated_at?: string
+        }
+        Update: {
+          content_id?: string
+          content_table?: string
+          created_at?: string
+          field_name?: string
+          id?: string
+          locale?: string
+          translated_value?: string
+          updated_at?: string
         }
         Relationships: []
       }
