@@ -169,12 +169,10 @@ const SuggestionBox = () => {
                 <ArrowLeft className="w-5 h-5" />
               </Button>
               <div className="relative">
-                <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-lg" />
-                <img 
-                  src={obaLogo} 
-                  alt="MoodAI Logo" 
-                  className="relative w-12 h-12 rounded-2xl shadow-lg object-cover ring-2 ring-border/50"
-                />
+                <div className="absolute inset-0 bg-primary/20 rounded-full blur-lg" />
+                <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center shadow-lg ring-2 ring-border/50">
+                  <span className="text-2xl">😊</span>
+                </div>
               </div>
               <div>
                 <h1 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">

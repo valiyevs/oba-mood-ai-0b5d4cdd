@@ -237,13 +237,11 @@ const Index = () => {
                 whileHover={{ scale: 1.05, rotate: 2 }}
                 className="relative group"
               >
-                <div className="absolute -inset-1 bg-gradient-to-r from-primary/40 to-purple-500/40 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-lg" />
-                <img 
-                  src={obaLogo} 
-                  alt="MoodAI Logo" 
-                  className="relative w-14 h-14 rounded-2xl shadow-xl object-cover ring-2 ring-border/50 transition-all duration-300"
-                />
+                <div className="absolute -inset-1 bg-gradient-to-r from-primary/40 to-primary-glow/40 rounded-full blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-primary/20 rounded-full blur-lg" />
+                <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center shadow-xl ring-2 ring-border/50 transition-all duration-300">
+                  <span className="text-3xl">😊</span>
+                </div>
               </motion.div>
               <div>
                 <h1 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
