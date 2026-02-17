@@ -20,6 +20,8 @@ import Targets from "./pages/Targets";
 import Analytics from "./pages/Analytics";
 import Install from "./pages/Install";
 import ExportSpec from "./pages/ExportSpec";
+import AdminCMS from "./pages/AdminCMS";
+import AdminRoute from "./components/AdminRoute";
 
 const queryClient = new QueryClient();
 
@@ -81,6 +83,11 @@ const App = () => (
             </ProtectedRoute>
           } />
           <Route path="/export-spec" element={<ExportSpec />} />
+          <Route path="/admin" element={
+            <AdminRoute>
+              <AdminCMS />
+            </AdminRoute>
+          } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
