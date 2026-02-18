@@ -12,3 +12,15 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /auth
+Disallow: /dashboard
+Disallow: /hr-panel
+Disallow: /manager-actions
+Disallow: /manager-assignments
+Disallow: /employee-responses
+Disallow: /admin
+Disallow: /targets
+Disallow: /analytics
+Disallow: /suggestions-management
+
+Sitemap: https://moodai.az/sitemap.xml
