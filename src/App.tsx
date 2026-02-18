@@ -24,6 +24,8 @@ import Install from "./pages/Install";
 import ExportSpec from "./pages/ExportSpec";
 import AdminCMS from "./pages/AdminCMS";
 import AdminRoute from "./components/AdminRoute";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 
 const queryClient = new QueryClient();
 
@@ -92,6 +94,8 @@ const App = () => (
                 <AdminCMS />
               </AdminRoute>
             } />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
