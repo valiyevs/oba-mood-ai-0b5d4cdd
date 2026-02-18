@@ -23,4 +23,4 @@ Disallow: /targets
 Disallow: /analytics
 Disallow: /suggestions-management
 
-Sitemap: hhttps://moodai.az/functions/v1/sitemap
+Sitemap: https://moodai.az/functions/v1/sitemap
