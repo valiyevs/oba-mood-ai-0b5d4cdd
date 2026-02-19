@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -112,21 +112,41 @@ const CounterItem = ({ end, suffix, label, delay }: { end: number; suffix: strin
   );
 };
 
+/* ─── Floating Particles ─── */
+const FloatingParticle = ({ delay, x, y, size }: { delay: number; x: string; y: string; size: number }) => (
+  <motion.div
+    className="absolute rounded-full bg-primary/20 blur-sm"
+    style={{ left: x, top: y, width: size, height: size }}
+    animate={{
+      y: [0, -30, 0],
+      x: [0, 15, 0],
+      opacity: [0.2, 0.5, 0.2],
+      scale: [1, 1.2, 1],
+    }}
+    transition={{ duration: 6 + delay, repeat: Infinity, ease: "easeInOut", delay }}
+  />
+);
+
 /* ─── AI Insight Card ─── */
 const AIInsightCard = ({ icon: Icon, title, description, color, delay }: {
   icon: any; title: string; description: string; color: string; delay: number;
 }) => (
   <motion.div
-    initial={{ opacity: 0, x: 20 }}
-    whileInView={{ opacity: 1, x: 0 }}
+    initial={{ opacity: 0, x: 20, rotateY: -10 }}
+    whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
     viewport={{ once: true }}
-    transition={{ delay, duration: 0.5 }}
+    transition={{ delay, duration: 0.6, type: "spring" }}
+    whileHover={{ scale: 1.03, y: -4 }}
     className="glass-card rounded-xl p-4 glass-card-hover transition-all duration-300"
   >
     <div className="flex items-start gap-3">
-      <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${color}`}>
+      <motion.div
+        className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${color}`}
+        animate={{ rotate: [0, 5, -5, 0] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: delay * 2 }}
+      >
         <Icon className="w-4 h-4" />
-      </div>
+      </motion.div>
       <div className="space-y-1">
         <p className="text-xs font-semibold text-foreground">{title}</p>
         <p className="text-xs text-muted-foreground leading-relaxed">{description}</p>
@@ -135,6 +155,19 @@ const AIInsightCard = ({ icon: Icon, title, description, color, delay }: {
   </motion.div>
 );
 
+/* ─── Parallax Section Wrapper ─── */
+const ParallaxSection = ({ children, className, speed = 0.1 }: { children: React.ReactNode; className?: string; speed?: number }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const y = useTransform(scrollYProgress, [0, 1], [50 * speed, -50 * speed]);
+
+  return (
+    <motion.div ref={ref} style={{ y }} className={className}>
+      {children}
+    </motion.div>
+  );
+};
+
 const Landing = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
@@ -142,9 +175,16 @@ const Landing = () => {
   const { menus: landingMenus } = useCmsMenus("landing_nav");
   const heroRef = useRef<HTMLDivElement>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  // Main hero parallax
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroOpacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 100]);
+  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
+  
+  // Dashboard parallax (moves slower than hero text for depth)
+  const dashboardY = useTransform(scrollYProgress, [0, 1], [0, 50]);
+  const dashboardScale = useTransform(scrollYProgress, [0, 1], [1, 0.98]);
 
   // CMS Data
   const { data: cmsFaqs = [] } = useQuery({
@@ -305,7 +345,7 @@ const Landing = () => {
         )}
       </motion.nav>
 
-      {/* ═══ Hero — Centered High-Impact ═══ */}
+      {/* ═══ Hero — Centered High-Impact with Parallax ═══ */}
       <section ref={heroRef} className="relative py-24 md:py-36 lg:py-44 overflow-hidden">
         {/* Animated gradient orbs */}
         <div className="absolute inset-0 -z-10">
@@ -324,9 +364,16 @@ const Landing = () => {
             animate={{ scale: [1.1, 1, 1.1], opacity: [0.15, 0.1, 0.15] }}
             transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
           />
+          {/* Floating particles */}
+          <FloatingParticle delay={0} x="10%" y="20%" size={6} />
+          <FloatingParticle delay={1.5} x="85%" y="30%" size={8} />
+          <FloatingParticle delay={3} x="50%" y="15%" size={5} />
+          <FloatingParticle delay={2} x="30%" y="70%" size={7} />
+          <FloatingParticle delay={4} x="70%" y="60%" size={4} />
+          <FloatingParticle delay={1} x="20%" y="80%" size={6} />
         </div>
 
-        <motion.div style={{ opacity: heroOpacity, y: heroY }} className="container mx-auto px-4">
+        <motion.div style={{ opacity: heroOpacity, y: heroY, scale: heroScale }} className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}>
               <Badge variant="outline" className="text-sm px-5 py-2 rounded-full border-primary/30 text-primary bg-primary/5 backdrop-blur-sm font-medium">
@@ -393,12 +440,13 @@ const Landing = () => {
             </motion.p>
           </div>
 
-          {/* ═══ Glassmorphism Dashboard Preview ═══ */}
+          {/* ═══ Glassmorphism Dashboard Preview with Parallax ═══ */}
           <motion.div
             initial={{ opacity: 0, y: 60, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
-            className="mt-16 md:mt-24 max-w-5xl mx-auto relative"
+            style={{ y: dashboardY, scale: dashboardScale }}
+            className="mt-16 md:mt-24 max-w-5xl mx-auto relative perspective-[1200px]"
           >
             <div className="glass-card rounded-2xl p-6 md:p-8 shadow-2xl">
               {/* Top bar */}
@@ -549,8 +597,10 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* ═══ Pain Point Statistics ═══ */}
-      <section id="problem" className="py-20 md:py-28">
+      {/* ═══ Pain Point Statistics with Parallax ═══ */}
+      <section id="problem" className="py-20 md:py-28 relative overflow-hidden">
+        <FloatingParticle delay={2} x="5%" y="30%" size={5} />
+        <FloatingParticle delay={4} x="90%" y="60%" size={7} />
         <div className="container mx-auto px-4">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-16 space-y-4">
             <motion.div variants={fadeUp} custom={0}>
@@ -570,17 +620,21 @@ const Landing = () => {
             {painStats.map((stat, i) => (
               <motion.div
                 key={stat.label}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 30, rotateX: 10 }}
+                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
+                transition={{ delay: i * 0.12, type: "spring", stiffness: 100 }}
+                whileHover={{ y: -8, scale: 1.02 }}
               >
-                <Card className="h-full border-border/40 glass-card glass-card-hover hover:-translate-y-1 transition-all duration-300 group rounded-2xl">
+                <Card className="h-full border-border/40 glass-card glass-card-hover transition-all duration-300 group rounded-2xl">
                   <CardContent className="p-6 space-y-4">
                     <div className="flex items-center justify-between">
-                      <div className="w-12 h-12 rounded-xl bg-destructive/10 flex items-center justify-center group-hover:bg-destructive/15 transition-colors">
+                      <motion.div
+                        className="w-12 h-12 rounded-xl bg-destructive/10 flex items-center justify-center group-hover:bg-destructive/15 transition-colors"
+                        whileHover={{ rotate: 10, scale: 1.1 }}
+                      >
                         <stat.icon className="w-6 h-6 text-destructive" />
-                      </div>
+                      </motion.div>
                       <span className="text-3xl md:text-4xl font-extrabold text-foreground">{stat.value}</span>
                     </div>
                     <h3 className="text-lg font-semibold">{stat.label}</h3>
@@ -633,18 +687,23 @@ const Landing = () => {
             {solutionFeatures.map((feature, i) => (
               <motion.div
                 key={feature.title || i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
+                transition={{ delay: i * 0.1, type: "spring", stiffness: 120 }}
+                whileHover={{ y: -6, scale: 1.02 }}
                 className={i === 0 ? "lg:col-span-2" : ""}
               >
-                <Card className={`h-full glass-card glass-card-hover hover:-translate-y-1 transition-all duration-300 group rounded-2xl ${i === 0 ? "bg-gradient-to-br from-primary/5 to-transparent" : ""}`}>
+                <Card className={`h-full glass-card glass-card-hover transition-all duration-300 group rounded-2xl ${i === 0 ? "bg-gradient-to-br from-primary/5 to-transparent" : ""}`}>
                   <CardContent className="p-7 space-y-4">
                     <div className="flex items-center justify-between">
-                      <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                      <motion.div
+                        className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors"
+                        whileHover={{ rotate: 12, scale: 1.1 }}
+                        transition={{ type: "spring", stiffness: 300 }}
+                      >
                         <feature.icon className="w-6 h-6 text-primary" />
-                      </div>
+                      </motion.div>
                       <Badge variant="outline" className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-muted/50 text-muted-foreground">
                         {feature.metric}
                       </Badge>
@@ -782,9 +841,13 @@ const Landing = () => {
                 transition={{ delay: i * 0.15 }}
                 className="relative text-center space-y-5"
               >
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-primary/10 border border-primary/20 shadow-glow">
+                <motion.div
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                  className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-primary/10 border border-primary/20 shadow-glow"
+                >
                   <item.icon className="w-9 h-9 text-primary" />
-                </div>
+                </motion.div>
                 <div className="inline-block text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full tracking-widest uppercase">
                   {t('step_label', 'Addım')} {item.step}
                 </div>
@@ -792,7 +855,12 @@ const Landing = () => {
                 <p className="text-muted-foreground leading-relaxed">{item.description}</p>
                 {i < 2 && (
                   <div className="hidden md:block absolute top-10 -right-4 translate-x-1/2">
-                    <ArrowRight className="w-6 h-6 text-primary/25" />
+                    <motion.div
+                      animate={{ x: [0, 6, 0] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      <ArrowRight className="w-6 h-6 text-primary/25" />
+                    </motion.div>
                   </div>
                 )}
               </motion.div>

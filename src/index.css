@@ -8,17 +8,17 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Core backgrounds — Deep Charcoal/Navy */
-    --background: 222 47% 11%;
-    --foreground: 210 40% 96%;
+    /* ═══ LIGHT MODE — Clean Corporate ═══ */
+    --background: 220 20% 97%;
+    --foreground: 222 47% 11%;
 
-    /* Card surfaces — Glassmorphism dark */
-    --card: 217 33% 14%;
-    --card-foreground: 210 40% 96%;
+    /* Card surfaces */
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
 
     /* Popover surfaces */
-    --popover: 217 33% 14%;
-    --popover-foreground: 210 40% 96%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
 
     /* Primary brand — Electric Indigo */
     --primary: 239 84% 67%;
@@ -30,14 +30,14 @@ All colors MUST be HSL.
     --secondary-foreground: 0 0% 100%;
 
     /* Muted backgrounds */
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 60%;
+    --muted: 220 14% 93%;
+    --muted-foreground: 220 10% 46%;
 
     /* Accent — Indigo tint */
-    --accent: 239 50% 20%;
-    --accent-foreground: 239 84% 80%;
+    --accent: 239 40% 94%;
+    --accent-foreground: 239 84% 50%;
 
-    /* Status colors for mood tracking */
+    /* Status colors */
     --status-good: 160 84% 39%;
     --status-good-foreground: 0 0% 100%;
     --status-normal: 38 92% 50%;
@@ -50,8 +50,8 @@ All colors MUST be HSL.
     --destructive-foreground: 0 0% 100%;
 
     /* Borders and inputs */
-    --border: 217 20% 20%;
-    --input: 217 20% 20%;
+    --border: 220 13% 88%;
+    --input: 220 13% 88%;
     --ring: 239 84% 67%;
 
     /* Border radius */
@@ -59,22 +59,28 @@ All colors MUST be HSL.
 
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(239 84% 67%) 0%, hsl(239 84% 75%) 100%);
-    --gradient-subtle: linear-gradient(180deg, hsl(222 47% 11%) 0%, hsl(217 33% 14%) 100%);
-    --gradient-card: linear-gradient(135deg, hsl(217 33% 14%) 0%, hsl(217 33% 17%) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(222 47% 11%) 0%, hsl(230 40% 14%) 50%, hsl(222 47% 11%) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(220 20% 98%) 0%, hsl(220 14% 96%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(220 20% 98%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(220 20% 97%) 0%, hsl(230 25% 95%) 50%, hsl(220 20% 97%) 100%);
 
     /* Shadows */
-    --shadow-soft: 0 4px 14px -3px hsl(0 0% 0% / 0.4);
-    --shadow-medium: 0 8px 30px -5px hsl(0 0% 0% / 0.5);
-    --shadow-glow: 0 0 40px hsl(239 84% 67% / 0.25);
-    --shadow-glow-emerald: 0 0 40px hsl(160 84% 39% / 0.2);
+    --shadow-soft: 0 4px 14px -3px hsl(220 20% 50% / 0.08);
+    --shadow-medium: 0 8px 30px -5px hsl(220 20% 50% / 0.12);
+    --shadow-glow: 0 0 40px hsl(239 84% 67% / 0.15);
+    --shadow-glow-emerald: 0 0 40px hsl(160 84% 39% / 0.12);
 
     /* Transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-spring: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 
+    /* Glass card (light mode) */
+    --glass-bg: hsl(0 0% 100% / 0.7);
+    --glass-border: hsl(220 13% 88% / 0.6);
+    --glass-hover-border: hsl(239 84% 67% / 0.25);
+    --glass-hover-shadow: 0 0 30px hsl(239 84% 67% / 0.08);
+
     /* Sidebar */
-    --sidebar-background: 222 47% 8%;
+    --sidebar-background: 222 47% 11%;
     --sidebar-foreground: 210 40% 93%;
     --sidebar-primary: 239 84% 67%;
     --sidebar-primary-foreground: 0 0% 100%;
@@ -85,7 +91,7 @@ All colors MUST be HSL.
   }
 
   .dark {
-    /* Dark mode is the same as root for this dark-first design */
+    /* ═══ DARK MODE — Corporate Dark ═══ */
     --background: 222 47% 11%;
     --foreground: 210 40% 96%;
 
@@ -131,6 +137,12 @@ All colors MUST be HSL.
     --shadow-medium: 0 8px 30px -5px hsl(0 0% 0% / 0.5);
     --shadow-glow: 0 0 40px hsl(239 84% 67% / 0.3);
     --shadow-glow-emerald: 0 0 40px hsl(160 84% 39% / 0.2);
+
+    /* Glass card (dark mode) */
+    --glass-bg: hsl(217 33% 14% / 0.6);
+    --glass-border: hsl(217 20% 24% / 0.5);
+    --glass-hover-border: hsl(239 84% 67% / 0.3);
+    --glass-hover-shadow: 0 0 30px hsl(239 84% 67% / 0.1);
 
     --sidebar-background: 222 47% 8%;
     --sidebar-foreground: 210 40% 93%;
@@ -191,14 +203,14 @@ All colors MUST be HSL.
   }
 
   .glass-card {
-    background: hsl(217 33% 14% / 0.6);
+    background: var(--glass-bg);
     backdrop-filter: blur(20px);
-    border: 1px solid hsl(217 20% 24% / 0.5);
+    border: 1px solid var(--glass-border);
   }
 
   .glass-card-hover:hover {
-    border-color: hsl(239 84% 67% / 0.3);
-    box-shadow: 0 0 30px hsl(239 84% 67% / 0.1);
+    border-color: var(--glass-hover-border);
+    box-shadow: var(--glass-hover-shadow);
   }
   
   .transition-smooth {
