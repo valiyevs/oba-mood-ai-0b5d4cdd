@@ -304,10 +304,8 @@ const Dashboard = () => {
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-4 min-w-0">
               <div className="relative flex-shrink-0">
-                <div className="absolute inset-0 bg-primary/20 rounded-full blur-lg" />
-                <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center shadow-lg ring-2 ring-border/50">
-                  <span className="text-3xl">😊</span>
-                </div>
+                <div className="absolute inset-0 bg-primary/20 rounded-xl blur-lg" />
+                <img src={obaLogo} alt="MoodAI" className="relative w-14 h-14 rounded-xl object-cover shadow-lg ring-2 ring-border/50" />
               </div>
               <div className="min-w-0">
                 <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate flex items-center gap-2">

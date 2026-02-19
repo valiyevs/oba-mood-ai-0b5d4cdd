@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import obaLogo from "@/assets/oba-logo.jpg";
 
 const authSchema = z.object({
   email: z.string().email({ message: "Düzgün email daxil edin" }),
@@ -225,10 +226,8 @@ const Auth = () => {
               transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
               className="relative inline-flex"
             >
-              <div className="absolute -inset-3 bg-gradient-to-r from-primary/30 to-primary-glow/30 rounded-full blur-xl" />
-              <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center shadow-xl ring-2 ring-border/50">
-                <span className="text-4xl">😊</span>
-              </div>
+              <div className="absolute -inset-3 bg-gradient-to-r from-primary/30 to-primary-glow/30 rounded-2xl blur-xl" />
+              <img src={obaLogo} alt="MoodAI" className="relative w-20 h-20 rounded-2xl object-cover shadow-xl ring-2 ring-border/50" />
             </motion.div>
             
             {/* Title */}
