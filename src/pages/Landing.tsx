@@ -170,7 +170,7 @@ const ParallaxSection = ({ children, className, speed = 0.1 }: { children: React
 
 const Landing = () => {
   const navigate = useNavigate();
-  const { locale, t, tField } = useLanguage();
+  const { locale, t, tField, cmsContentRaw } = useLanguage();
   const { menus: landingMenus } = useCmsMenus("landing_nav");
   const heroRef = useRef<HTMLDivElement>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -201,53 +201,72 @@ const Landing = () => {
     },
   });
 
-  // CMS-driven dynamic arrays
-  const painStats = [1, 2, 3, 4].map((i, idx) => ({
-    value: t(`pain_${i}_value`, ['65%', '79%', '+3%', '5%'][idx]),
-    label: t(`pain_${i}_label`, ['Müştəri itkisi', 'Həvəssiz işçi', 'Gizli qazanc', 'Zəncir reaksiya'][idx]),
-    detail: t(`pain_${i}_detail`, ''),
-    source: t(`pain_${i}_source`, ''),
-    icon: painIcons[idx],
-  }));
+  // Helper: check if a CMS key is active (returns true if key doesn't exist in CMS — fallback mode)
+  const isKeyActive = (key: string): boolean => {
+    const found = cmsContentRaw.find(c => c.content_key === key);
+    return !found || found.is_active;
+  };
 
-  const solutionFeatures = [1, 2, 3, 4, 5, 6].map((i, idx) => ({
-    icon: featureIcons[idx],
-    title: t(`feature_${i}_title`, ''),
-    description: t(`feature_${i}_desc`, ''),
-    metric: t(`feature_${i}_metric`, ''),
-  }));
+  // CMS-driven dynamic arrays — items filtered by is_active
+  const painStats = [1, 2, 3, 4]
+    .filter((i) => isKeyActive(`pain_${i}_label`))
+    .map((i, idx) => ({
+      value: t(`pain_${i}_value`, ['65%', '79%', '+3%', '5%'][idx]),
+      label: t(`pain_${i}_label`, ['Müştəri itkisi', 'Həvəssiz işçi', 'Gizli qazanc', 'Zəncir reaksiya'][idx]),
+      detail: t(`pain_${i}_detail`, ''),
+      source: t(`pain_${i}_source`, ''),
+      icon: painIcons[Math.min(idx, painIcons.length - 1)],
+    }));
 
-  const steps = [1, 2, 3].map((i, idx) => ({
-    step: `0${i}`,
-    title: t(`step_${i}_title`, ''),
-    description: t(`step_${i}_desc`, ''),
-    icon: stepIcons[idx],
-  }));
+  const solutionFeatures = [1, 2, 3, 4, 5, 6]
+    .filter((i) => isKeyActive(`feature_${i}_title`))
+    .map((i, idx) => ({
+      icon: featureIcons[Math.min(idx, featureIcons.length - 1)],
+      title: t(`feature_${i}_title`, ''),
+      description: t(`feature_${i}_desc`, ''),
+      metric: t(`feature_${i}_metric`, ''),
+    }));
 
-  const resultMetrics = [1, 2, 3, 4].map((i, idx) => ({
-    value: t(`result_${i}_value`, ['60%', '35%', '25%', '3x'][idx]),
-    label: t(`result_${i}_label`, ''),
-  }));
+  const steps = [1, 2, 3]
+    .filter((i) => isKeyActive(`step_${i}_title`))
+    .map((i, idx) => ({
+      step: `0${i}`,
+      title: t(`step_${i}_title`, ''),
+      description: t(`step_${i}_desc`, ''),
+      icon: stepIcons[Math.min(idx, stepIcons.length - 1)],
+    }));
 
-  const sectors = [
+  const resultMetrics = [1, 2, 3, 4]
+    .filter((i) => isKeyActive(`result_${i}_label`))
+    .map((i, idx) => ({
+      value: t(`result_${i}_value`, ['60%', '35%', '25%', '3x'][idx]),
+      label: t(`result_${i}_label`, ''),
+    }));
+
+  const sectorDefs = [
     { icon: ShoppingCart, emoji: "🛒", n: 1 },
     { icon: Landmark, emoji: "🏦", n: 2 },
     { icon: Wifi, emoji: "📡", n: 3 },
-  ].map(s => ({
-    icon: s.icon,
-    emoji: s.emoji,
-    title: t(`sector_${s.n}_title`, ''),
-    subtitle: t(`sector_${s.n}_subtitle`, ''),
-    pain: t(`sector_${s.n}_pain`, ''),
-    solution: t(`sector_${s.n}_solution`, ''),
-  }));
+  ];
+  const sectors = sectorDefs
+    .filter(s => isKeyActive(`sector_${s.n}_title`))
+    .map((s, idx) => ({
+      icon: s.icon,
+      emoji: s.emoji,
+      title: t(`sector_${s.n}_title`, ''),
+      subtitle: t(`sector_${s.n}_subtitle`, ''),
+      pain: t(`sector_${s.n}_pain`, ''),
+      solution: t(`sector_${s.n}_solution`, ''),
+    }));
 
-  const testimonials = [1, 2, 3].map((i, idx) => ({
-    quote: t(`testimonial_${i}_quote`, ''),
-    name: t(`testimonial_${i}_name`, ''),
-    role: t(`testimonial_${i}_role`, ''),
-    emoji: ["🛒", "🏦", "📡"][idx],
-  }));
+  const testimonials = [1, 2, 3]
+    .filter((i) => isKeyActive(`testimonial_${i}_quote`))
+    .map((i, idx) => ({
+      quote: t(`testimonial_${i}_quote`, ''),
+      name: t(`testimonial_${i}_name`, ''),
+      role: t(`testimonial_${i}_role`, ''),
+      emoji: ["🛒", "🏦", "📡"][idx],
+    }));
 
   const pricingFeatureCounts: Record<string, { f: number; n: number }> = {
     basic: { f: 6, n: 3 },
@@ -259,16 +278,18 @@ const Landing = () => {
     { key: 'basic', icon: planIcons[0], popular: false },
     { key: 'premium', icon: planIcons[1], popular: true },
     { key: 'enterprise', icon: planIcons[2], popular: false },
-  ].map(p => ({
-    name: t(`pricing_${p.key}_name`, p.key),
-    price: t(`pricing_${p.key}_price`, '0'),
-    period: t(`pricing_${p.key}_period`, 'ay / filial'),
-    description: t(`pricing_${p.key}_desc`, ''),
-    icon: p.icon,
-    popular: p.popular,
-    features: Array.from({ length: pricingFeatureCounts[p.key].f }, (_, i) => t(`pricing_${p.key}_f${i + 1}`, '')).filter(Boolean),
-    notIncluded: Array.from({ length: pricingFeatureCounts[p.key].n }, (_, i) => t(`pricing_${p.key}_n${i + 1}`, '')).filter(Boolean),
-  }));
+  ]
+    .filter(p => isKeyActive(`pricing_${p.key}_name`))
+    .map(p => ({
+      name: t(`pricing_${p.key}_name`, p.key),
+      price: t(`pricing_${p.key}_price`, '0'),
+      period: t(`pricing_${p.key}_period`, 'ay / filial'),
+      description: t(`pricing_${p.key}_desc`, ''),
+      icon: p.icon,
+      popular: p.popular,
+      features: Array.from({ length: pricingFeatureCounts[p.key].f }, (_, i) => t(`pricing_${p.key}_f${i + 1}`, '')).filter(Boolean),
+      notIncluded: Array.from({ length: pricingFeatureCounts[p.key].n }, (_, i) => t(`pricing_${p.key}_n${i + 1}`, '')).filter(Boolean),
+    }));
 
   const fadeUp = {
     hidden: { opacity: 0, y: 30 },
@@ -578,16 +599,28 @@ const Landing = () => {
       {/* ═══ Counter Stats ═══ */}
       <section className="py-16 md:py-20">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto text-center">
-            {[
-              { end: parseInt(t('stat_companies', '50')), suffix: "+", label: t('stat_companies_label', 'Şirkət istifadə edir') },
-              { end: parseInt(t('stat_users', '340')), suffix: "+", label: t('stat_users_label', 'Aktiv istifadəçi') },
-              { end: parseInt(t('stat_branches', '120')), suffix: "+", label: t('stat_branches_label', 'Filial') },
-              { end: parseInt(t('stat_satisfaction', '98')), suffix: "%", label: t('stat_satisfaction_label', 'Məmnuniyyət') },
-            ].map((item, i) => (
-              <CounterItem key={item.label} end={item.end} suffix={item.suffix} label={item.label} delay={i * 0.15} />
-            ))}
-          </div>
+          {(() => {
+            const statItems = [
+              { key: 'stat_companies', suffix: "+", label_key: 'stat_companies_label', def: '50', deflabel: 'Şirkət istifadə edir' },
+              { key: 'stat_users', suffix: "+", label_key: 'stat_users_label', def: '340', deflabel: 'Aktiv istifadəçi' },
+              { key: 'stat_branches', suffix: "+", label_key: 'stat_branches_label', def: '120', deflabel: 'Filial' },
+              { key: 'stat_satisfaction', suffix: "%", label_key: 'stat_satisfaction_label', def: '98', deflabel: 'Məmnuniyyət' },
+            ].filter(s => isKeyActive(s.key));
+            const cols = statItems.length <= 2 ? 'grid-cols-2' : statItems.length === 3 ? 'grid-cols-3' : 'grid-cols-2 md:grid-cols-4';
+            return (
+              <div className={`grid ${cols} gap-8 max-w-4xl mx-auto text-center`}>
+                {statItems.map((item, i) => (
+                  <CounterItem
+                    key={item.key}
+                    end={parseInt(t(item.key, item.def))}
+                    suffix={item.suffix}
+                    label={t(item.label_key, item.deflabel)}
+                    delay={i * 0.15}
+                  />
+                ))}
+              </div>
+            );
+          })()}
         </div>
       </section>
 
@@ -610,7 +643,7 @@ const Landing = () => {
             </motion.p>
           </motion.div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className={`grid gap-5 ${painStats.length <= 2 ? 'sm:grid-cols-2' : painStats.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2 lg:grid-cols-4'}`}>
             {painStats.map((stat, i) => (
               <motion.div
                 key={stat.label}
@@ -676,39 +709,57 @@ const Landing = () => {
             </Card>
           </motion.div>
 
-          {/* ═══ Bento Grid Features ═══ */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-6xl mx-auto">
-            {solutionFeatures.map((feature, i) => (
-              <motion.div
-                key={feature.title || i}
-                initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, type: "spring", stiffness: 120 }}
-                whileHover={{ y: -6, scale: 1.02 }}
-                className={i === 0 ? "lg:col-span-2" : ""}
-              >
-                <Card className={`h-full glass-card glass-card-hover transition-all duration-300 group rounded-2xl ${i === 0 ? "bg-gradient-to-br from-primary/5 to-transparent" : ""}`}>
-                  <CardContent className="p-7 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <motion.div
-                        className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors"
-                        whileHover={{ rotate: 12, scale: 1.1 }}
-                        transition={{ type: "spring", stiffness: 300 }}
-                      >
-                        <feature.icon className="w-6 h-6 text-primary" />
-                      </motion.div>
-                      <Badge variant="outline" className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-muted/50 text-muted-foreground">
-                        {feature.metric}
-                      </Badge>
-                    </div>
-                    <h3 className="text-lg font-semibold group-hover:text-primary transition-colors">{feature.title}</h3>
-                    <p className="text-muted-foreground leading-relaxed text-sm">{feature.description}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
+          {/* ═══ Bento Grid Features — auto-reflows based on active count ═══ */}
+          {solutionFeatures.length > 0 && (() => {
+            const count = solutionFeatures.length;
+            // Determine grid cols: 1→1col, 2→2col, 3→3col, 4→2×2, 5-6→3col
+            const gridCols =
+              count === 1 ? "grid-cols-1 max-w-md mx-auto" :
+              count === 2 ? "md:grid-cols-2 max-w-3xl mx-auto" :
+              count === 4 ? "md:grid-cols-2 lg:grid-cols-2 max-w-4xl mx-auto" :
+              "md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto";
+
+            return (
+              <div className={`grid gap-5 ${gridCols}`}>
+                {solutionFeatures.map((feature, i) => {
+                  // First card gets wide span only when count is 5 or 6
+                  const isWide = i === 0 && count >= 5;
+                  return (
+                    <motion.div
+                      key={feature.title || i}
+                      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.1, type: "spring", stiffness: 120 }}
+                      whileHover={{ y: -6, scale: 1.02 }}
+                      className={isWide ? "lg:col-span-2" : ""}
+                    >
+                      <Card className={`h-full glass-card glass-card-hover transition-all duration-300 group rounded-2xl ${isWide ? "bg-gradient-to-br from-primary/5 to-transparent" : ""}`}>
+                        <CardContent className="p-7 space-y-4">
+                          <div className="flex items-center justify-between">
+                            <motion.div
+                              className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors"
+                              whileHover={{ rotate: 12, scale: 1.1 }}
+                              transition={{ type: "spring", stiffness: 300 }}
+                            >
+                              <feature.icon className="w-6 h-6 text-primary" />
+                            </motion.div>
+                            {feature.metric && (
+                              <Badge variant="outline" className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-muted/50 text-muted-foreground">
+                                {feature.metric}
+                              </Badge>
+                            )}
+                          </div>
+                          <h3 className="text-lg font-semibold group-hover:text-primary transition-colors">{feature.title}</h3>
+                          <p className="text-muted-foreground leading-relaxed text-sm">{feature.description}</p>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            );
+          })()}
         </div>
       </section>
 
@@ -769,7 +820,7 @@ const Landing = () => {
             </motion.p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-5 max-w-6xl mx-auto">
+          <div className={`grid gap-5 max-w-6xl mx-auto ${sectors.length === 1 ? 'grid-cols-1 max-w-xl mx-auto' : sectors.length === 2 ? 'md:grid-cols-2 max-w-3xl' : 'md:grid-cols-3'}`}>
             {sectors.map((sector, i) => (
               <motion.div
                 key={sector.title || i}
@@ -825,7 +876,7 @@ const Landing = () => {
             </motion.p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className={`grid gap-8 max-w-5xl mx-auto ${steps.length === 1 ? 'grid-cols-1 max-w-sm mx-auto' : steps.length === 2 ? 'md:grid-cols-2 max-w-3xl' : 'md:grid-cols-3'}`}>
             {steps.map((item, i) => (
               <motion.div
                 key={item.step}
@@ -847,7 +898,7 @@ const Landing = () => {
                 </div>
                 <h3 className="text-xl font-semibold">{item.title}</h3>
                 <p className="text-muted-foreground leading-relaxed">{item.description}</p>
-                {i < 2 && (
+                {i < steps.length - 1 && (
                   <div className="hidden md:block absolute top-10 -right-4 translate-x-1/2">
                     <motion.div
                       animate={{ x: [0, 6, 0] }}
@@ -877,7 +928,7 @@ const Landing = () => {
             </motion.h2>
           </motion.div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-5xl mx-auto">
+          <div className={`grid gap-5 max-w-5xl mx-auto ${resultMetrics.length <= 2 ? 'sm:grid-cols-2' : resultMetrics.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2 lg:grid-cols-4'}`}>
             {resultMetrics.map((m, i) => (
               <motion.div
                 key={m.label || i}
@@ -914,7 +965,7 @@ const Landing = () => {
             </motion.h2>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+          <div className={`grid gap-5 max-w-5xl mx-auto ${testimonials.length === 1 ? 'grid-cols-1 max-w-lg mx-auto' : testimonials.length === 2 ? 'md:grid-cols-2 max-w-3xl' : 'md:grid-cols-3'}`}>
             {testimonials.map((item, i) => (
               <motion.div
                 key={item.name || i}
@@ -957,7 +1008,7 @@ const Landing = () => {
             </motion.p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-5 max-w-6xl mx-auto">
+          <div className={`grid gap-5 max-w-6xl mx-auto ${pricingPlans.length === 1 ? 'grid-cols-1 max-w-sm mx-auto' : pricingPlans.length === 2 ? 'md:grid-cols-2 max-w-3xl' : 'md:grid-cols-3'}`}>
             {pricingPlans.map((plan, i) => (
               <motion.div
                 key={plan.name}

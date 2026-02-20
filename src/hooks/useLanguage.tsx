@@ -4,12 +4,22 @@ import { supabase } from "@/integrations/supabase/client";
 
 type Locale = "az" | "ru" | "en";
 
+interface CmsContentItem {
+  id: string;
+  content_key: string;
+  content_value: string;
+  is_active: boolean;
+  section: string;
+}
+
 interface LanguageContextType {
   locale: Locale;
   setLocale: (locale: Locale) => void;
   t: (contentKey: string, fallback?: string) => string;
   tField: (table: string, contentId: string, field: string, fallback?: string) => string;
   locales: { code: Locale; label: string; flag: string }[];
+  /** Raw CMS content including is_active status — for filtering deactivated items */
+  cmsContentRaw: CmsContentItem[];
 }
 
 const LOCALES: { code: Locale; label: string; flag: string }[] = [
@@ -35,15 +45,18 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     document.documentElement.lang = locale;
   }, [locale]);
 
-  // Fetch all CMS content (AZ originals)
-  const { data: cmsContent = [] } = useQuery({
-    queryKey: ["cms_content_i18n"],
+  // Fetch all CMS content including is_active (for filtering in UI)
+  const { data: cmsContentRaw = [] } = useQuery({
+    queryKey: ["cms_content_i18n_raw"],
     queryFn: async () => {
-      const { data } = await supabase.from("cms_content").select("id,content_key,content_value").eq("is_active", true);
-      return data || [];
+      const { data } = await supabase.from("cms_content").select("id,content_key,content_value,is_active,section");
+      return (data || []) as CmsContentItem[];
     },
     staleTime: 5 * 60 * 1000,
   });
+
+  // Only active items for t() translation lookups
+  const cmsContent = cmsContentRaw.filter(c => c.is_active);
 
   // Fetch translations for current locale
   const { data: translations = [] } = useQuery({
@@ -80,7 +93,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   }, [translations, locale]);
 
   return (
-    <LanguageContext.Provider value={{ locale, setLocale, t, tField, locales: LOCALES }}>
+    <LanguageContext.Provider value={{ locale, setLocale, t, tField, locales: LOCALES, cmsContentRaw }}>
       {children}
     </LanguageContext.Provider>
   );
