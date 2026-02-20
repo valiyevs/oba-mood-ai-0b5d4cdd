@@ -3,12 +3,14 @@ import { MoodSelector, type MoodType } from "@/components/MoodSelector";
 import { ReasonSelector, type ReasonType } from "@/components/ReasonSelector";
 import { BranchSelector, type BranchType } from "@/components/BranchSelector";
 import { SuccessScreen } from "@/components/SuccessScreen";
-import { TrendingUp, Sparkles, Star, Download } from "lucide-react";
+import { TrendingUp, Sparkles, Star, Download, Home, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
-import obaLogo from "@/assets/oba-logo.jpg";
+import { AppLogo } from "@/components/AppLogo";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 type StepType = "branch" | "mood" | "reason" | "success";
 
@@ -230,63 +232,43 @@ const Index = () => {
         transition={{ duration: 0.5 }}
         className="sticky top-0 z-50 bg-gradient-to-b from-background/95 via-background/80 to-background/0 backdrop-blur-xl"
       >
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <motion.div 
-                whileHover={{ scale: 1.05, rotate: 2 }}
-                className="relative group"
-              >
-                <div className="absolute -inset-1 bg-gradient-to-r from-primary/40 to-primary-glow/40 rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <img src={obaLogo} alt="MoodAI" className="relative w-14 h-14 rounded-xl object-cover shadow-xl ring-2 ring-border/50 transition-all duration-300" />
-              </motion.div>
-              <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-                  MoodAI
-                </h1>
-                <p className="text-sm text-muted-foreground flex items-center gap-2">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-                  </span>
-                  Gündəlik check-in
-                </p>
-              </div>
-            </div>
+            {/* Logo + back to home */}
             <div className="flex items-center gap-2">
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate("/install")}
-                  className="gap-2 rounded-xl hover:bg-emerald-500/10"
-                >
-                  <Download className="w-4 h-4" />
-                  <span className="hidden sm:inline">Quraşdır</span>
-                </Button>
-              </motion.div>
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate("/suggestion-box")}
-                  className="gap-2 rounded-xl hover:bg-violet-500/10"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  <span className="hidden sm:inline">Təklif</span>
-                </Button>
-              </motion.div>
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate("/dashboard")}
-                  className="gap-2 rounded-xl border-border/50 bg-card/50 backdrop-blur-sm hover:bg-primary/10 hover:border-primary/50 transition-all duration-300 shadow-lg shadow-black/5"
-                >
-                  <TrendingUp className="w-4 h-4" />
-                  <span className="hidden sm:inline">İdarəetmə Paneli</span>
-                </Button>
-              </motion.div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate("/")}
+                className="rounded-xl hover:bg-primary/10 shrink-0"
+                title="Ana Səhifə"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <AppLogo size="sm" showText={true} />
+            </div>
+            {/* Actions */}
+            <div className="flex items-center gap-1.5">
+              <LanguageSelector />
+              <ThemeToggle />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/suggestion-box")}
+                className="gap-2 rounded-xl hover:bg-primary/10 hidden sm:inline-flex"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span>Təklif</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate("/dashboard")}
+                className="gap-2 rounded-xl border-border/50 bg-card/50 backdrop-blur-sm hover:bg-primary/10 hover:border-primary/50 transition-all duration-300 hidden sm:inline-flex"
+              >
+                <TrendingUp className="w-4 h-4" />
+                <span>Panel</span>
+              </Button>
             </div>
           </div>
         </div>

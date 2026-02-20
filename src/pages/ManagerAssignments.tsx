@@ -2,9 +2,11 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import obaLogo from "@/assets/oba-logo.jpg";
+import { AppLogo } from "@/components/AppLogo";
 import { ManagerBranchAssignment } from "@/components/ManagerBranchAssignment";
 import { MobileNavMenu } from "@/components/MobileNavMenu";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 const ManagerAssignments = () => {
   const navigate = useNavigate();
@@ -12,30 +14,28 @@ const ManagerAssignments = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border bg-card">
+      <header className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-xl">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-4 min-w-0">
-              <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center shadow-lg flex-shrink-0">
-                <span className="text-2xl">😊</span>
-              </div>
-              <div className="min-w-0">
-                <h1 className="text-2xl font-bold text-foreground truncate">Menecer Təyinatları</h1>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate("/hr-panel")}
+                className="rounded-xl hover:bg-primary/10 shrink-0 hidden sm:flex"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <AppLogo size="sm" showText={true} />
+              <div className="hidden sm:block min-w-0">
+                <h1 className="text-xl font-bold text-foreground truncate">Menecer Təyinatları</h1>
                 <p className="text-sm text-muted-foreground truncate">Bölgə menecerlərinin idarə edilməsi</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              {/* Desktop navigation */}
               <div className="hidden sm:flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate("/hr-panel")}
-                  className="gap-2"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  HR Paneli
-                </Button>
+                <LanguageSelector />
+                <ThemeToggle />
                 <Button
                   variant="ghost"
                   size="sm"
@@ -43,13 +43,12 @@ const ManagerAssignments = () => {
                     await supabase.auth.signOut();
                     navigate("/auth");
                   }}
-                  className="gap-2 text-destructive hover:text-destructive"
+                  className="gap-2 text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl"
                 >
                   <LogOut className="w-4 h-4" />
                   <span className="hidden md:inline">Çıxış</span>
                 </Button>
               </div>
-              {/* Mobile hamburger menu */}
               <MobileNavMenu showDatePicker={false} />
             </div>
           </div>
