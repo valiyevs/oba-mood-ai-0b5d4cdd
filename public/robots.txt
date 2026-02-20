@@ -22,5 +22,7 @@ Disallow: /admin
 Disallow: /targets
 Disallow: /analytics
 Disallow: /suggestions-management
+Disallow: /blog
+Disallow: /blog/
 
 Sitemap: https://moodai.az/sitemap.xml

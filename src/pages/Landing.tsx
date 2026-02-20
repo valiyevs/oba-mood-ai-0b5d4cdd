@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,18 +7,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
-  Brain, BarChart3, Shield, Bell, TrendingUp, Users, Zap, ArrowRight,
-  CheckCircle2, Sparkles, MessageSquare, Target, ChevronRight, Star, Crown,
+  Brain, Shield, Bell, TrendingUp, Users, Zap, ArrowRight,
+  CheckCircle2, Sparkles, MessageSquare, Target, ChevronRight, Crown,
   Building2, Check, Activity, Lock, AlertTriangle, XCircle, Eye, Gauge,
   HeartCrack, ShieldAlert, LineChart, Layers, MousePointerClick, Menu, X,
-  Quote, ShoppingCart, Landmark, Wifi, Award, Handshake, HelpCircle,
+  Quote, ShoppingCart, Landmark, Wifi, Award, HelpCircle,
   ExternalLink, Globe, Radar,
 } from "lucide-react";
-import { useTheme } from "@/hooks/useTheme";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useCmsMenus } from "@/hooks/useCmsMenus";
+import { AppLogo } from "@/components/AppLogo";
 import { useRef, useState, useEffect } from "react";
 import {
   ChartContainer, ChartTooltip, ChartTooltipContent,
@@ -33,7 +33,7 @@ import {
 const painIcons = [HeartCrack, ShieldAlert, TrendingUp, AlertTriangle];
 const featureIcons = [MousePointerClick, Gauge, Brain, LineChart, Eye, Bell];
 const stepIcons = [MessageSquare, Brain, Zap];
-const planIcons = [Star, Crown, Building2];
+const planIcons = [Sparkles, Crown, Building2];
 
 /* ─── Mock Chart Data ─── */
 const weeklyMoodData = [
@@ -170,7 +170,6 @@ const ParallaxSection = ({ children, className, speed = 0.1 }: { children: React
 
 const Landing = () => {
   const navigate = useNavigate();
-  const { theme } = useTheme();
   const { locale, t, tField } = useLanguage();
   const { menus: landingMenus } = useCmsMenus("landing_nav");
   const heroRef = useRef<HTMLDivElement>(null);
@@ -296,12 +295,7 @@ const Landing = () => {
         className="sticky top-0 z-50 border-b border-border/40 bg-background/70 backdrop-blur-2xl"
       >
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center shadow-lg shadow-primary/30">
-              <Brain className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="text-lg font-bold tracking-tight">MoodAI</span>
-          </div>
+          <AppLogo size="sm" onClick={() => navigate("/")} />
           <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
             {navLinks.map(link => (
               <a key={link.href} href={link.href} className="hover:text-foreground transition-colors font-medium">{link.label}</a>
@@ -1107,12 +1101,7 @@ const Landing = () => {
           <div className="grid md:grid-cols-4 gap-10 mb-12">
             {/* Brand */}
             <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center shadow-lg shadow-primary/20">
-                  <Brain className="w-5 h-5 text-primary-foreground" />
-                </div>
-                <span className="text-lg font-bold">MoodAI</span>
-              </div>
+              <AppLogo size="sm" onClick={() => navigate("/")} />
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {t('footer_tagline', 'Əməkdaş Emosiya Analitika Platforması. AI ilə işçi əhvalını biznesin gücünə çevirin.')}
               </p>
@@ -1124,7 +1113,6 @@ const Landing = () => {
               <div className="space-y-2">
                 <button onClick={() => navigate("/survey")} className="block text-sm text-muted-foreground hover:text-primary transition-colors">Demo</button>
                 <button onClick={() => navigate("/auth")} className="block text-sm text-muted-foreground hover:text-primary transition-colors">Giriş</button>
-                <button onClick={() => navigate("/blog")} className="block text-sm text-muted-foreground hover:text-primary transition-colors">Blog</button>
                 <button onClick={() => navigate("/suggestion-box")} className="block text-sm text-muted-foreground hover:text-primary transition-colors">Təklif qutusu</button>
               </div>
             </div>
