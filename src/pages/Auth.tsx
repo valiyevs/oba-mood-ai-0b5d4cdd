@@ -221,16 +221,16 @@ const Auth = () => {
 
           {/* Header */}
           <div className="p-8 pb-6 text-center space-y-6">
-            {/* Smiley Icon */}
+            {/* App Logo */}
             <motion.div
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-              className="relative inline-flex"
+              className="relative inline-flex justify-center"
             >
               <div className="absolute -inset-3 bg-gradient-to-r from-primary/30 to-primary-glow/30 rounded-full blur-xl" />
-              <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center shadow-xl ring-2 ring-border/50">
-                <span className="text-4xl">😊</span>
+              <div className="relative">
+                <AppLogo size="lg" showText={false} />
               </div>
             </motion.div>
             

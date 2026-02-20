@@ -288,11 +288,11 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
-      {/* ═══ Sticky Navigation ═══ */}
+      {/* ═══ Fixed Navigation ═══ */}
       <motion.nav
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="sticky top-0 z-50 border-b border-border/40 bg-background/70 backdrop-blur-2xl"
+        className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-2xl"
       >
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <AppLogo size="sm" onClick={() => navigate("/")} />
@@ -340,7 +340,7 @@ const Landing = () => {
       </motion.nav>
 
       {/* ═══ Hero — Centered High-Impact with Parallax ═══ */}
-      <section ref={heroRef} className="relative py-24 md:py-36 lg:py-44 overflow-hidden">
+      <section ref={heroRef} className="relative pt-36 pb-24 md:pt-48 md:pb-36 lg:pt-56 lg:pb-44 overflow-hidden">
         {/* Animated gradient orbs */}
         <div className="absolute inset-0 -z-10">
           <motion.div
