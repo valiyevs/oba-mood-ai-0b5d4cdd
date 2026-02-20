@@ -27,9 +27,9 @@ import {
   LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid,
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar as RechartsRadar,
 } from "recharts";
-import obaLogo from "@/assets/oba-logo.jpg";
 import heroAbstract from "@/assets/hero-abstract.png";
 import analyticsAbstract from "@/assets/analytics-abstract.png";
+import { AppLogo } from "@/components/AppLogo";
 
 /* ─── Icon maps for CMS-driven arrays ─── */
 const painIcons = [HeartCrack, ShieldAlert, TrendingUp, AlertTriangle];
@@ -308,8 +308,7 @@ const Landing = () => {
       >
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src={obaLogo} alt="MoodAI Logo" className="w-10 h-10 rounded-xl object-cover shadow-lg" />
-            <span className="text-lg font-bold tracking-tight">MoodAI</span>
+            <AppLogo size="sm" showText={true} />
           </div>
           <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
             {navLinks.map(link => (
@@ -1147,10 +1146,7 @@ const Landing = () => {
           <div className="grid md:grid-cols-3 gap-10 mb-12">
             {/* Brand */}
             <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <img src={obaLogo} alt="MoodAI" className="w-10 h-10 rounded-xl object-cover shadow-lg" />
-                <span className="text-lg font-bold">MoodAI</span>
-              </div>
+              <AppLogo size="sm" showText={true} />
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {t('footer_tagline', 'Əməkdaş Emosiya Analitika Platforması')}
               </p>

@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { format, subDays } from "date-fns";
 import { az } from "date-fns/locale";
-import obaLogo from "@/assets/oba-logo.jpg";
+import { AppLogo } from "@/components/AppLogo";
 import { MobileNavMenu } from "@/components/MobileNavMenu";
 import { useToast } from "@/hooks/use-toast";
 import { AIAnalysisCard } from "@/components/AIAnalysisCard";
@@ -303,10 +303,7 @@ const Dashboard = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-4 min-w-0">
-              <div className="relative flex-shrink-0">
-                <div className="absolute inset-0 bg-primary/20 rounded-xl blur-lg" />
-                <img src={obaLogo} alt="MoodAI" className="relative w-14 h-14 rounded-xl object-cover shadow-lg ring-2 ring-border/50" />
-              </div>
+              <AppLogo size="md" showText={false} />
               <div className="min-w-0">
                 <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate flex items-center gap-2">
                   MoodAI İdarəetmə Paneli
