@@ -19,11 +19,12 @@ export const AppLogo = ({ size = "md", showText = true, className }: AppLogoProp
     <div className={cn("flex items-center gap-3", className)}>
       <div className="relative group">
         <div className="absolute -inset-1 bg-gradient-to-r from-primary/40 to-primary/20 rounded-xl blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        <div className="relative flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/30 rounded-xl shadow-lg p-1.5">
+        <div className="relative flex items-center justify-center rounded-xl p-1">
           <img
             src={moodaiLogo}
             alt="MoodAI"
-            className={cn("object-contain drop-shadow-sm", s.img)}
+            className={cn("object-contain", s.img)}
+            style={{ background: "transparent" }}
           />
         </div>
       </div>
