@@ -32,7 +32,7 @@ import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { AppLogo } from "@/components/AppLogo";
+import obaLogo from "@/assets/oba-logo.jpg";
 import { supabase } from "@/integrations/supabase/client";
 import { MobileNavMenu } from "@/components/MobileNavMenu";
 import { AIAnalysisCard } from "@/components/AIAnalysisCard";
@@ -429,7 +429,12 @@ const HRPanel = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-4 min-w-0">
-              <AppLogo size="md" showText={false} />
+              <div className="relative flex-shrink-0">
+                <div className="absolute inset-0 bg-primary/20 rounded-full blur-lg" />
+                <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center shadow-lg ring-2 ring-border/50">
+                  <span className="text-3xl">😊</span>
+                </div>
+              </div>
               <div className="min-w-0">
                 <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate flex items-center gap-2">
                   <Shield className="w-6 h-6 text-primary" />

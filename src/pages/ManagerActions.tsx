@@ -27,7 +27,7 @@ import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { az } from "date-fns/locale";
-import { AppLogo } from "@/components/AppLogo";
+import obaLogo from "@/assets/oba-logo.jpg";
 import { MobileNavMenu } from "@/components/MobileNavMenu";
 
 type ActionStatus = "pending" | "in_progress" | "completed" | "cancelled";
@@ -245,7 +245,9 @@ const ManagerActions = () => {
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <AppLogo size="sm" showText={false} />
+            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center shadow-lg">
+              <span className="text-xl">😊</span>
+            </div>
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-foreground">Menecer Tapşırıqları</h1>
               <p className="text-sm text-muted-foreground hidden sm:block">Tükənmişlik hallarına görülən tədbirlər</p>

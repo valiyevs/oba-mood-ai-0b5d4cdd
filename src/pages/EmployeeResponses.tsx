@@ -11,8 +11,6 @@ import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, Brain, TrendingUp, TrendingDown, Minus, AlertTriangle, MessageSquare, Calendar, Filter, Sparkles, Activity, Users, Building2 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
 import { MobileNavMenu } from "@/components/MobileNavMenu";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { LanguageSelector } from "@/components/LanguageSelector";
 
 // Mock data for anonymized responses
 const mockResponses = [
@@ -278,8 +276,6 @@ const EmployeeResponses = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <LanguageSelector />
-            <ThemeToggle />
             <MobileNavMenu />
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="hidden sm:block">
               <Button variant="outline" size="sm" className="rounded-xl border-primary/20 hover:bg-primary/10 hover:border-primary/40">

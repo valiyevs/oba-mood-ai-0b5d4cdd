@@ -8,7 +8,6 @@ interface LanguageContextType {
   locale: Locale;
   setLocale: (locale: Locale) => void;
   t: (contentKey: string, fallback?: string) => string;
-  tOptional: (contentKey: string) => string | null;
   tField: (table: string, contentId: string, field: string, fallback?: string) => string;
   locales: { code: Locale; label: string; flag: string }[];
 }
@@ -36,11 +35,11 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     document.documentElement.lang = locale;
   }, [locale]);
 
-  // Fetch ALL CMS content (including inactive — so we can detect deactivation)
+  // Fetch all CMS content (AZ originals)
   const { data: cmsContent = [] } = useQuery({
     queryKey: ["cms_content_i18n"],
     queryFn: async () => {
-      const { data } = await supabase.from("cms_content").select("id,content_key,content_value,is_active");
+      const { data } = await supabase.from("cms_content").select("id,content_key,content_value").eq("is_active", true);
       return data || [];
     },
     staleTime: 5 * 60 * 1000,
@@ -58,25 +57,9 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   });
 
   // t() - translate by content_key (for cms_content table)
-  // If key exists but is_active=false → returns empty string (deactivated)
-  // If key doesn't exist → returns fallback
   const t = useCallback((contentKey: string, fallback?: string): string => {
     const content = cmsContent.find((c: any) => c.content_key === contentKey);
     if (!content) return fallback || contentKey;
-    if (!content.is_active) return ''; // DEACTIVATED → empty
-
-    if (locale === "az") return content.content_value;
-
-    const trans = translations.find(
-      (tr: any) => tr.content_id === content.id && tr.content_table === "cms_content" && tr.field_name === "content_value"
-    );
-    return trans?.translated_value || content.content_value;
-  }, [cmsContent, translations, locale]);
-
-  // tOptional() - returns null if key doesn't exist or is deactivated
-  const tOptional = useCallback((contentKey: string): string | null => {
-    const content = cmsContent.find((c: any) => c.content_key === contentKey);
-    if (!content || !content.is_active) return null;
 
     if (locale === "az") return content.content_value;
 
@@ -97,7 +80,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   }, [translations, locale]);
 
   return (
-    <LanguageContext.Provider value={{ locale, setLocale, t, tOptional, tField, locales: LOCALES }}>
+    <LanguageContext.Provider value={{ locale, setLocale, t, tField, locales: LOCALES }}>
       {children}
     </LanguageContext.Provider>
   );

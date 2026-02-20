@@ -9,7 +9,6 @@ import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { AppLogo } from "@/components/AppLogo";
 
 const authSchema = z.object({
   email: z.string().email({ message: "Düzgün email daxil edin" }),
@@ -226,7 +225,10 @@ const Auth = () => {
               transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
               className="relative inline-flex"
             >
-              <AppLogo size="lg" showText={false} className="justify-center" />
+              <div className="absolute -inset-3 bg-gradient-to-r from-primary/30 to-primary-glow/30 rounded-full blur-xl" />
+              <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center shadow-xl ring-2 ring-border/50">
+                <span className="text-4xl">😊</span>
+              </div>
             </motion.div>
             
             {/* Title */}
