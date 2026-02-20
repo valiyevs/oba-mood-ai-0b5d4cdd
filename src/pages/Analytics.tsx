@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Brain } from "lucide-react";
 import { PredictiveAnalytics } from "@/components/PredictiveAnalytics";
 import { MobileNavMenu } from "@/components/MobileNavMenu";
+import { AppLogo } from "@/components/AppLogo";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 const Analytics = () => {
   const navigate = useNavigate();
@@ -17,28 +20,21 @@ const Analytics = () => {
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center justify-between mb-8"
         >
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate(-1)}
-              className="hover:bg-primary/10 hidden sm:flex"
-            >
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="hover:bg-primary/10 hidden sm:flex">
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-full bg-primary/20">
-                <Brain className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <h1 className="text-xl sm:text-2xl font-bold">Proqnozlaşdırıcı Analitika</h1>
-                <p className="text-sm text-muted-foreground hidden sm:block">
-                  1C/SAP məlumatları ilə stress korrelyasiyası
-                </p>
-              </div>
+            <AppLogo size="sm" onClick={() => navigate("/")} showText={false} />
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold">Proqnozlaşdırıcı Analitika</h1>
+              <p className="text-sm text-muted-foreground hidden sm:block">1C/SAP məlumatları ilə stress korrelyasiyası</p>
             </div>
           </div>
-          <MobileNavMenu />
+          <div className="flex items-center gap-2">
+            <LanguageSelector />
+            <ThemeToggle />
+            <MobileNavMenu />
+          </div>
         </motion.div>
 
         {/* Main Content */}

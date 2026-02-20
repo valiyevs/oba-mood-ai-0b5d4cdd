@@ -2,9 +2,11 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import obaLogo from "@/assets/oba-logo.jpg";
+import { AppLogo } from "@/components/AppLogo";
 import { ManagerBranchAssignment } from "@/components/ManagerBranchAssignment";
 import { MobileNavMenu } from "@/components/MobileNavMenu";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 const ManagerAssignments = () => {
   const navigate = useNavigate();
@@ -16,15 +18,17 @@ const ManagerAssignments = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-4 min-w-0">
-              <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center shadow-lg flex-shrink-0">
-                <span className="text-2xl">😊</span>
-              </div>
+              <AppLogo size="md" onClick={() => navigate("/")} showText={false} />
               <div className="min-w-0">
                 <h1 className="text-2xl font-bold text-foreground truncate">Menecer Təyinatları</h1>
                 <p className="text-sm text-muted-foreground truncate">Bölgə menecerlərinin idarə edilməsi</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <div className="hidden sm:flex items-center gap-1">
+                <LanguageSelector />
+                <ThemeToggle />
+              </div>
               {/* Desktop navigation */}
               <div className="hidden sm:flex items-center gap-2">
                 <Button
