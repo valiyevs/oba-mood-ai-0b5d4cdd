@@ -12,8 +12,8 @@ import {
   Building2, Check, Activity, Lock, AlertTriangle, XCircle, Eye, Gauge,
   HeartCrack, ShieldAlert, LineChart, Layers, MousePointerClick, Menu, X,
   Quote, ShoppingCart, Landmark, Wifi, Award, HelpCircle,
-  ExternalLink, Globe, Radar,
-} from "lucide-react";
+  ExternalLink, Globe, Radar } from
+"lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -21,13 +21,13 @@ import { useCmsMenus } from "@/hooks/useCmsMenus";
 import { AppLogo } from "@/components/AppLogo";
 import { useRef, useState, useEffect } from "react";
 import {
-  ChartContainer, ChartTooltip, ChartTooltipContent,
-} from "@/components/ui/chart";
+  ChartContainer, ChartTooltip, ChartTooltipContent } from
+"@/components/ui/chart";
 import {
   LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid,
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar as RechartsRadar,
-  ResponsiveContainer,
-} from "recharts";
+  ResponsiveContainer } from
+"recharts";
 
 /* ─── Icon maps for CMS-driven arrays ─── */
 const painIcons = [HeartCrack, ShieldAlert, TrendingUp, AlertTriangle];
@@ -37,34 +37,34 @@ const planIcons = [Sparkles, Crown, Building2];
 
 /* ─── Mock Chart Data ─── */
 const weeklyMoodData = [
-  { day: "Baz", mood: 68, engagement: 72 },
-  { day: "Ber", mood: 72, engagement: 70 },
-  { day: "Çrş", mood: 65, engagement: 68 },
-  { day: "Crş", mood: 78, engagement: 75 },
-  { day: "Cüm", mood: 74, engagement: 80 },
-  { day: "Şnb", mood: 82, engagement: 85 },
-  { day: "Baz", mood: 85, engagement: 82 },
-];
+{ day: "Baz", mood: 68, engagement: 72 },
+{ day: "Ber", mood: 72, engagement: 70 },
+{ day: "Çrş", mood: 65, engagement: 68 },
+{ day: "Crş", mood: 78, engagement: 75 },
+{ day: "Cüm", mood: 74, engagement: 80 },
+{ day: "Şnb", mood: 82, engagement: 85 },
+{ day: "Baz", mood: 85, engagement: 82 }];
+
 
 const radarData = [
-  { metric: "Məhsuldarlıq", value: 82 },
-  { metric: "Stress", value: 45 },
-  { metric: "Bağlılıq", value: 78 },
-  { metric: "Məmnuniyyət", value: 88 },
-  { metric: "Enerji", value: 72 },
-];
+{ metric: "Məhsuldarlıq", value: 82 },
+{ metric: "Stress", value: 45 },
+{ metric: "Bağlılıq", value: 78 },
+{ metric: "Məmnuniyyət", value: 88 },
+{ metric: "Enerji", value: 72 }];
+
 
 const moodChartConfig = {
   mood: { label: "Əhval", color: "hsl(239 84% 67%)" },
-  engagement: { label: "Bağlılıq", color: "hsl(160 84% 39%)" },
+  engagement: { label: "Bağlılıq", color: "hsl(160 84% 39%)" }
 };
 
 const radarChartConfig = {
-  value: { label: "Skor", color: "hsl(239 84% 67%)" },
+  value: { label: "Skor", color: "hsl(239 84% 67%)" }
 };
 
 /* ─── Counter Animation Component ─── */
-const CounterItem = ({ end, suffix, label, delay }: { end: number; suffix: string; label: string; delay: number }) => {
+const CounterItem = ({ end, suffix, label, delay }: {end: number;suffix: string;label: string;delay: number;}) => {
   const [count, setCount] = useState(0);
   const [hasAnimated, setHasAnimated] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -102,49 +102,49 @@ const CounterItem = ({ end, suffix, label, delay }: { end: number; suffix: strin
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay }}
-      className="space-y-1"
-    >
+      className="space-y-1">
+      
       <div className="text-3xl md:text-4xl font-extrabold text-primary">
         {count}{suffix}
       </div>
       <p className="text-sm text-muted-foreground">{label}</p>
-    </motion.div>
-  );
+    </motion.div>);
+
 };
 
 /* ─── Floating Particles ─── */
-const FloatingParticle = ({ delay, x, y, size }: { delay: number; x: string; y: string; size: number }) => (
-  <motion.div
-    className="absolute rounded-full bg-primary/20 blur-sm"
-    style={{ left: x, top: y, width: size, height: size }}
-    animate={{
-      y: [0, -30, 0],
-      x: [0, 15, 0],
-      opacity: [0.2, 0.5, 0.2],
-      scale: [1, 1.2, 1],
-    }}
-    transition={{ duration: 6 + delay, repeat: Infinity, ease: "easeInOut", delay }}
-  />
-);
+const FloatingParticle = ({ delay, x, y, size }: {delay: number;x: string;y: string;size: number;}) =>
+<motion.div
+  className="absolute rounded-full bg-primary/20 blur-sm"
+  style={{ left: x, top: y, width: size, height: size }}
+  animate={{
+    y: [0, -30, 0],
+    x: [0, 15, 0],
+    opacity: [0.2, 0.5, 0.2],
+    scale: [1, 1.2, 1]
+  }}
+  transition={{ duration: 6 + delay, repeat: Infinity, ease: "easeInOut", delay }} />;
+
+
 
 /* ─── AI Insight Card ─── */
-const AIInsightCard = ({ icon: Icon, title, description, color, delay }: {
-  icon: any; title: string; description: string; color: string; delay: number;
-}) => (
-  <motion.div
-    initial={{ opacity: 0, x: 20, rotateY: -10 }}
-    whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
-    viewport={{ once: true }}
-    transition={{ delay, duration: 0.6, type: "spring" }}
-    whileHover={{ scale: 1.03, y: -4 }}
-    className="glass-card rounded-xl p-4 glass-card-hover transition-all duration-300"
-  >
+const AIInsightCard = ({ icon: Icon, title, description, color, delay
+
+}: {icon: any;title: string;description: string;color: string;delay: number;}) =>
+<motion.div
+  initial={{ opacity: 0, x: 20, rotateY: -10 }}
+  whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
+  viewport={{ once: true }}
+  transition={{ delay, duration: 0.6, type: "spring" }}
+  whileHover={{ scale: 1.03, y: -4 }}
+  className="glass-card rounded-xl p-4 glass-card-hover transition-all duration-300">
+  
     <div className="flex items-start gap-3">
       <motion.div
-        className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${color}`}
-        animate={{ rotate: [0, 5, -5, 0] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: delay * 2 }}
-      >
+      className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${color}`}
+      animate={{ rotate: [0, 5, -5, 0] }}
+      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: delay * 2 }}>
+      
         <Icon className="w-4 h-4" />
       </motion.div>
       <div className="space-y-1">
@@ -152,11 +152,11 @@ const AIInsightCard = ({ icon: Icon, title, description, color, delay }: {
         <p className="text-xs text-muted-foreground leading-relaxed">{description}</p>
       </div>
     </div>
-  </motion.div>
-);
+  </motion.div>;
+
 
 /* ─── Parallax Section Wrapper ─── */
-const ParallaxSection = ({ children, className, speed = 0.1 }: { children: React.ReactNode; className?: string; speed?: number }) => {
+const ParallaxSection = ({ children, className, speed = 0.1 }: {children: React.ReactNode;className?: string;speed?: number;}) => {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], [50 * speed, -50 * speed]);
@@ -164,8 +164,8 @@ const ParallaxSection = ({ children, className, speed = 0.1 }: { children: React
   return (
     <motion.div ref={ref} style={{ y }} className={className}>
       {children}
-    </motion.div>
-  );
+    </motion.div>);
+
 };
 
 const Landing = () => {
@@ -174,13 +174,13 @@ const Landing = () => {
   const { menus: landingMenus } = useCmsMenus("landing_nav");
   const heroRef = useRef<HTMLDivElement>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
+
   // Main hero parallax
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroOpacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 100]);
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
-  
+
   // Dashboard parallax (moves slower than hero text for depth)
   const dashboardY = useTransform(scrollYProgress, [0, 1], [0, 50]);
   const dashboardScale = useTransform(scrollYProgress, [0, 1], [1, 0.98]);
@@ -191,121 +191,121 @@ const Landing = () => {
     queryFn: async () => {
       const { data } = await supabase.from("cms_faqs").select("*").eq("is_active", true).order("sort_order");
       return data || [];
-    },
+    }
   });
   const { data: cmsPartners = [] } = useQuery({
     queryKey: ["cms_partners_landing"],
     queryFn: async () => {
       const { data } = await supabase.from("cms_partners").select("*").eq("is_active", true).order("sort_order");
       return data || [];
-    },
+    }
   });
 
   // Helper: check if a CMS key is active (returns true if key doesn't exist in CMS — fallback mode)
   const isKeyActive = (key: string): boolean => {
-    const found = cmsContentRaw.find(c => c.content_key === key);
+    const found = cmsContentRaw.find((c) => c.content_key === key);
     return !found || found.is_active;
   };
 
   // CMS-driven dynamic arrays — items filtered by is_active
-  const painStats = [1, 2, 3, 4]
-    .filter((i) => isKeyActive(`pain_${i}_label`))
-    .map((i, idx) => ({
-      value: t(`pain_${i}_value`, ['65%', '79%', '+3%', '5%'][idx]),
-      label: t(`pain_${i}_label`, ['Müştəri itkisi', 'Həvəssiz işçi', 'Gizli qazanc', 'Zəncir reaksiya'][idx]),
-      detail: t(`pain_${i}_detail`, ''),
-      source: t(`pain_${i}_source`, ''),
-      icon: painIcons[Math.min(idx, painIcons.length - 1)],
-    }));
+  const painStats = [1, 2, 3, 4].
+  filter((i) => isKeyActive(`pain_${i}_label`)).
+  map((i, idx) => ({
+    value: t(`pain_${i}_value`, ['65%', '79%', '+3%', '5%'][idx]),
+    label: t(`pain_${i}_label`, ['Müştəri itkisi', 'Həvəssiz işçi', 'Gizli qazanc', 'Zəncir reaksiya'][idx]),
+    detail: t(`pain_${i}_detail`, ''),
+    source: t(`pain_${i}_source`, ''),
+    icon: painIcons[Math.min(idx, painIcons.length - 1)]
+  }));
 
-  const solutionFeatures = [1, 2, 3, 4, 5, 6]
-    .filter((i) => isKeyActive(`feature_${i}_title`))
-    .map((i, idx) => ({
-      icon: featureIcons[Math.min(idx, featureIcons.length - 1)],
-      title: t(`feature_${i}_title`, ''),
-      description: t(`feature_${i}_desc`, ''),
-      metric: t(`feature_${i}_metric`, ''),
-    }));
+  const solutionFeatures = [1, 2, 3, 4, 5, 6].
+  filter((i) => isKeyActive(`feature_${i}_title`)).
+  map((i, idx) => ({
+    icon: featureIcons[Math.min(idx, featureIcons.length - 1)],
+    title: t(`feature_${i}_title`, ''),
+    description: t(`feature_${i}_desc`, ''),
+    metric: t(`feature_${i}_metric`, '')
+  }));
 
-  const steps = [1, 2, 3]
-    .filter((i) => isKeyActive(`step_${i}_title`))
-    .map((i, idx) => ({
-      step: `0${i}`,
-      title: t(`step_${i}_title`, ''),
-      description: t(`step_${i}_desc`, ''),
-      icon: stepIcons[Math.min(idx, stepIcons.length - 1)],
-    }));
+  const steps = [1, 2, 3].
+  filter((i) => isKeyActive(`step_${i}_title`)).
+  map((i, idx) => ({
+    step: `0${i}`,
+    title: t(`step_${i}_title`, ''),
+    description: t(`step_${i}_desc`, ''),
+    icon: stepIcons[Math.min(idx, stepIcons.length - 1)]
+  }));
 
-  const resultMetrics = [1, 2, 3, 4]
-    .filter((i) => isKeyActive(`result_${i}_label`))
-    .map((i, idx) => ({
-      value: t(`result_${i}_value`, ['60%', '35%', '25%', '3x'][idx]),
-      label: t(`result_${i}_label`, ''),
-    }));
+  const resultMetrics = [1, 2, 3, 4].
+  filter((i) => isKeyActive(`result_${i}_label`)).
+  map((i, idx) => ({
+    value: t(`result_${i}_value`, ['60%', '35%', '25%', '3x'][idx]),
+    label: t(`result_${i}_label`, '')
+  }));
 
   const sectorDefs = [
-    { icon: ShoppingCart, emoji: "🛒", n: 1 },
-    { icon: Landmark, emoji: "🏦", n: 2 },
-    { icon: Wifi, emoji: "📡", n: 3 },
-  ];
-  const sectors = sectorDefs
-    .filter(s => isKeyActive(`sector_${s.n}_title`))
-    .map((s, idx) => ({
-      icon: s.icon,
-      emoji: s.emoji,
-      title: t(`sector_${s.n}_title`, ''),
-      subtitle: t(`sector_${s.n}_subtitle`, ''),
-      pain: t(`sector_${s.n}_pain`, ''),
-      solution: t(`sector_${s.n}_solution`, ''),
-    }));
+  { icon: ShoppingCart, emoji: "🛒", n: 1 },
+  { icon: Landmark, emoji: "🏦", n: 2 },
+  { icon: Wifi, emoji: "📡", n: 3 }];
 
-  const testimonials = [1, 2, 3]
-    .filter((i) => isKeyActive(`testimonial_${i}_quote`))
-    .map((i, idx) => ({
-      quote: t(`testimonial_${i}_quote`, ''),
-      name: t(`testimonial_${i}_name`, ''),
-      role: t(`testimonial_${i}_role`, ''),
-      emoji: ["🛒", "🏦", "📡"][idx],
-    }));
+  const sectors = sectorDefs.
+  filter((s) => isKeyActive(`sector_${s.n}_title`)).
+  map((s, idx) => ({
+    icon: s.icon,
+    emoji: s.emoji,
+    title: t(`sector_${s.n}_title`, ''),
+    subtitle: t(`sector_${s.n}_subtitle`, ''),
+    pain: t(`sector_${s.n}_pain`, ''),
+    solution: t(`sector_${s.n}_solution`, '')
+  }));
 
-  const pricingFeatureCounts: Record<string, { f: number; n: number }> = {
+  const testimonials = [1, 2, 3].
+  filter((i) => isKeyActive(`testimonial_${i}_quote`)).
+  map((i, idx) => ({
+    quote: t(`testimonial_${i}_quote`, ''),
+    name: t(`testimonial_${i}_name`, ''),
+    role: t(`testimonial_${i}_role`, ''),
+    emoji: ["🛒", "🏦", "📡"][idx]
+  }));
+
+  const pricingFeatureCounts: Record<string, {f: number;n: number;}> = {
     basic: { f: 6, n: 3 },
     premium: { f: 8, n: 1 },
-    enterprise: { f: 8, n: 0 },
+    enterprise: { f: 8, n: 0 }
   };
 
   const pricingPlans = [
-    { key: 'basic', icon: planIcons[0], popular: false },
-    { key: 'premium', icon: planIcons[1], popular: true },
-    { key: 'enterprise', icon: planIcons[2], popular: false },
-  ]
-    .filter(p => isKeyActive(`pricing_${p.key}_name`))
-    .map(p => ({
-      name: t(`pricing_${p.key}_name`, p.key),
-      price: t(`pricing_${p.key}_price`, '0'),
-      period: t(`pricing_${p.key}_period`, 'ay / filial'),
-      description: t(`pricing_${p.key}_desc`, ''),
-      icon: p.icon,
-      popular: p.popular,
-      features: Array.from({ length: pricingFeatureCounts[p.key].f }, (_, i) => t(`pricing_${p.key}_f${i + 1}`, '')).filter(Boolean),
-      notIncluded: Array.from({ length: pricingFeatureCounts[p.key].n }, (_, i) => t(`pricing_${p.key}_n${i + 1}`, '')).filter(Boolean),
-    }));
+  { key: 'basic', icon: planIcons[0], popular: false },
+  { key: 'premium', icon: planIcons[1], popular: true },
+  { key: 'enterprise', icon: planIcons[2], popular: false }].
+
+  filter((p) => isKeyActive(`pricing_${p.key}_name`)).
+  map((p) => ({
+    name: t(`pricing_${p.key}_name`, p.key),
+    price: t(`pricing_${p.key}_price`, '0'),
+    period: t(`pricing_${p.key}_period`, 'ay / filial'),
+    description: t(`pricing_${p.key}_desc`, ''),
+    icon: p.icon,
+    popular: p.popular,
+    features: Array.from({ length: pricingFeatureCounts[p.key].f }, (_, i) => t(`pricing_${p.key}_f${i + 1}`, '')).filter(Boolean),
+    notIncluded: Array.from({ length: pricingFeatureCounts[p.key].n }, (_, i) => t(`pricing_${p.key}_n${i + 1}`, '')).filter(Boolean)
+  }));
 
   const fadeUp = {
     hidden: { opacity: 0, y: 30 },
-    visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.5 } }),
+    visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.5 } })
   };
 
-  const navLinks = landingMenus.length > 0
-    ? landingMenus.map(m => ({ href: m.url || "#", label: m.label }))
-    : [
-        { href: "#problem", label: "Problem" },
-        { href: "#solution", label: "Həll" },
-        { href: "#sectors", label: "Sektorlar" },
-        { href: "#how-it-works", label: "Necə işləyir" },
-        { href: "#testimonials", label: "Rəylər" },
-        { href: "#pricing", label: "Qiymətlər" },
-      ];
+  const navLinks = landingMenus.length > 0 ?
+  landingMenus.map((m) => ({ href: m.url || "#", label: m.label })) :
+  [
+  { href: "#problem", label: "Problem" },
+  { href: "#solution", label: "Həll" },
+  { href: "#sectors", label: "Sektorlar" },
+  { href: "#how-it-works", label: "Necə işləyir" },
+  { href: "#testimonials", label: "Rəylər" },
+  { href: "#pricing", label: "Qiymətlər" }];
+
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -313,14 +313,14 @@ const Landing = () => {
       <motion.nav
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-2xl"
-      >
+        className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-2xl">
+        
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <AppLogo size="sm" onClick={() => navigate("/")} />
           <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
-            {navLinks.map(link => (
-              <a key={link.href} href={link.href} className="hover:text-foreground transition-colors font-medium">{link.label}</a>
-            ))}
+            {navLinks.map((link) =>
+            <a key={link.href} href={link.href} className="hover:text-foreground transition-colors font-medium">{link.label}</a>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <LanguageSelector />
@@ -338,26 +338,26 @@ const Landing = () => {
         </div>
 
         {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-t border-border/40 bg-background/95 backdrop-blur-xl"
-          >
+        {mobileMenuOpen &&
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          className="md:hidden border-t border-border/40 bg-background/95 backdrop-blur-xl">
+          
             <div className="container mx-auto px-4 py-4 space-y-3">
-              {navLinks.map(link => (
-                <a key={link.href} href={link.href} onClick={() => setMobileMenuOpen(false)} className="block py-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+              {navLinks.map((link) =>
+            <a key={link.href} href={link.href} onClick={() => setMobileMenuOpen(false)} className="block py-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
                   {link.label}
                 </a>
-              ))}
+            )}
               <div className="pt-2 flex flex-col gap-2">
-                <Button variant="outline" size="sm" onClick={() => { navigate("/survey"); setMobileMenuOpen(false); }}>Demo</Button>
-                <Button size="sm" onClick={() => { navigate("/auth"); setMobileMenuOpen(false); }}>Giriş <ArrowRight className="w-3.5 h-3.5 ml-1" /></Button>
+                <Button variant="outline" size="sm" onClick={() => {navigate("/survey");setMobileMenuOpen(false);}}>Demo</Button>
+                <Button size="sm" onClick={() => {navigate("/auth");setMobileMenuOpen(false);}}>Giriş <ArrowRight className="w-3.5 h-3.5 ml-1" /></Button>
               </div>
             </div>
           </motion.div>
-        )}
+        }
       </motion.nav>
 
       {/* ═══ Hero — Centered High-Impact with Parallax ═══ */}
@@ -367,18 +367,18 @@ const Landing = () => {
           <motion.div
             className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[180px]"
             animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.35, 0.2] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          />
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} />
+          
           <motion.div
             className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-secondary/8 rounded-full blur-[160px]"
             animate={{ scale: [1, 1.15, 1], opacity: [0.1, 0.25, 0.1] }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-          />
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }} />
+          
           <motion.div
             className="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[140px]"
             animate={{ scale: [1.1, 1, 1.1], opacity: [0.15, 0.1, 0.15] }}
-            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-          />
+            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }} />
+          
           {/* Floating particles */}
           <FloatingParticle delay={0} x="10%" y="20%" size={6} />
           <FloatingParticle delay={1.5} x="85%" y="30%" size={8} />
@@ -401,8 +401,8 @@ const Landing = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7 }}
-              className="text-4xl sm:text-5xl lg:text-7xl font-extrabold leading-[1.05] tracking-tight"
-            >
+              className="text-4xl sm:text-5xl lg:text-7xl font-extrabold leading-[1.05] tracking-tight">
+              
               <span className="bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text">
                 {t('hero_title_1', 'Turn Employee Sentiment into')}
               </span>
@@ -416,8 +416,8 @@ const Landing = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
-            >
+              className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              
               {t('hero_subtitle', 'Satışı ölçürsünüz. Bəs satışı yaradan insanın əhvalını? Ölçülməyən emosiya idarə oluna bilməz.')}
             </motion.p>
 
@@ -425,21 +425,21 @@ const Landing = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center"
-            >
+              className="flex flex-col sm:flex-row gap-4 justify-center">
+              
               <Button
                 size="lg"
                 onClick={() => navigate("/auth")}
-                className="text-base px-10 h-14 rounded-2xl gap-2 shadow-xl shadow-primary/30 hover:shadow-primary/50 transition-all duration-300 hover:scale-[1.02]"
-              >
+                className="text-base px-10 h-14 rounded-2xl gap-2 shadow-xl shadow-primary/30 hover:shadow-primary/50 transition-all duration-300 hover:scale-[1.02]">
+                
                 {t('hero_cta_primary', 'Request Demo')} <ArrowRight className="w-5 h-5" />
               </Button>
               <Button
                 variant="outline"
                 size="lg"
                 onClick={() => navigate("/survey")}
-                className="text-base px-10 h-14 rounded-2xl gap-2 border-border/60 hover:border-primary/40 hover:bg-primary/5 transition-all duration-300"
-              >
+                className="text-base px-10 h-14 rounded-2xl gap-2 border-border/60 hover:border-primary/40 hover:bg-primary/5 transition-all duration-300">
+                
                 {t('hero_cta_secondary', 'Get Started')} <ChevronRight className="w-5 h-5" />
               </Button>
             </motion.div>
@@ -448,8 +448,8 @@ const Landing = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
-              className="text-sm text-muted-foreground flex items-center justify-center gap-2"
-            >
+              className="text-sm text-muted-foreground flex items-center justify-center gap-2">
+              
               <Lock className="w-3.5 h-3.5" />
               {t('hero_trust_text', '')}
             </motion.p>
@@ -461,8 +461,8 @@ const Landing = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
             style={{ y: dashboardY, scale: dashboardScale }}
-            className="mt-16 md:mt-24 max-w-5xl mx-auto relative perspective-[1200px]"
-          >
+            className="mt-16 md:mt-24 max-w-5xl mx-auto relative perspective-[1200px]">
+            
             <div className="glass-card rounded-2xl p-6 md:p-8 shadow-2xl">
               {/* Top bar */}
               <div className="flex items-center justify-between mb-6">
@@ -482,25 +482,25 @@ const Landing = () => {
               {/* Mini dashboard cards */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                 {[
-                  { label: "Əhval Skoru", value: "78%", change: "+5%", icon: TrendingUp, positive: true },
-                  { label: "Tükənmə Riski", value: "Aşağı", change: "Stabil", icon: Shield, positive: true },
-                  { label: "Aktiv İşçi", value: "342", change: "12 filial", icon: Users, positive: true },
-                  { label: "AI Alerts", value: "3", change: "Bu həftə", icon: Bell, positive: false },
-                ].map((card, i) => (
-                  <motion.div
-                    key={card.label}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.8 + i * 0.1 }}
-                    className="rounded-xl bg-muted/50 border border-border/40 p-4 space-y-1"
-                  >
+                { label: "Əhval Skoru", value: "78%", change: "+5%", icon: TrendingUp, positive: true },
+                { label: "Tükənmə Riski", value: "Aşağı", change: "Stabil", icon: Shield, positive: true },
+                { label: "Aktiv İşçi", value: "342", change: "12 filial", icon: Users, positive: true },
+                { label: "AI Alerts", value: "3", change: "Bu həftə", icon: Bell, positive: false }].
+                map((card, i) =>
+                <motion.div
+                  key={card.label}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8 + i * 0.1 }}
+                  className="rounded-xl bg-muted/50 border border-border/40 p-4 space-y-1">
+                  
                     <p className="text-xs text-muted-foreground">{card.label}</p>
                     <p className="text-xl md:text-2xl font-bold text-foreground">{card.value}</p>
                     <div className={`flex items-center gap-1 text-xs ${card.positive ? 'text-secondary' : 'text-primary'}`}>
                       <card.icon className="w-3 h-3" /> {card.change}
                     </div>
                   </motion.div>
-                ))}
+                )}
               </div>
 
               {/* Charts Row */}
@@ -558,37 +558,37 @@ const Landing = () => {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="text-center text-sm text-muted-foreground mb-8 uppercase tracking-widest font-medium"
-          >
+            className="text-center text-sm text-muted-foreground mb-8 uppercase tracking-widest font-medium">
+            
             {t('trust_title', 'Trusted by Leaders')}
           </motion.p>
           <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16">
-            {(cmsPartners.length > 0 ? cmsPartners : [{ name: "OBA Market", logo_url: null }, { name: "PATCO Group", logo_url: null }]).map((partner: any, i: number) => (
-              <motion.div
-                key={partner.name}
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.15 }}
-                className="flex items-center gap-3 opacity-50 hover:opacity-100 transition-all duration-500 cursor-default"
-              >
-                {partner.logo_url ? (
-                  <img src={partner.logo_url} alt={partner.name} className="w-12 h-12 object-contain rounded-xl" />
-                ) : (
-                  <div className="w-12 h-12 rounded-xl bg-muted/50 border border-border/40 flex items-center justify-center">
+            {(cmsPartners.length > 0 ? cmsPartners : [{ name: "OBA Market", logo_url: null }, { name: "PATCO Group", logo_url: null }]).map((partner: any, i: number) =>
+            <motion.div
+              key={partner.name}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.15 }}
+              className="flex items-center gap-3 opacity-50 hover:opacity-100 transition-all duration-500 cursor-default">
+              
+                {partner.logo_url ?
+              <img src={partner.logo_url} alt={partner.name} className="w-12 h-12 object-contain rounded-xl" /> :
+
+              <div className="w-12 h-12 rounded-xl bg-muted/50 border border-border/40 flex items-center justify-center">
                     <Building2 className="w-6 h-6 text-muted-foreground" />
                   </div>
-                )}
+              }
                 <span className="text-lg font-semibold text-muted-foreground">{partner.name}</span>
               </motion.div>
-            ))}
+            )}
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
-              className="flex items-center gap-2 bg-secondary/10 border border-secondary/20 rounded-full px-5 py-2"
-            >
+              className="flex items-center gap-2 bg-secondary/10 border border-secondary/20 rounded-full px-5 py-2">
+              
               <Award className="w-5 h-5 text-secondary" />
               <span className="text-sm font-semibold text-secondary">{t('trusted_partner', 'Trusted Partner Certificate')}</span>
             </motion.div>
@@ -601,25 +601,25 @@ const Landing = () => {
         <div className="container mx-auto px-4">
           {(() => {
             const statItems = [
-              { key: 'stat_companies', suffix: "+", label_key: 'stat_companies_label', def: '50', deflabel: 'Şirkət istifadə edir' },
-              { key: 'stat_users', suffix: "+", label_key: 'stat_users_label', def: '340', deflabel: 'Aktiv istifadəçi' },
-              { key: 'stat_branches', suffix: "+", label_key: 'stat_branches_label', def: '120', deflabel: 'Filial' },
-              { key: 'stat_satisfaction', suffix: "%", label_key: 'stat_satisfaction_label', def: '98', deflabel: 'Məmnuniyyət' },
-            ].filter(s => isKeyActive(s.key));
+            { key: 'stat_companies', suffix: "+", label_key: 'stat_companies_label', def: '50', deflabel: 'Şirkət istifadə edir' },
+            { key: 'stat_users', suffix: "+", label_key: 'stat_users_label', def: '340', deflabel: 'Aktiv istifadəçi' },
+            { key: 'stat_branches', suffix: "+", label_key: 'stat_branches_label', def: '120', deflabel: 'Filial' },
+            { key: 'stat_satisfaction', suffix: "%", label_key: 'stat_satisfaction_label', def: '98', deflabel: 'Məmnuniyyət' }].
+            filter((s) => isKeyActive(s.key));
             const cols = statItems.length <= 2 ? 'grid-cols-2' : statItems.length === 3 ? 'grid-cols-3' : 'grid-cols-2 md:grid-cols-4';
             return (
               <div className={`grid ${cols} gap-8 max-w-4xl mx-auto text-center`}>
-                {statItems.map((item, i) => (
-                  <CounterItem
-                    key={item.key}
-                    end={parseInt(t(item.key, item.def))}
-                    suffix={item.suffix}
-                    label={t(item.label_key, item.deflabel)}
-                    delay={i * 0.15}
-                  />
-                ))}
-              </div>
-            );
+                {statItems.map((item, i) =>
+                <CounterItem
+                  key={item.key}
+                  end={parseInt(t(item.key, item.def))}
+                  suffix={item.suffix}
+                  label={t(item.label_key, item.deflabel)}
+                  delay={i * 0.15} />
+
+                )}
+              </div>);
+
           })()}
         </div>
       </section>
@@ -644,22 +644,22 @@ const Landing = () => {
           </motion.div>
 
           <div className={`grid gap-5 ${painStats.length <= 2 ? 'sm:grid-cols-2' : painStats.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2 lg:grid-cols-4'}`}>
-            {painStats.map((stat, i) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, y: 30, rotateX: 10 }}
-                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.12, type: "spring", stiffness: 100 }}
-                whileHover={{ y: -8, scale: 1.02 }}
-              >
+            {painStats.map((stat, i) =>
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 30, rotateX: 10 }}
+              whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.12, type: "spring", stiffness: 100 }}
+              whileHover={{ y: -8, scale: 1.02 }}>
+              
                 <Card className="h-full border-border/40 glass-card glass-card-hover transition-all duration-300 group rounded-2xl">
                   <CardContent className="p-6 space-y-4">
                     <div className="flex items-center justify-between">
                       <motion.div
-                        className="w-12 h-12 rounded-xl bg-destructive/10 flex items-center justify-center group-hover:bg-destructive/15 transition-colors"
-                        whileHover={{ rotate: 10, scale: 1.1 }}
-                      >
+                      className="w-12 h-12 rounded-xl bg-destructive/10 flex items-center justify-center group-hover:bg-destructive/15 transition-colors"
+                      whileHover={{ rotate: 10, scale: 1.1 }}>
+                      
                         <stat.icon className="w-6 h-6 text-destructive" />
                       </motion.div>
                       <span className="text-3xl md:text-4xl font-extrabold text-foreground">{stat.value}</span>
@@ -670,7 +670,7 @@ const Landing = () => {
                   </CardContent>
                 </Card>
               </motion.div>
-            ))}
+            )}
           </div>
         </div>
       </section>
@@ -696,8 +696,8 @@ const Landing = () => {
                 <motion.div
                   animate={{ scale: [1, 1.05, 1] }}
                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                  className="w-20 h-20 rounded-2xl gradient-primary flex items-center justify-center mx-auto shadow-glow"
-                >
+                  className="w-20 h-20 rounded-2xl gradient-primary flex items-center justify-center mx-auto shadow-glow">
+                  
                   <Brain className="w-10 h-10 text-primary-foreground" />
                 </motion.div>
                 <p className="text-xl md:text-2xl leading-relaxed text-foreground/90 max-w-2xl mx-auto" dangerouslySetInnerHTML={{ __html: t('solution_intro', 'Emosiyaları <strong class="text-primary">KPI-ya</strong> çevirin. İtkini gözləməyin — <strong class="text-secondary">qarşısını alın.</strong>') }} />
@@ -714,10 +714,10 @@ const Landing = () => {
             const count = solutionFeatures.length;
             // Determine grid cols: 1→1col, 2→2col, 3→3col, 4→2×2, 5-6→3col
             const gridCols =
-              count === 1 ? "grid-cols-1 max-w-md mx-auto" :
-              count === 2 ? "md:grid-cols-2 max-w-3xl mx-auto" :
-              count === 4 ? "md:grid-cols-2 lg:grid-cols-2 max-w-4xl mx-auto" :
-              "md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto";
+            count === 1 ? "grid-cols-1 max-w-md mx-auto" :
+            count === 2 ? "md:grid-cols-2 max-w-3xl mx-auto" :
+            count === 4 ? "md:grid-cols-2 lg:grid-cols-2 max-w-4xl mx-auto" :
+            "md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto";
 
             return (
               <div className={`grid gap-5 ${gridCols}`}>
@@ -732,33 +732,33 @@ const Landing = () => {
                       viewport={{ once: true }}
                       transition={{ delay: i * 0.1, type: "spring", stiffness: 120 }}
                       whileHover={{ y: -6, scale: 1.02 }}
-                      className={isWide ? "lg:col-span-2" : ""}
-                    >
+                      className={isWide ? "lg:col-span-2" : ""}>
+                      
                       <Card className={`h-full glass-card glass-card-hover transition-all duration-300 group rounded-2xl ${isWide ? "bg-gradient-to-br from-primary/5 to-transparent" : ""}`}>
                         <CardContent className="p-7 space-y-4">
                           <div className="flex items-center justify-between">
                             <motion.div
                               className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors"
                               whileHover={{ rotate: 12, scale: 1.1 }}
-                              transition={{ type: "spring", stiffness: 300 }}
-                            >
+                              transition={{ type: "spring", stiffness: 300 }}>
+                              
                               <feature.icon className="w-6 h-6 text-primary" />
                             </motion.div>
-                            {feature.metric && (
-                              <Badge variant="outline" className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-muted/50 text-muted-foreground">
+                            {feature.metric &&
+                            <Badge variant="outline" className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-muted/50 text-muted-foreground">
                                 {feature.metric}
                               </Badge>
-                            )}
+                            }
                           </div>
                           <h3 className="text-lg font-semibold group-hover:text-primary transition-colors">{feature.title}</h3>
                           <p className="text-muted-foreground leading-relaxed text-sm">{feature.description}</p>
                         </CardContent>
                       </Card>
-                    </motion.div>
-                  );
+                    </motion.div>);
+
                 })}
-              </div>
-            );
+              </div>);
+
           })()}
         </div>
       </section>
@@ -783,22 +783,22 @@ const Landing = () => {
               title="Stress Artımı Aşkarlandı"
               description="Marketinq şöbəsində stress səviyyəsi bu həftə 12% artıb. Proaktiv müdaxilə tövsiyə olunur."
               color="bg-status-normal/10 text-status-normal"
-              delay={0.1}
-            />
+              delay={0.1} />
+            
             <AIInsightCard
               icon={AlertTriangle}
               title="Burnout Riski"
               description="3 əməkdaşda ardıcıl 5 gün mənfi əhval-ruhiyyə qeydə alınıb. Menecerə bildiriş göndərildi."
               color="bg-destructive/10 text-destructive"
-              delay={0.2}
-            />
+              delay={0.2} />
+            
             <AIInsightCard
               icon={CheckCircle2}
               title="Pozitiv Trend"
               description="Satış şöbəsində məmnuniyyət 8% artıb. Komanda toplantılarının müsbət təsiri müşahidə olunur."
               color="bg-secondary/10 text-secondary"
-              delay={0.3}
-            />
+              delay={0.3} />
+            
           </div>
         </div>
       </section>
@@ -821,14 +821,14 @@ const Landing = () => {
           </motion.div>
 
           <div className={`grid gap-5 max-w-6xl mx-auto ${sectors.length === 1 ? 'grid-cols-1 max-w-xl mx-auto' : sectors.length === 2 ? 'md:grid-cols-2 max-w-3xl' : 'md:grid-cols-3'}`}>
-            {sectors.map((sector, i) => (
-              <motion.div
-                key={sector.title || i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.12 }}
-              >
+            {sectors.map((sector, i) =>
+            <motion.div
+              key={sector.title || i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.12 }}>
+              
                 <Card className="h-full glass-card glass-card-hover hover:-translate-y-2 transition-all duration-300 group rounded-2xl overflow-hidden">
                   <div className="h-1 w-full gradient-primary" />
                   <CardContent className="p-7 space-y-5">
@@ -856,7 +856,7 @@ const Landing = () => {
                   </CardContent>
                 </Card>
               </motion.div>
-            ))}
+            )}
           </div>
         </div>
       </section>
@@ -877,20 +877,20 @@ const Landing = () => {
           </motion.div>
 
           <div className={`grid gap-8 max-w-5xl mx-auto ${steps.length === 1 ? 'grid-cols-1 max-w-sm mx-auto' : steps.length === 2 ? 'md:grid-cols-2 max-w-3xl' : 'md:grid-cols-3'}`}>
-            {steps.map((item, i) => (
-              <motion.div
-                key={item.step}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.15 }}
-                className="relative text-center space-y-5"
-              >
+            {steps.map((item, i) =>
+            <motion.div
+              key={item.step}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.15 }}
+              className="relative text-center space-y-5">
+              
                 <motion.div
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                  className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-primary/10 border border-primary/20 shadow-glow"
-                >
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                transition={{ type: "spring", stiffness: 300 }}
+                className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-primary/10 border border-primary/20 shadow-glow">
+                
                   <item.icon className="w-9 h-9 text-primary" />
                 </motion.div>
                 <div className="inline-block text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full tracking-widest uppercase">
@@ -898,18 +898,18 @@ const Landing = () => {
                 </div>
                 <h3 className="text-xl font-semibold">{item.title}</h3>
                 <p className="text-muted-foreground leading-relaxed">{item.description}</p>
-                {i < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-10 -right-4 translate-x-1/2">
+                {i < steps.length - 1 &&
+              <div className="hidden md:block absolute top-10 -right-4 translate-x-1/2">
                     <motion.div
-                      animate={{ x: [0, 6, 0] }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                    >
+                  animate={{ x: [0, 6, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}>
+                  
                       <ArrowRight className="w-6 h-6 text-primary/25" />
                     </motion.div>
                   </div>
-                )}
+              }
               </motion.div>
-            ))}
+            )}
           </div>
         </div>
       </section>
@@ -929,14 +929,14 @@ const Landing = () => {
           </motion.div>
 
           <div className={`grid gap-5 max-w-5xl mx-auto ${resultMetrics.length <= 2 ? 'sm:grid-cols-2' : resultMetrics.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2 lg:grid-cols-4'}`}>
-            {resultMetrics.map((m, i) => (
-              <motion.div
-                key={m.label || i}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-              >
+            {resultMetrics.map((m, i) =>
+            <motion.div
+              key={m.label || i}
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}>
+              
                 <Card className="text-center glass-card glass-card-hover hover:-translate-y-1 transition-all duration-300 rounded-2xl">
                   <CardContent className="p-8 space-y-3">
                     <div className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
@@ -946,7 +946,7 @@ const Landing = () => {
                   </CardContent>
                 </Card>
               </motion.div>
-            ))}
+            )}
           </div>
         </div>
       </section>
@@ -966,14 +966,14 @@ const Landing = () => {
           </motion.div>
 
           <div className={`grid gap-5 max-w-5xl mx-auto ${testimonials.length === 1 ? 'grid-cols-1 max-w-lg mx-auto' : testimonials.length === 2 ? 'md:grid-cols-2 max-w-3xl' : 'md:grid-cols-3'}`}>
-            {testimonials.map((item, i) => (
-              <motion.div
-                key={item.name || i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-              >
+            {testimonials.map((item, i) =>
+            <motion.div
+              key={item.name || i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}>
+              
                 <Card className="h-full glass-card glass-card-hover transition-all duration-300 rounded-2xl group">
                   <CardContent className="p-7 space-y-5">
                     <Quote className="w-10 h-10 text-primary/20 group-hover:text-primary/30 transition-colors" />
@@ -988,7 +988,7 @@ const Landing = () => {
                   </CardContent>
                 </Card>
               </motion.div>
-            ))}
+            )}
           </div>
         </div>
       </section>
@@ -1009,32 +1009,32 @@ const Landing = () => {
           </motion.div>
 
           <div className={`grid gap-5 max-w-6xl mx-auto ${pricingPlans.length === 1 ? 'grid-cols-1 max-w-sm mx-auto' : pricingPlans.length === 2 ? 'md:grid-cols-2 max-w-3xl' : 'md:grid-cols-3'}`}>
-            {pricingPlans.map((plan, i) => (
-              <motion.div
-                key={plan.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="relative"
-              >
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
+            {pricingPlans.map((plan, i) =>
+            <motion.div
+              key={plan.name}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="relative">
+              
+                {plan.popular &&
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
                     <Badge className="gradient-primary text-primary-foreground px-4 py-1 text-xs shadow-glow">
                       <Sparkles className="w-3 h-3 mr-1" /> {t('popular_badge', 'Ən populyar')}
                     </Badge>
                   </div>
-                )}
+              }
                 <Card className={`h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 rounded-2xl ${
-                  plan.popular
-                    ? "border-primary/50 shadow-glow bg-gradient-to-b from-primary/10 to-transparent"
-                    : "glass-card glass-card-hover"
-                }`}>
+              plan.popular ?
+              "border-primary/50 shadow-glow bg-gradient-to-b from-primary/10 to-transparent" :
+              "glass-card glass-card-hover"}`
+              }>
                   <CardHeader className="pb-4 pt-8">
                     <div className="flex items-center gap-3 mb-4">
                       <div className={`w-11 h-11 rounded-xl flex items-center justify-center shadow-md ${
-                        plan.popular ? "gradient-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-                      }`}>
+                    plan.popular ? "gradient-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`
+                    }>
                         <plan.icon className="w-5 h-5" />
                       </div>
                       <CardTitle className="text-xl">{plan.name}</CardTitle>
@@ -1048,37 +1048,37 @@ const Landing = () => {
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <Button
-                      onClick={() => navigate("/auth")}
-                      className={`w-full h-11 rounded-xl transition-all duration-300 ${plan.popular ? "shadow-lg shadow-primary/30 hover:shadow-primary/50" : ""}`}
-                      variant={plan.popular ? "default" : "outline"}
-                    >
+                    onClick={() => navigate("/auth")}
+                    className={`w-full h-11 rounded-xl transition-all duration-300 ${plan.popular ? "shadow-lg shadow-primary/30 hover:shadow-primary/50" : ""}`}
+                    variant={plan.popular ? "default" : "outline"}>
+                    
                       {t('free_start_btn', 'Pulsuz başla')} <ArrowRight className="w-4 h-4 ml-1" />
                     </Button>
                     <div className="space-y-3">
-                      {plan.features.map((feature) => (
-                        <div key={feature} className="flex items-start gap-2.5 text-sm">
+                      {plan.features.map((feature) =>
+                    <div key={feature} className="flex items-start gap-2.5 text-sm">
                           <Check className="w-4 h-4 text-secondary mt-0.5 shrink-0" />
                           <span>{feature}</span>
                         </div>
-                      ))}
-                      {plan.notIncluded.map((feature) => (
-                        <div key={feature} className="flex items-start gap-2.5 text-sm text-muted-foreground/50">
+                    )}
+                      {plan.notIncluded.map((feature) =>
+                    <div key={feature} className="flex items-start gap-2.5 text-sm text-muted-foreground/50">
                           <Check className="w-4 h-4 mt-0.5 shrink-0 opacity-30" />
                           <span className="line-through">{feature}</span>
                         </div>
-                      ))}
+                    )}
                     </div>
                   </CardContent>
                 </Card>
               </motion.div>
-            ))}
+            )}
           </div>
         </div>
       </section>
 
       {/* ═══ FAQ (CMS) ═══ */}
-      {cmsFaqs.length > 0 && (
-        <section id="faq" className="py-20 md:py-28">
+      {cmsFaqs.length > 0 &&
+      <section id="faq" className="py-20 md:py-28">
           <div className="container mx-auto px-4 max-w-3xl">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12 space-y-4">
               <motion.div variants={fadeUp} custom={0}>
@@ -1090,24 +1090,24 @@ const Landing = () => {
             </motion.div>
 
             <Accordion type="single" collapsible className="space-y-3">
-              {cmsFaqs.map((faq: any, i: number) => (
-                <motion.div
-                  key={faq.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.05 }}
-                >
+              {cmsFaqs.map((faq: any, i: number) =>
+            <motion.div
+              key={faq.id}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.05 }}>
+              
                   <AccordionItem value={faq.id} className="border border-border/40 rounded-xl px-5 glass-card">
-                    <AccordionTrigger className="text-left font-medium hover:no-underline py-4">{locale !== 'az' ? (tField('cms_faqs', faq.id, 'question', faq.question) || faq.question) : faq.question}</AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground pb-4">{locale !== 'az' ? (tField('cms_faqs', faq.id, 'answer', faq.answer) || faq.answer) : faq.answer}</AccordionContent>
+                    <AccordionTrigger className="text-left font-medium hover:no-underline py-4">{locale !== 'az' ? tField('cms_faqs', faq.id, 'question', faq.question) || faq.question : faq.question}</AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pb-4">{locale !== 'az' ? tField('cms_faqs', faq.id, 'answer', faq.answer) || faq.answer : faq.answer}</AccordionContent>
                   </AccordionItem>
                 </motion.div>
-              ))}
+            )}
             </Accordion>
           </div>
         </section>
-      )}
+      }
 
       {/* ═══ CTA ═══ */}
       <section className="py-20 md:py-28">
@@ -1116,24 +1116,24 @@ const Landing = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="max-w-4xl mx-auto text-center rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 via-card to-secondary/5 p-12 md:p-20 space-y-8 shadow-2xl relative overflow-hidden"
-          >
+            className="max-w-4xl mx-auto text-center rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 via-card to-secondary/5 p-12 md:p-20 space-y-8 shadow-2xl relative overflow-hidden">
+            
             {/* Ambient glow */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-primary/10 blur-[120px] -z-10" />
 
             <motion.div
               animate={{ scale: [1, 1.05, 1] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mx-auto shadow-glow"
-            >
+              className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mx-auto shadow-glow">
+              
               <span className="text-3xl">🚀</span>
             </motion.div>
             <h2 className="text-3xl md:text-5xl font-bold">
               {t('cta_title', 'Emosiyaları ölçməyə başlayın. Satışları qoruyun.')}
             </h2>
-            <p className="text-muted-foreground text-lg max-w-md mx-auto">
-              {t('cta_subtitle', '')}
-            </p>
+            
+
+            
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
               <Button size="lg" onClick={() => navigate("/auth")} className="text-base px-10 h-14 rounded-2xl gap-2 shadow-xl shadow-primary/30 hover:shadow-primary/50 text-lg transition-all duration-300 hover:scale-[1.02]">
                 {t('nav_free_start', 'Pulsuz başlayın')} <ArrowRight className="w-5 h-5" />
@@ -1211,8 +1211,8 @@ const Landing = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>);
+
 };
 
 export default Landing;
