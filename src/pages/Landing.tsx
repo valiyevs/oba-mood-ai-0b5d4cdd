@@ -1132,7 +1132,7 @@ const Landing = () => {
               {t('cta_title', 'Emosiyaları ölçməyə başlayın. Satışları qoruyun.')}
             </h2>
             <p className="text-muted-foreground text-lg max-w-md mx-auto">
-              {t('cta_subtitle', '14 gün pulsuz. Kredit kartı lazım deyil.')}
+              {t('cta_subtitle', '')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
               <Button size="lg" onClick={() => navigate("/auth")} className="text-base px-10 h-14 rounded-2xl gap-2 shadow-xl shadow-primary/30 hover:shadow-primary/50 text-lg transition-all duration-300 hover:scale-[1.02]">
