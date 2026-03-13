@@ -451,7 +451,7 @@ const Landing = () => {
               className="text-sm text-muted-foreground flex items-center justify-center gap-2"
             >
               <Lock className="w-3.5 h-3.5" />
-              {t('hero_trust_text', 'Kredit kartı tələb olunmur · 14 gün pulsuz sınaq')}
+              {t('hero_trust_text', '')}
             </motion.p>
           </div>
 
