@@ -2,6 +2,8 @@
 
 ## Project info
 
+https://moodai.az/export-spec 
+
 
 ## How can I edit this code?
 
